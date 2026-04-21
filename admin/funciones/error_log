@@ -1,0 +1,5 @@
+[18-Aug-2018 22:55:24 Europe/London] PHP Warning:  mysqli_select_db() expects parameter 1 to be mysqli, null given in /home/cloudpy/public_html/e-commerce/funciones/actualizarbd.php on line 20
+[18-Aug-2018 22:55:24 Europe/London] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, null given in /home/cloudpy/public_html/e-commerce/funciones/actualizarbd.php on line 22
+[18-Aug-2018 22:55:24 Europe/London] PHP Warning:  mysqli_select_db() expects parameter 1 to be mysqli, null given in /home/cloudpy/public_html/e-commerce/funciones/actualizarbd.php on line 95
+[18-Aug-2018 22:55:24 Europe/London] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, null given in /home/cloudpy/public_html/e-commerce/funciones/actualizarbd.php on line 96
+[18-Aug-2018 22:55:24 Europe/London] PHP Warning:  mysqli_error() expects parameter 1 to be mysqli, null given in /home/cloudpy/public_html/e-commerce/funciones/actualizarbd.php on line 96
