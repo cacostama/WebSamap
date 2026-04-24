@@ -16,6 +16,15 @@ Dos superficies:
 
 Legacy vive en `legacy/` (read-only reference).
 
+## Brand basics
+
+Referencia: `Logos y colores.pdf` entregado por cliente.
+
+- **Azul institucional** (llamitas y tipografía Red Hospitales IASD): `#274767` / variantes cercanas `#254564`, `#274266`.
+- **Verde mar SAMAP** (bandas envolventes): `#6CA3AB` / variante `#74A4B0`.
+- **Neutro oscuro**: `#2F2E2D`.
+- Usar esta paleta como base visual. Evitar verdes genéricos, azules saturados o paletas monocromáticas no alineadas.
+
 ## Tech stack
 
 - **Runtime**: Node.js 20 LTS
