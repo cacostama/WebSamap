@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #274767;
+  --color-brand-blue-light: #254564;
+  --color-brand-blue-dark: #274266;
+  --color-brand-green: #6CA3AB;
+  --color-brand-green-dark: #4A8A87;
+  --color-brand-green-light: #74A4B0;
+  --color-brand-blue-5: #f0f4f7;
+  --color-brand-blue-10: #e1e8ed;
+  --color-neutral-dark: #2F2E2D;
+  --color-neutral-gray: #6B6B6B;
+  
+  --font-display: "DM Serif Display", serif;
+  --font-body: "DM Sans", sans-serif;
+}
+
+:root {
+  --background: #FAFAFA;
+  --foreground: #2F2E2D;
+  --muted: #6B6B6B;
+  --border: #E5E5E5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+/* Modal animations */
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modal-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modal-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+.animate-modal-in {
+  animation: modal-scale-in 300ms ease-out forwards;
+}
+
+.animate-modal-out {
+  animation: modal-scale-out 200ms ease-in forwards;
+}
+
+.animate-backdrop-in {
+  animation: modal-fade-in 200ms ease-out forwards;
+}
+
+.animate-backdrop-out {
+  animation: modal-fade-out 200ms ease-in forwards;
+}
+
+/* Hide scrollbar for carousel */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade-in animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 300ms ease-out forwards;
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Carousel transitions */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
