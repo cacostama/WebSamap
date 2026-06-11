@@ -28,7 +28,7 @@
     $totalRows_servicios = mysqli_num_rows($servicios);
 
     mysqli_select_db($connect, $database);
-    $query_medicos = 'SELECT * FROM tbl_medicos ORDER BY id DESC';
+    $query_medicos = "SELECT * FROM tbl_medicos WHERE imagen IS NOT NULL AND imagen <> '' ORDER BY id DESC";
     $medicos = mysqli_query($connect, $query_medicos) or die(mysqli_error($link));
     $row_medicos = mysqli_fetch_assoc($medicos);
     $totalRows_medicos = mysqli_num_rows($medicos);

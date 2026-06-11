@@ -2,8 +2,8 @@
 	require_once('funciones/db.php');
 	
 
-//$login= $_GET['log'];
-//$captcha= $_GET['captcha'];
+$login   = $_GET['log'] ?? '';
+$captcha = $_GET['captcha'] ?? '';
 header( 'X-Frame-Options: SAMEORIGIN' );
 
 ?>
@@ -25,14 +25,17 @@ header( 'X-Frame-Options: SAMEORIGIN' );
 	
 	
 					session_start();
-					
-					include("conexion.php");
-					$usuario= $conexion->real_escape_string($_POST['usuario']);
-					$contrasena= $conexion->real_escape_string($_POST['clave']);
-					
-					$proceso = $conexion->query("SELECT * FROM tbl_user WHERE userName= '$usuario' AND userPass= md5('$contrasena')");
 
-					
+					include("conexion.php");
+					$usuario = $_POST['usuario'];
+					$contrasena = $_POST['clave'];
+
+					$stmt = $conexion->prepare("SELECT * FROM tbl_user WHERE userName = ? AND userPass = md5(?)");
+					$stmt->bind_param('ss', $usuario, $contrasena);
+					$stmt->execute();
+					$proceso = $stmt->get_result();
+
+
 					if($resultado = mysqli_fetch_array($proceso)){
 
 						$_SESSION['ADM_Username'] = $usuario;

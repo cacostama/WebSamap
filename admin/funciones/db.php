@@ -3,16 +3,19 @@
 //error_reporting(0);
 date_default_timezone_set('America/Asuncion');
 
-$hostname = 'localhost';
-$database = 'web_samap';
-$username = 'webadmin';
-$password = 's2m2p.m2st3r';
+$hostname = getenv('DB_HOST') ?: 'db';
+$database = getenv('DB_NAME') ?: 'web_samap';
+$username = getenv('DB_USER') ?: 'webadmin';
+$password = getenv('DB_PASS') ?: 's2m2p.m2st3r';
 $connect = mysqli_connect($hostname, $username, $password) or mysqli_error($connect);
 mysqli_set_charset($connect, 'utf8');
 
 
 
-$URL = 'https://'.$_SERVER['HTTP_HOST'].'/';
+$esHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+    || (($_SERVER['SERVER_PORT'] ?? '') == 443);
+$URL = ($esHttps ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].'/';
 
 $ruta = '../documentos/';
 $ruta_marca = '../documentos/marca/';
@@ -49,7 +52,6 @@ require_once('session.php');
 
 
 #header("Content-Security-Policy: default-src 'self'");
-#header("X-Content-Security-Policy: default-src 'self'"); 
-//header("Cache-Control: max-age=2592000"); 
-?>
+#header("X-Content-Security-Policy: default-src 'self'");
+//header("Cache-Control: max-age=2592000");
 
