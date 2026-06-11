@@ -47,6 +47,10 @@
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
 
+    <!-- rediseño -->
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-nosotros.css">
+
 </head>
 
 <body>
@@ -58,128 +62,146 @@
     <?php include 'header.php'; ?>
     <!-- header-section end -->
 
-    <!-- Banner Start -->
-    <section class="banner">
-        <div class="container ">
-            <div class="row ">
-                <div class="col-lg-12">
-                    <div class="banner__content">
-                        <h1 class="banner__title wow fadeInLeft" data-wow-duration="1.2s">Nosotros</h1> 
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb wow fadeInRight" data-wow-duration="1.2s">
-                                <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Nosotros</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+    <!-- Rediseño Nosotros Start -->
+    <main class="rd-nosotros">
+
+      <!-- HERO -->
+      <section class="rd-hero">
+        <div class="rd-container">
+          <ol class="rd-breadcrumb">
+            <li><a href="<?php echo $URL?>">Inicio</a></li>
+            <li class="is-active">Nosotros</li>
+          </ol>
+          <h1 class="rd-hero__title">NOSOTROS</h1>
+          <p class="rd-hero__lead">Más de 40 años cuidando la salud de miles de familias paraguayas, con el respaldo del Sanatorio Adventista de Asunción.</p>
         </div>
-    </section>
-    <!-- Banner End -->
+      </section>
 
-    <!-- Service start -->
-    <section class="section service">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="section__header">
-                        <h2 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">SAMAP</h2>
-                        <p class=" wow fadeInDown" data-wow-duration="1.5s" style="text-align:justify" >Más de 43 años cuidando tu salud con compromiso y calidez.
-<br><br>
-SAMAP es medicina prepaga del Sanatorio Adventista de Asunción, y desde hace más de tres décadas acompañamos a miles de familias con un servicio médico confiable, humano y accesible.
-<br><br>
-Nuestra historia comenzó con el propósito de brindar una cobertura de salud basada en la excelencia médica y los valores cristianos. Con el paso del tiempo, fuimos creciendo y adaptándonos a los nuevos desafíos del sector, sin perder de vista lo más importante: el cuidado integral de nuestros asegurados.
-<br><br>
-Hoy, más de 8.000 personas confían en nosotros. Contamos con una red de prestadores de primer nivel en todo el país y un centro médico propio —el Sanatorio Adventista— con tecnología de vanguardia, atención personalizada y un enfoque que contempla el bienestar físico, mental y espiritual.
-<br><br>
-En SAMAP, creemos que la salud se cuida todos los días, con empatía, responsabilidad y cercanía. Por eso, miramos al futuro con el mismo compromiso que nos impulsó desde el principio, dispuestos a seguir siendo tu mejor respaldo en salud.
-<br><br>
-</p>
- 
-                        
-
-    
-                    </div>
-                </div>
+      <!-- NUESTRA HISTORIA -->
+      <section class="rd-section rd-section--center">
+        <div class="rd-container">
+          <h2 class="rd-title">Nuestra Historia</h2>
+          <p class="rd-subtitle">Un camino de crecimiento constante al servicio del bienestar de nuestros asegurados.</p>
+          <div class="rd-timeline">
+            <div class="rd-timeline__item">
+              <span class="rd-timeline__year">1983</span>
+              <h3>Nace SAMAP</h3>
+              <p>Comenzamos con el respaldo del Sanatorio Adventista de Asunción, con el propósito de brindar una cobertura basada en la excelencia médica y valores cristianos.</p>
             </div>
-            <div class="container">
-  <div class="row">
-    <!-- MISIÓN -->
-    <div class="col-md-6 mb-4">
-      <h3 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">MISIÓN</h3>
-      <p class="wow fadeInDown" data-wow-duration="1.5s" style="text-align: justify;">
-        Ser una institución de salud autosustentable, dedicada a la atención y promoción de la salud física, mental, social y espiritual de nuestros asegurados, pacientes y comunidad, siguiendo el ejemplo del Señor Jesús, el Médico de los médicos.
-      </p>
-    </div>
-
-    <!-- VISIÓN -->
-    <div class="col-md-6 mb-4">
-      <h3 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">VISIÓN</h3>
-      <p class="wow fadeInDown" data-wow-duration="1.5s" style="text-align: justify;">
-        Ser una institución de salud con altos estándares de calidad en la prevención y tratamiento de la enfermedad, promoviendo la salud integral de nuestros asegurados, pacientes y comunidad.
-      </p>
-    </div>
-  </div>
-</div>
-<div class="container mt-5">
-  <h3 class="section__header-title wow fadeInUp text-center" data-wow-duration="1.2s">EQUIPO DIRECTIVO</h3>
-  
-  <div class="row mt-4">
-    <!-- Imagen 1 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/EDER.jpg" alt="Miembro 1" class="img-fluid rounded shadow-sm mb-2">
-  
-    </div>
-    
-    <!-- Imagen 2 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/JUAN CARLOS.jpg" alt="Miembro 2" class="img-fluid rounded shadow-sm mb-2">
-    
-    </div>
-
-    <!-- Imagen 3 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/NESTOR.jpg" alt="Miembro 3" class="img-fluid rounded shadow-sm mb-2">
-
-    </div>
-
-    <!-- Imagen 4 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/JORGE INGLES.jpg" alt="Miembro 4" class="img-fluid rounded shadow-sm mb-2">
-     
-    </div>
-
-
-    <!-- Imagen 5 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/MARCOS.jpg" alt="Miembro 6" class="img-fluid rounded shadow-sm mb-2">
-      
-    </div>
-
-    <!-- Imagen 6 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/NATALY.jpg" alt="Miembro 7" class="img-fluid rounded shadow-sm mb-2">
-      
-    </div>
-
-    <!-- Imagen 7 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/ROCIO.jpg" alt="Miembro 8" class="img-fluid rounded shadow-sm mb-2">
-     
-    </div>
-<!-- Imagen 8 -->
-    <div class="col-md-3 col-sm-6 mb-4 text-center">
-      <img src="https://www.samap.com.py/assets/images/RAQUEL.jpg" alt="Miembro 8" class="img-fluid rounded shadow-sm mb-2">
-     
-    </div>
-  </div>
-</div>
-
-            
+            <div class="rd-timeline__item">
+              <span class="rd-timeline__year">1995</span>
+              <h3>Más servicios y red</h3>
+              <p>Ampliamos nuestros servicios y la red de atención, llegando a más ciudades con prestadores de primer nivel en todo el país.</p>
+            </div>
+            <div class="rd-timeline__item">
+              <span class="rd-timeline__year">2005</span>
+              <h3>Nuevas coberturas</h3>
+              <p>Incorporamos nuevas coberturas y beneficios, adaptándonos a las necesidades de cada etapa de la vida de nuestros socios.</p>
+            </div>
+            <div class="rd-timeline__item">
+              <span class="rd-timeline__year">Hoy</span>
+              <h3>Miles de familias</h3>
+              <p>Miles de familias confían en SAMAP. Seguimos creciendo con el mismo compromiso humano, responsable y cercano de siempre.</p>
+            </div>
+          </div>
         </div>
-    </section>
-    <!-- Service End -->
+      </section>
+
+      <!-- MISIÓN Y VISIÓN -->
+      <section class="rd-section rd-section--alt">
+        <div class="rd-container">
+          <div class="rd-grid-2">
+            <article class="rd-card">
+              <div class="rd-card__icon"><i class="fas fa-bullseye"></i></div>
+              <h3>Misión</h3>
+              <p>Ser una institución de salud autosustentable, dedicada a la atención y promoción de la salud física, mental, social y espiritual de nuestros asegurados, pacientes y comunidad, siguiendo el ejemplo del Señor Jesús, el Médico de los médicos.</p>
+            </article>
+            <article class="rd-card">
+              <div class="rd-card__icon"><i class="fas fa-eye"></i></div>
+              <h3>Visión</h3>
+              <p>Ser una institución de salud con altos estándares de calidad en la prevención y tratamiento de la enfermedad, promoviendo la salud integral de nuestros asegurados, pacientes y comunidad.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- NUESTROS VALORES -->
+      <section class="rd-section rd-section--center">
+        <div class="rd-container">
+          <h2 class="rd-title">Nuestros Valores</h2>
+          <p class="rd-subtitle">Los principios que guían cada decisión y cada gesto de cuidado.</p>
+          <div class="rd-values">
+            <div class="rd-value">
+              <div class="rd-value__icon"><i class="fas fa-handshake"></i></div>
+              <h4>Compromiso</h4>
+              <p>Cuidamos tu salud todos los días, con responsabilidad.</p>
+            </div>
+            <div class="rd-value">
+              <div class="rd-value__icon"><i class="fas fa-hand-holding-heart"></i></div>
+              <h4>Servicio</h4>
+              <p>Atención humana y cálida en cada contacto.</p>
+            </div>
+            <div class="rd-value">
+              <div class="rd-value__icon"><i class="fas fa-award"></i></div>
+              <h4>Excelencia</h4>
+              <p>Altos estándares de calidad médica y tecnología.</p>
+            </div>
+            <div class="rd-value">
+              <div class="rd-value__icon"><i class="fas fa-shield-heart"></i></div>
+              <h4>Integridad</h4>
+              <p>Transparencia y ética en todo lo que hacemos.</p>
+            </div>
+            <div class="rd-value">
+              <div class="rd-value__icon"><i class="fas fa-people-group"></i></div>
+              <h4>Cercanía</h4>
+              <p>Acompañamos a cada familia como propia.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATS -->
+      <section class="rd-section rd-band">
+        <div class="rd-container">
+          <div class="rd-stats">
+            <div class="rd-stat">
+              <div class="rd-stat__num"><span>+40</span></div>
+              <span class="rd-stat__label">años de experiencia</span>
+            </div>
+            <div class="rd-stat">
+              <div class="rd-stat__num"><span>+120.000</span></div>
+              <span class="rd-stat__label">asegurados</span>
+            </div>
+            <div class="rd-stat">
+              <div class="rd-stat__num"><span>+1.200</span></div>
+              <span class="rd-stat__label">especialistas</span>
+            </div>
+            <div class="rd-stat">
+              <div class="rd-stat__num"><span>+500</span></div>
+              <span class="rd-stat__label">convenios</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EQUIPO MÉDICO -->
+      <section class="rd-section">
+        <div class="rd-container">
+          <div class="rd-team">
+            <div class="rd-team__media">
+              <img src="<?php echo $URL?>documentos/home-bg-1.png" alt="Equipo médico de SAMAP" loading="lazy" onerror="this.src='<?php echo $URL?>assets/images/EDER.jpg'">
+            </div>
+            <div class="rd-team__text">
+              <h2 class="rd-title">Un equipo que cuida de vos</h2>
+              <p>SAMAP es medicina prepaga del Sanatorio Adventista de Asunción. Desde hace más de tres décadas acompañamos a miles de familias con un servicio médico confiable, humano y accesible.</p>
+              <p>Contamos con una red de prestadores de primer nivel en todo el país y un centro médico propio —el Sanatorio Adventista— con tecnología de vanguardia, atención personalizada y un enfoque que contempla el bienestar físico, mental y espiritual. Creemos que la salud se cuida todos los días, con empatía, responsabilidad y cercanía.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+    <!-- Rediseño Nosotros End -->
  
     <!-- newsletter Start -->
     <?php include 'newsletter.php'; ?>

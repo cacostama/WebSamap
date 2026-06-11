@@ -5,63 +5,77 @@
     $row_planesH = mysqli_fetch_assoc($planesH);
     $totalRows_planesH = mysqli_num_rows($planesH);
 ?>
-<header class="header_area">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nav class="navbar navbar-expand-lg nav-shadow" id="#navbar">
-                    <a class="navbar-brand" href="<?php echo $URL?>"><img src="<?php echo $URL?>assets/images/logo.png" class="logo" alt="logo"></a>
-                    <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="collapse navbar-collapse justify-content-center " id="navbar-content">
-                        <ul class="navbar-nav mb-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo $URL?>nosotros/">Nosotros</a>
-                            </li>
-							<li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Planes </a>
-                                <ul class="dropdown-menu">
-									<?php do{ ?>
-                                		<li><a class="dropdown-item" href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planesH['titulo']); ?>/cod/<?php echo $row_planesH['id']; ?>/"><?php echo $row_planesH['titulo']; ?></a></li>
-                      				<?php 
-                                    	$row_planesH = mysqli_fetch_assoc($planesH);
-                                    	} while ($row_planesH);   //end horizontal looper 
-                                	?>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="https://api.whatsapp.com/send?phone=5950982304977">Visaciones</a>
-                            </li>
-                            <!--<li class="nav-item">
-                                <a target="_blank" class="nav-link" href="https://7you.app/career/">Trabaje con Nosotros</a>
-                            </li>-->
-                            <li class="nav-item">
-                                <a class="nav-link" href="https://api.whatsapp.com/send?phone=595972520828" target="_blank">Facturación Electrónica</a>
-                            </li>
+<link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+<header class="rd-nav" id="rdNav">
+    <div class="rd-nav__inner">
+        <a class="rd-nav__brand" href="<?php echo $URL?>">
+            <img src="<?php echo $URL?>assets/images/logo.png" alt="SAMAP">
+        </a>
 
-<!--
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Facturacion </a>
-                                <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="doctor.html">Doctor's</a></li>
-                                <li><a class="dropdown-item" href="doctor-details.html">Doctor's Details</a></li>
-                                <li><a class="dropdown-item" href="service-details.html">Service Details</a></li>
-                                <li><a class="dropdown-item" href="blog-details.html">Blog Details</a></li>
-                                <li><a class="dropdown-item" href="gallery.html">Gallery</a></li>
-                                <li><a class="dropdown-item" href="coming-soon.html">Coming Soon</a></li>
-                                <li><a class="dropdown-item" href="404-error.html">404 Error</a></li>
-                                </ul>
-                            </li>
--->
+        <button class="rd-nav__toggle" type="button" id="rdNavToggle" aria-label="Abrir menú" aria-controls="rdNavMenu" aria-expanded="false">
+            <i class="fas fa-bars"></i>
+        </button>
 
-                        </ul> 
-                    </div>
-                    <div class="btn_nav">
-                        <a href="<?php echo $URL?>contactos/" class="btn_theme">Contactos</a>
-                    </div>
-                </nav>
-            </div>
+        <ul class="rd-nav__menu" id="rdNavMenu">
+            <li><a class="rd-nav__link" href="<?php echo $URL?>">Inicio</a></li>
+
+            <li class="rd-dropdown">
+                <a class="rd-nav__link" href="<?php echo $URL?>planes/" role="button" aria-haspopup="true" aria-expanded="false">
+                    Planes <i class="fas fa-chevron-down" style="font-size:.7em"></i>
+                </a>
+                <ul class="rd-dropdown__menu">
+                    <?php do{ ?>
+                        <li><a class="rd-dropdown__item" href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planesH['titulo']); ?>/cod/<?php echo $row_planesH['id']; ?>/"><?php echo $row_planesH['titulo']; ?></a></li>
+                    <?php
+                        $row_planesH = mysqli_fetch_assoc($planesH);
+                    } while ($row_planesH);   //end horizontal looper
+                    ?>
+                </ul>
+            </li>
+
+            <li><a class="rd-nav__link" href="<?php echo $URL?>guiamedica/">Guía Médica</a></li>
+            <li><a class="rd-nav__link" href="<?php echo $URL?>convenios/">Convenios</a></li>
+            <li><a class="rd-nav__link" href="<?php echo $URL?>nosotros/">Nosotros</a></li>
+            <li><a class="rd-nav__link" href="<?php echo $URL?>contactos/">Contacto</a></li>
+
+            <li class="rd-nav__actions">
+                <a href="<?php echo $URL?>contactos/" class="rd-btn rd-btn--azul">Solicitar información</a>
+                <a class="rd-nav__wa" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="rd-nav__actions">
+            <a href="<?php echo $URL?>contactos/" class="rd-btn rd-btn--azul">Solicitar información</a>
+            <a class="rd-nav__wa" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
         </div>
+
+        <div class="rd-nav__overlay" id="rdNavOverlay"></div>
     </div>
 </header>
+
+<script>
+(function () {
+    var nav = document.getElementById('rdNav');
+    var toggle = document.getElementById('rdNavToggle');
+    var overlay = document.getElementById('rdNavOverlay');
+    if (!nav || !toggle) return;
+    function close() {
+        nav.classList.remove('is-open');
+        document.body.classList.remove('rd-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+    toggle.addEventListener('click', function () {
+        var open = nav.classList.toggle('is-open');
+        document.body.classList.toggle('rd-nav-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    if (overlay) overlay.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+    });
+})();
+</script>

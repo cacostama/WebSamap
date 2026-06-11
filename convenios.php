@@ -47,6 +47,9 @@
     
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <!-- rediseno css -->
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css">
 
 </head>
 
@@ -59,60 +62,115 @@
     <?php include 'header.php'; ?>
     <!-- header-section end -->
 
-    <!-- Banner Start -->
-    <section class="banner">
-        <div class="container ">
-            <div class="row ">
-                <div class="col-lg-12">
-                    <div class="banner__content">
-                        <h1 class="banner__title wow fadeInLeft" data-wow-duration="1.2s">Convenios</h1> 
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb wow fadeInRight" data-wow-duration="1.2s">
-                                <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Convenios</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+    <div class="rd-cv">
+
+    <!-- Hero Start -->
+    <section class="rd-hero">
+        <div class="rd-container rd-hero__inner">
+            <h1 class="rd-hero__title">Convenios <span>y Beneficios</span></h1>
+            <p class="rd-hero__lead">Accedé a una amplia red de convenios nacionales, asistencia internacional al viajero y descuentos exclusivos pensados para vos y tu familia.</p>
+            <nav class="rd-hero__crumb" aria-label="breadcrumb">
+                <a href="<?php echo $URL;?>">Inicio</a> <span>/</span> <span>Convenios</span>
+            </nav>
         </div>
     </section>
-    <!-- Banner End -->
+    <!-- Hero End -->
 
-    <!-- Service start -->
-    <section class="section service">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="section__header">
-                        <h2 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">Nuestros Convenios</h2>
-                        <p class=" wow fadeInDown" data-wow-duration="1.5s">Con un enfoque dedicado y profesionales comprometidos, te ofrecemos atención integral para tu salud. </p>
-                    </div>
-                </div>
+    <!-- Convenios Nacionales (datos DB: tbl_convenios) Start -->
+    <section class="rd-section">
+        <div class="rd-container">
+            <div class="rd-section__header">
+                <span class="rd-eyebrow">Red SAMAP</span>
+                <h2 class="rd-title">Convenios Nacionales</h2>
+                <p class="rd-subtitle">Comercios, instituciones y aliados que acompañan tu bienestar con un enfoque dedicado y profesionales comprometidos.</p>
             </div>
-            <div class="row gy-3 gy-md-4">
 
-                <?php do { ?>
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="service__card wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.3s">
-                            <div class="service__card-icon mb_40 mx-auto">
-                                <img src="<?php echo $URL?>documentos/<?php echo $row_convenios['imagen'];?>" alt="Icon">
-                            </div>
-                            <h4 class="mb_30"><?php echo $row_convenios['titulo'];?></h4>
-                            <p class="mb_40"><?php echo $row_convenios['intro'];?></p>
-                            <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_convenios['titulo']); ?>/cod/<?php echo $row_convenios['id']; ?>/" class="service__card-read-more">Más info</a>
+            <div class="rd-grid">
+                <?php if ($totalRows_convenios > 0) { do { ?>
+                    <article class="rd-card">
+                        <div class="rd-card__logo">
+                            <img src="<?php echo $URL?>documentos/<?php echo $row_convenios['imagen'];?>" alt="<?php echo $row_convenios['titulo'];?>">
                         </div>
-                    </div>
-                <?php 
+                        <h3 class="rd-card__title"><?php echo $row_convenios['titulo'];?></h3>
+                        <p class="rd-card__text"><?php echo $row_convenios['ciudad'];?></p>
+                        <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_convenios['titulo']); ?>/cod/<?php echo $row_convenios['id']; ?>/" class="rd-card__link">Más info</a>
+                    </article>
+                <?php
                     $row_convenios = mysqli_fetch_assoc($convenios);
-                    } while ($row_convenios);   //end horizontal looper 
-                ?>
-    
+                    } while ($row_convenios); }   //end horizontal looper
+                else { ?>
+                    <p class="rd-empty">Pronto sumaremos nuevos convenios.</p>
+                <?php } ?>
             </div>
-            
+
+            <div class="rd-cv__cta">
+                <a href="<?php echo $URL;?>convenios/" class="rd-btn rd-btn--azul">Ver todos los convenios</a>
+            </div>
         </div>
     </section>
-    <!-- Service End -->
+    <!-- Convenios Nacionales End -->
+
+    <!-- Beneficios Internacionales (Assist Card) Start -->
+    <section class="rd-section rd-section--celeste">
+        <div class="rd-container">
+            <div class="rd-assist">
+                <div class="rd-assist__icon"><i class="fas fa-plane-departure"></i></div>
+                <div class="rd-assist__body">
+                    <span class="rd-assist__eyebrow">Beneficios Internacionales</span>
+                    <h2 class="rd-assist__title">Assist Card — Asistencia al viajero</h2>
+                    <p class="rd-assist__text">Viajá tranquilo con cobertura de asistencia médica internacional. Estés donde estés, contás con el respaldo de SAMAP y la red global de Assist Card.</p>
+                    <a href="<?php echo $URL;?>contactos/" class="rd-btn rd-btn--azul">Conocer beneficio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Beneficios Internacionales End -->
+
+    <!-- Descuentos Exclusivos Start -->
+    <section class="rd-section">
+        <div class="rd-container">
+            <div class="rd-section__header">
+                <span class="rd-eyebrow">Solo para socios</span>
+                <h2 class="rd-title">Descuentos Exclusivos</h2>
+                <p class="rd-subtitle">Aprovechá precios preferenciales en una red de comercios y servicios de salud aliados.</p>
+            </div>
+
+            <div class="rd-disc-grid">
+                <article class="rd-disc">
+                    <div class="rd-disc__icon"><i class="fas fa-prescription-bottle-alt"></i></div>
+                    <h3 class="rd-disc__name">Farmacias</h3>
+                    <span class="rd-disc__pct">Hasta 25%<small>de descuento</small></span>
+                </article>
+                <article class="rd-disc">
+                    <div class="rd-disc__icon"><i class="fas fa-glasses"></i></div>
+                    <h3 class="rd-disc__name">Ópticas</h3>
+                    <span class="rd-disc__pct">Hasta 30%<small>de descuento</small></span>
+                </article>
+                <article class="rd-disc">
+                    <div class="rd-disc__icon"><i class="fas fa-vials"></i></div>
+                    <h3 class="rd-disc__name">Laboratorios</h3>
+                    <span class="rd-disc__pct">Hasta 20%<small>de descuento</small></span>
+                </article>
+                <article class="rd-disc">
+                    <div class="rd-disc__icon"><i class="fas fa-dumbbell"></i></div>
+                    <h3 class="rd-disc__name">Gimnasios</h3>
+                    <span class="rd-disc__pct">Hasta 15%<small>de descuento</small></span>
+                </article>
+                <article class="rd-disc rd-disc--more">
+                    <div class="rd-disc__icon"><i class="fas fa-ellipsis-h"></i></div>
+                    <h3 class="rd-disc__name">Y más</h3>
+                    <p class="rd-disc__sub">Nuevos aliados cada mes</p>
+                </article>
+            </div>
+
+            <div class="rd-cv__cta">
+                <a href="<?php echo $URL;?>beneficios/" class="rd-btn rd-btn--ghost">Ver todos los beneficios</a>
+            </div>
+        </div>
+    </section>
+    <!-- Descuentos Exclusivos End -->
+
+    </div><!-- /.rd-cv -->
  
     <!-- newsletter Start -->
     <?php include 'newsletter.php'; ?>

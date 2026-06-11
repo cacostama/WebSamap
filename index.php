@@ -78,6 +78,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <!-- rediseno css -->
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-home.css">
 
 </head>
 
@@ -90,163 +93,136 @@
     <?php include 'header.php'; ?>
     <!-- header-section end -->
    
-    <!-- Hero Section Start --><br><br>
-    <section class="hero-area">
-        <div style="margin-top: 120px;" >
-            <div class="row align-items-center">
-                
-                <div class="col-xl-12">
-                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-    <a href="https://www.samap.com.py/planes/" >
-      <img src="documentos/slider/web01.jpg" class="d-block w-100" alt="...">
-    </a>
-    </div>
-  </div>
-    <div class="carousel-inner">
-    <div class="carousel-item ">
-    <a onclick="mostrarCobertura()">
-      <img src="documentos/slider/banner-viaje.jpg" class="d-block w-100" alt="...">
-    </a>
-    </div>
-  </div>
-     <div class="carousel-inner">
-    <div class="carousel-item">
-    <a href="https://www.samap.com.py/planes/" >
-      <img src="documentos/slider/banner-corporativo.jpg" class="d-block w-100" alt="...">
-    </a>
-    </div>
-  </div>
-      <div class="carousel-inner">
-    <div class="carousel-item">
-    <a href="https://www.samap.com.py/planes/" >
-      <img src="documentos/slider/banner-sanatorio.jpg" class="d-block w-100" alt="...">
-    </a>
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
+    <!-- Hero Section Start (rediseño) -->
+    <section class="rd-hero">
+        <div class="rd-container">
+            <div class="rd-hero__grid">
+                <div class="rd-hero__content">
+                    <span class="rd-hero__eyebrow">Medicina Prepaga · Sanatorio Adventista</span>
+                    <h1 class="rd-hero__title">Cuidándote siempre</h1>
+                    <p class="rd-hero__subtitle">Cobertura médica para vos y tu familia con el respaldo del Sanatorio Adventista.</p>
+                    <div class="rd-hero__cta">
+                        <a href="https://api.whatsapp.com/send?phone=5950982304977" class="rd-btn rd-btn--wa">
+                            <i class="fa-brands fa-whatsapp"></i> Solicitar información
+                        </a>
+                        <a href="<?php echo $URL?>planes/" class="rd-btn rd-btn--azul">Conocer planes</a>
+                    </div>
+                </div>
+                <div class="rd-hero__media">
+                    <img src="<?php echo $URL?>documentos/slider/web01.jpg" alt="Familia con cobertura médica SAMAP">
+                </div>
+            </div>
+
+            <!-- Mini-stats -->
+            <div class="rd-stats">
+                <div class="rd-stats__item">
+                    <span class="rd-stats__num">+40</span>
+                    <span class="rd-stats__label">años de experiencia</span>
+                </div>
+                <div class="rd-stats__item">
+                    <span class="rd-stats__num">+8.000</span>
+                    <span class="rd-stats__label">familias adheridas</span>
+                </div>
+                <div class="rd-stats__item">
+                    <span class="rd-stats__num">Respaldo</span>
+                    <span class="rd-stats__label">del Sanatorio Adventista</span>
                 </div>
             </div>
         </div>
     </section>
     <!--Hero Section End -->
-
-    <!-- Countdown Start -->
-    <section class="section countdown wow fadeInUp" data-wow-duration="1.2s">
-        <div class="container">
-            <div class="row align-items-center gy-3 gy-lg-0">
-                <div class="col-6 col-sm-6 col-lg-3">
-                    <div class="countdown__part wow fadeInUp" data-wow-duration="1.2s">
-                        <h3 class="theme_color d-inline-flex align-items-center mb_30"><span class="odometer" data-odometer-final="50"></span> <span>+</span></h3>
-                        <div class="fs-4">Convenios</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-6 col-lg-3">
-                    <div class="countdown__part wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.3s">                            
-                        <h3 class="theme_color mb_30"><span class="odometer" data-odometer-final="8000"></span> <span>+</span></h3>
-                        <div class="fs-4">Adheridos</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-6 col-lg-3">
-                    <div class="countdown__part wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.6s">
-                        <h3 class="theme_color mb_30"><span class="odometer" data-odometer-final="30"></span> <span>+</span></h3>
-                        <div class="fs-4">Años de Experiencia</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-6 col-lg-3">
-                    <div class="countdown__part wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.9s">
-                        <h3 class="theme_color mb_30"><span class="odometer" data-odometer-final="50"></span> <span>+</span></h3>
-                        <div class="fs-4">Especialidades</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Countdown End -->
     
-    <!-- about us start -->
-    <section class="section about">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="about__single-thumb wow fadeInLeft" data-wow-duration="1.5s">
-                        <img src="<?php echo $URL?>assets/images/about_img.png" alt="Image">
-                    </div>
+    <!-- ¿Por qué elegir SAMAP? start (rediseño) -->
+    <section class="rd-section rd-why">
+        <div class="rd-container">
+            <div class="rd-why__header">
+                <span class="rd-section__eyebrow">Beneficios</span>
+                <h2 class="rd-title">¿Por qué elegir SAMAP?</h2>
+                <p class="rd-subtitle">Atención integral para tu salud, con un enfoque dedicado y profesionales comprometidos.</p>
+            </div>
+            <div class="rd-grid rd-why__grid">
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-hospital"></i></div>
+                    <h4>Respaldo Médico</h4>
+                    <p>El aval del Sanatorio Adventista en cada plan.</p>
                 </div>
-                <div class="col-md-10 col-lg-6">
-                    <div class="section__content">
-                        <div class="section__content-sub-title word d-inline-flex">
-                            <!--
-                            <span data-wow-duration="1.1s" data-wow-delay="0.1s" class="letter headingFour wow fadeInDown">S</span>
-                            <span data-wow-duration="1.1s" data-wow-delay="0.2s" class="letter headingFour wow fadeInDown">A</span>
-                            <span data-wow-duration="1.1s" data-wow-delay="0.3s" class="letter headingFour wow fadeInDown">M</span>
-                            <span data-wow-duration="1.1s" data-wow-delay="0.4s" class="letter headingFour wow fadeInDown">A</span>
-                            <span data-wow-duration="1.1s" data-wow-delay="0.5s" class="letter headingFour wow fadeInDown">P</span>
-
-                            <span data-wow-duration="1.1s" data-wow-delay="0.6s" class="letter headingFour wow fadeInDown">&nbsp;U</span>
-                            <span data-wow-duration="1.1s" data-wow-delay="0.7s" class="letter headingFour wow fadeInDown">s</span>
--->
-
-                        </div>
-                        <h2 class="section__content-title wow fadeInUp" data-wow-duration="1.3s">UN PLAN para cada necesidad <span class="theme_color">SAMAP</span> </h2>
-                        <p class="section__content-text wow fadeInDown" data-wow-duration="1.5s"> Nuestra amplia gama de planes está diseñada para adaptarse a tus requerimientos individuales, brindándote la cobertura perfecta que necesitas en cada etapa de tu vida.</p>
-                        <div class="section__content-inner wow fadeInRight" data-wow-duration="1.5s">
-                            <ul>
-                            
-                            	<li><span class="material-symbols-outlined"> done </span> ALFA AMBULATORIO </li>
-                            	<li><span class="material-symbols-outlined"> done </span> KIDS </li>
-                            	<li><span class="material-symbols-outlined"> done </span> ALFA </li>
-                            	<li><span class="material-symbols-outlined"> done </span> SENIOR </li>
-                            	
-                            	<li><span class="material-symbols-outlined"> done </span> BETA </li>
-                            	
-                            	<li><span class="material-symbols-outlined"> done </span> MATERNO </li>
-                            	<li><span class="material-symbols-outlined"> done </span> SEVEN </li>
-                               <!-- <?php do { ?>
-
-                                    <li><span class="material-symbols-outlined"> done </span><?php echo $row_planes['titulo']; ?></li>
-
-                                <?php 
-                                    $row_planes = mysqli_fetch_assoc($planes);
-                                    } while ($row_planes);   //end horizontal looper 
-                                ?> -->
-                            </ul>
-                        </div>
-                        <a href="<?php echo $URL?>planes/" class="btn_theme btn_dark_border mt_40 wow fadeInLeft" data-wow-duration="1.5s">Más información</a>
-                    </div>
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-truck-medical"></i></div>
+                    <h4>Emergencias</h4>
+                    <p>Atención de urgencias cuando más lo necesitás.</p>
                 </div>
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-user-doctor"></i></div>
+                    <h4>Especialistas</h4>
+                    <p>Una amplia red de profesionales calificados.</p>
+                </div>
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-handshake"></i></div>
+                    <h4>Convenios</h4>
+                    <p>Acceso a sanatorios y centros de todo el país.</p>
+                </div>
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-gift"></i></div>
+                    <h4>Beneficios Exclusivos</h4>
+                    <p>Descuentos y ventajas pensadas para vos.</p>
+                </div>
+                <div class="rd-card rd-why__card">
+                    <div class="rd-why__icon"><i class="fa-solid fa-bolt"></i></div>
+                    <h4>Gestión Ágil</h4>
+                    <p>Trámites simples y respuestas rápidas.</p>
+                </div>
+            </div>
+            <p class="rd-why__closing">Un plan para <span>cada etapa</span> de la vida.</p>
+        </div>
+    </section>
+    <!-- ¿Por qué elegir SAMAP? end -->
+
+    <!-- Planes por etapa start (rediseño, datos de tbl_planes) -->
+    <section class="rd-section rd-planes">
+        <div class="rd-container">
+            <div class="rd-why__header">
+                <span class="rd-section__eyebrow">Nuestros planes</span>
+                <h2 class="rd-title">Un plan para cada etapa de la vida</h2>
+                <p class="rd-subtitle">Elegí la cobertura que mejor se adapta a vos y a tu familia.</p>
+            </div>
+            <div class="rd-grid rd-planes__grid">
+                <?php do { ?>
+                    <div class="rd-card rd-plan__card">
+                        <a href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planes['titulo']); ?>/cod/<?php echo $row_planes['id']; ?>/" class="rd-plan__thumb">
+                            <img src="<?php echo $URL?>documentos/planes/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
+                        </a>
+                        <div class="rd-plan__body">
+                            <h4 class="rd-plan__name"><?php echo $row_planes['titulo']; ?></h4>
+                            <p class="rd-plan__text">Cobertura pensada para acompañarte en cada momento.</p>
+                            <a href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planes['titulo']); ?>/cod/<?php echo $row_planes['id']; ?>/" class="rd-btn rd-btn--azul rd-btn--sm">Ver plan</a>
+                        </div>
+                    </div>
+                <?php
+                    $row_planes = mysqli_fetch_assoc($planes);
+                    } while ($row_planes);   //end horizontal looper
+                ?>
             </div>
         </div>
     </section>
-    <!-- about us end -->
+    <!-- Planes por etapa End -->
 
-    <!-- call to action start -->
-    <section class="section call-to-action" data-background="<?php echo $URL?>assets/images/call_to_action.png">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-7">
-                    <div class="section__content text-center">
-                        <h2 class="section__content-title text-white wow fadeInUp" data-wow-duration="1.2s">GUÍA MÉDICA SAMAP</h2>
-                        <p class="headingThree text-white wow fadeInDown" data-wow-duration="1.5s">Consultá los servicios que ofrecemos</p>
-                        <div class="section__content-cta customGapThree">
-                            <a href="<?php echo $URL?>guiamedica/" class="btn_theme btn_light wow fadeInLeft" data-wow-duration="1.2s">VER GUÍA MEDICA</a>
-                            <a href="https://api.whatsapp.com/send?phone=5950982304977" class="btn_theme btn_light_border wow fadeInRight" data-wow-duration="1.2s">VISACIONES</a>
-                        </div>
-                    </div>
+    <!-- Banda buscador guía médica start (rediseño) -->
+    <section class="rd-band rd-band--medicos">
+        <div class="rd-container">
+            <div class="rd-band__inner">
+                <div class="rd-band__text">
+                    <h2 class="rd-band__title">Encontrá tu médico en segundos</h2>
+                    <p class="rd-band__subtitle">Buscá por especialidad, médico o centro en nuestra Guía Médica.</p>
                 </div>
+                <form class="rd-band__search" action="<?php echo $URL?>guiamedica/" method="get">
+                    <i class="fa-solid fa-magnifying-glass rd-band__search-icon"></i>
+                    <input type="text" name="buscar" class="rd-band__input" placeholder="Especialidad, médico o centro...">
+                    <button type="submit" class="rd-btn rd-btn--wa">Buscar</button>
+                </form>
             </div>
         </div>
     </section>
-    <!-- call to action End -->
+    <!-- Banda buscador guía médica End -->
 
     <!-- Service start -->
     <section class="section service wow fadeInUp" data-wow-duration="0.4s">
