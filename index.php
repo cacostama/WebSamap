@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="rd-hero__media">
-                    <img src="<?php echo $URL?>documentos/slider/web01.jpg" alt="Familia con cobertura médica SAMAP">
+                    <img src="<?php echo $URL?>documentos/slider/03.jpg" alt="Familia con cobertura médica SAMAP">
                 </div>
             </div>
 

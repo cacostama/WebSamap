@@ -143,6 +143,9 @@
   gap: .75rem;
   flex-shrink: 0;
 }
+/* En desktop solo se ve el bloque de acciones standalone (fuera del menú);
+   el que está dentro del <ul> es exclusivo del panel mobile. */
+.rd-nav__menu .rd-nav__actions { display: none; }
 .rd-nav__wa {
   display: inline-flex;
   align-items: center;
