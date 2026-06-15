@@ -11,7 +11,7 @@
 
 ?> 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -133,8 +133,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

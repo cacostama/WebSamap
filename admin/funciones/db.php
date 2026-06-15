@@ -5,8 +5,12 @@ date_default_timezone_set('America/Asuncion');
 
 $hostname = getenv('DB_HOST') ?: 'db';
 $database = getenv('DB_NAME') ?: 'web_samap';
-$username = getenv('DB_USER') ?: 'webadmin';
-$password = getenv('DB_PASS') ?: 's2m2p.m2st3r';
+$username = getenv('DB_USER');
+$password = getenv('DB_PASS');
+if ($username === false || $username === '' || $password === false) {
+    http_response_code(500);
+    die('Configuracion de base de datos faltante. Defina DB_USER y DB_PASS en el entorno.');
+}
 $connect = mysqli_connect($hostname, $username, $password) or mysqli_error($connect);
 mysqli_set_charset($connect, 'utf8');
 

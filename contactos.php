@@ -1,6 +1,6 @@
 <?php require_once('funciones/db.php');?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -11,10 +11,13 @@
     <link rel="shortcut icon" href="<?php echo $URL?>assets/images/favicon.png" type="image/x-icon">
     <!-- #title -->
     <title>SAMAP - Contactos</title>
-    <!-- #keywords -->
-    <meta name="keywords" content="pharmaceutical, Medical">
-    <!-- #description -->
-    <meta name="description" content="Medical HTML5 Template">
+    <!-- #seo -->
+    <?php
+        $seoTitle = 'Contacto — SAMAP Medicina Prepaga';
+        $seoDesc  = 'Contactá con SAMAP. Resolvé tus consultas sobre planes, coberturas y beneficios. Estamos para acompañarte en el cuidado de tu salud.';
+        $seoKeywords = 'contacto SAMAP, consultas, atención al cliente, medicina prepaga Paraguay';
+        include 'funciones/seo.php';
+    ?>
 
     <!--  css dependencies start  -->
 
@@ -93,7 +96,7 @@
                 </div>
                 <div class="col-xl-6">
                     <div class="contact__form mt-5 mt-xl-0 wow fadeInRight" data-wow-duration="1.5s">
-                        <form method="post" action="https://www.samap.com.py/enviar.php" class="contact__form-mail text-center" novalidate="novalidate">
+                        <form method="post" action="<?php echo $URL?>enviar.php" class="contact__form-mail text-center" novalidate="novalidate">
                             <div class="in-box mb_20">
                                 <input type="text" class="form-control" name="nombre" id="name" placeholder="Nombre" required>
                             </div>
@@ -106,8 +109,23 @@
                             <div class="in-box">
                                 <textarea class="form-control" id="message" name="mensaje" rows="5" placeholder="Mensaje" required></textarea>
                             </div>
-                            <span id="msg"></span> 
-    
+
+                            <!-- Honeypot anti-spam: oculto para humanos, los bots lo completan -->
+                            <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                                <label>No completar este campo
+                                    <input type="text" name="website" tabindex="-1" autocomplete="off">
+                                </label>
+                            </div>
+
+                            <div class="in-box mb_20 text-start" style="margin-top:15px;">
+                                <label style="font-size:14px;display:flex;gap:8px;align-items:flex-start;">
+                                    <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px;">
+                                    <span>Acepto que mis datos sean utilizados para responder mi consulta, conforme a la <a href="<?php echo $URL?>privacidad/" target="_blank" rel="noopener">política de privacidad</a> (Ley 6534/20).</span>
+                                </label>
+                            </div>
+
+                            <span id="msg"></span>
+
                             <button type="submit" class="btn_theme mt_40" name="submit" id="submit">Enviar</button>
                         </form>
                     </div>
@@ -135,8 +153,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

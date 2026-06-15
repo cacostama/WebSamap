@@ -32,7 +32,7 @@
     <div class="rd-footer__inner">
         <div class="rd-footer__brand">
             <a href="<?php echo $URL?>">
-                <img src="<?php echo $URL?>assets/images/footer_logo.png" alt="SAMAP">
+                <img src="<?php echo $URL?>assets/images/footer_logo.png" alt="SAMAP" loading="lazy" decoding="async">
             </a>
             <ul class="rd-footer__contact">
                 <li>
@@ -74,7 +74,7 @@
 
     <div class="rd-footer__bottom">
         <div class="rd-footer__bottom-inner">
-            <p class="copyright">Copyright © <span id="copyYear"></span> <a href="<?php echo $URL?>">SAMAP</a>. Todos los derechos reservados</p>
+            <p class="copyright">Copyright © <span id="copyYear"></span> <a href="<?php echo $URL?>">SAMAP</a>. Todos los derechos reservados · <a href="<?php echo $URL?>privacidad/">Política de Privacidad</a></p>
         </div>
     </div>
 </footer>

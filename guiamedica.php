@@ -326,7 +326,7 @@
     } 
 ?> 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -337,10 +337,13 @@
     <link rel="shortcut icon" href="<?php echo $URL?>assets/images/favicon.png" type="image/x-icon">
     <!-- #title -->
     <title>SAMAP - Guía Médica</title>
-    <!-- #keywords -->
-    <meta name="keywords" content="pharmaceutical, Medical">
-    <!-- #description -->
-    <meta name="description" content="Medical HTML5 Template">
+    <!-- #seo -->
+    <?php
+        $seoTitle = 'Guía Médica — SAMAP';
+        $seoDesc  = 'Buscá profesionales y especialidades en la guía médica de SAMAP. Encontrá tu médico por especialidad, ciudad y sanatorio. Descargá la guía en PDF.';
+        $seoKeywords = 'guía médica SAMAP, médicos, especialidades, prestadores, sanatorios Paraguay';
+        include 'funciones/seo.php';
+    ?>
 
     <!--  css dependencies start  -->
 
@@ -501,8 +504,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

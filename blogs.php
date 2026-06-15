@@ -23,7 +23,7 @@
 ?> 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -101,7 +101,7 @@
                         <?php do { ?>
                             <div class="blog__single wow fadeInUp" data-wow-duration="1.2s">
                                 <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blog['titulo']); ?>/cod/<?php echo $row_blog['id']; ?>/" class="blog__thumb">
-                                    <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image">
+                                    <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image" loading="lazy" decoding="async">
                                 </a>
                                 <div class="blog__content">
                                     <p class="blog__content-meta">
@@ -140,7 +140,7 @@
                             <div class="sidebar__post-single">
                                 <div class="latest-post__thumb">
                                     <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogUltimos['titulo']); ?>/cod/<?php echo $row_blogUltimos['id']; ?>/" title="Read More">
-                                        <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blogUltimos['imagen']; ?>" alt="Blog">
+                                        <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blogUltimos['imagen']; ?>" alt="Blog" loading="lazy" decoding="async">
                                     </a>
                                 </div>
                                 <div class="latest-post__content">
@@ -194,8 +194,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

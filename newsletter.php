@@ -17,7 +17,7 @@
             </div>
             <div class="col-md-4 col-lg-5 col-xl-4 d-none d-md-block">
                 <div class="newsletter_img wow fadeInRight" data-wow-duration="1.2s">
-                    <img src="<?php echo $URL?>assets/images/newsletter_img.png" alt="Image">
+                    <img src="<?php echo $URL?>assets/images/newsletter_img.png" alt="Image" loading="lazy" decoding="async">
                 </div>
             </div>
         </div>

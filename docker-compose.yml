@@ -13,6 +13,13 @@ services:
       DB_NAME: ${DB_NAME:-web_samap}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      LEADS_TO: ${LEADS_TO}
+      LEADS_BCC: ${LEADS_BCC}
     depends_on:
       db:
         condition: service_healthy

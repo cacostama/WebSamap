@@ -42,7 +42,7 @@
 ?>  
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -53,10 +53,12 @@
     <link rel="shortcut icon" href="<?php echo $URL?>assets/images/favicon.png" type="image/x-icon">
     <!-- #title -->
     <title>SAMAP - Medicina Prepaga - Sanatorio Adventista</title>
-    <!-- #keywords -->
-    <meta name="keywords" content="pharmaceutical, Medical">
-    <!-- #description -->
-    <meta name="description" content="Medical HTML5 Template">
+    <!-- #seo -->
+    <?php
+        $seoTitle = 'SAMAP — Medicina Prepaga del Sanatorio Adventista';
+        $seoDesc  = 'SAMAP, medicina prepaga del Sanatorio Adventista de Asunción. Más de 35 años cuidando la salud de las familias paraguayas con planes a tu medida.';
+        include 'funciones/seo.php';
+    ?>
 
     <!--  css dependencies start  -->
 
@@ -109,7 +111,7 @@
                     </div>
                 </div>
                 <div class="rd-hero__media">
-                    <img src="<?php echo $URL?>documentos/slider/03.jpg" alt="Familia con cobertura médica SAMAP">
+                    <img src="<?php echo $URL?>documentos/slider/03.jpg" alt="Familia con cobertura médica SAMAP" fetchpriority="high" decoding="async">
                 </div>
             </div>
 
@@ -189,7 +191,7 @@
                 <?php do { ?>
                     <div class="rd-card rd-plan__card">
                         <a href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planes['titulo']); ?>/cod/<?php echo $row_planes['id']; ?>/" class="rd-plan__thumb">
-                            <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
+                            <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>" loading="lazy" decoding="async">
                         </a>
                         <div class="rd-plan__body">
                             <h4 class="rd-plan__name"><?php echo $row_planes['titulo']; ?></h4>
@@ -253,35 +255,35 @@
                         <div class="testimonial__slider-card text-center wow fadeInUp" data-wow-duration="1.2s">
                             <p class="mb_20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisi nisl velit, amet eget mattis Id all off the most popular think libero. </p>
                             <div class="testimonial__slider-card-author">
-                                <img src="<?php echo $URL?>assets/images/review.png" class="author mb_12" alt="image">
+                                <img src="<?php echo $URL?>assets/images/review.png" class="author mb_12" alt="image" loading="lazy" decoding="async">
                                 <h5 class="font_600">Mrttino Pal</h5>
                             </div>
                         </div>
                         <div class="testimonial__slider-card text-center wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.3s">
                             <p class="mb_20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisi nisl velit, amet eget mattis Id all off the most popular think libero. </p>
                             <div class="testimonial__slider-card-author">
-                                <img src="<?php echo $URL?>assets/images/review2.png" class="author mb_12" alt="image">
+                                <img src="<?php echo $URL?>assets/images/review2.png" class="author mb_12" alt="image" loading="lazy" decoding="async">
                                 <h5 class="font_600">Robert Fox</h5>
                             </div>
                         </div>
                         <div class="testimonial__slider-card text-center wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.6s">
                             <p class="mb_20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisi nisl velit, amet eget mattis Id all off the most popular think libero. </p>
                             <div class="testimonial__slider-card-author">
-                                <img src="<?php echo $URL?>assets/images/review3.png" class="author mb_12" alt="image">
+                                <img src="<?php echo $URL?>assets/images/review3.png" class="author mb_12" alt="image" loading="lazy" decoding="async">
                                 <h5 class="font_600">Alina Mardin</h5>
                             </div>
                         </div>
                         <div class="testimonial__slider-card text-center wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.9s">
                             <p class="mb_20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisi nisl velit, amet eget mattis Id all off the most popular think libero. </p>
                             <div class="testimonial__slider-card-author">
-                                <img src="<?php echo $URL?>assets/images/review.png" class="author mb_12" alt="image">
+                                <img src="<?php echo $URL?>assets/images/review.png" class="author mb_12" alt="image" loading="lazy" decoding="async">
                                 <h5 class="font_600">Mrttino Pal</h5>
                             </div>
                         </div>
                         <div class="testimonial__slider-card text-center wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="1.2s">
                             <p class="mb_20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisi nisl velit, amet eget mattis Id all off the most popular think libero. </p>
                             <div class="testimonial__slider-card-author">
-                                <img src="<?php echo $URL?>assets/images/review2.png" class="author mb_12" alt="image">
+                                <img src="<?php echo $URL?>assets/images/review2.png" class="author mb_12" alt="image" loading="lazy" decoding="async">
                                 <h5 class="font_600">Robert Fox</h5>
                             </div>
                         </div>
@@ -314,7 +316,7 @@
                 <div class="col-12 col-md-6">
                     <div class="blog-articles__card wow fadeInUp" data-wow-duration="1.2s">
                         <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blog['titulo']); ?>/cod/<?php echo $row_blog['id']; ?>/" class="blog-articles__card-thumb">
-                            <img style="width: 100%; height: 400px; object-fit: cover; object-position: center;" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image">
+                            <img style="width: 100%; height: 400px; object-fit: cover; object-position: center;" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image" loading="lazy" decoding="async">
                         </a>
                         <div class="blog-articles__card-content">
 
@@ -370,8 +372,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

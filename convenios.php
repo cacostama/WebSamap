@@ -11,7 +11,7 @@
 
 ?> 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -22,10 +22,13 @@
     <link rel="shortcut icon" href="<?php echo $URL?>assets/images/favicon.png" type="image/x-icon">
     <!-- #title -->
     <title>SAMAP - Convenios</title>
-    <!-- #keywords -->
-    <meta name="keywords" content="pharmaceutical, Medical">
-    <!-- #description -->
-    <meta name="description" content="Medical HTML5 Template">
+    <!-- #seo -->
+    <?php
+        $seoTitle = 'Convenios — SAMAP Medicina Prepaga';
+        $seoDesc  = 'Red de convenios y prestadores de SAMAP. Accedé a descuentos y servicios exclusivos para vos y tu familia en todo el país.';
+        $seoKeywords = 'convenios SAMAP, prestadores, red médica, descuentos, beneficios socios';
+        include 'funciones/seo.php';
+    ?>
 
     <!--  css dependencies start  -->
 
@@ -89,7 +92,7 @@
                 <?php if ($totalRows_convenios > 0) { do { ?>
                     <article class="rd-card">
                         <div class="rd-card__logo">
-                            <img src="<?php echo $URL?>documentos/<?php echo $row_convenios['imagen'];?>" alt="<?php echo $row_convenios['titulo'];?>">
+                            <img src="<?php echo $URL?>documentos/<?php echo $row_convenios['imagen'];?>" alt="<?php echo $row_convenios['titulo'];?>" loading="lazy" decoding="async">
                         </div>
                         <h3 class="rd-card__title"><?php echo $row_convenios['titulo'];?></h3>
                         <p class="rd-card__text"><?php echo $row_convenios['ciudad'];?></p>
@@ -158,7 +161,7 @@
                 </article>
                 <article class="rd-disc rd-disc--gym">
                     <div class="rd-disc__brand">
-                        <img src="<?php echo $URL?>documentos/aliados/nueva-onda-gimnasio.png" alt="Nueva Onda Gimnasio">
+                        <img src="<?php echo $URL?>documentos/aliados/nueva-onda-gimnasio.png" alt="Nueva Onda Gimnasio" loading="lazy" decoding="async">
                     </div>
                     <div class="rd-disc__benefits">
                         <h3 class="rd-disc__name">Nueva Onda Gimnasio</h3>
@@ -198,8 +201,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->

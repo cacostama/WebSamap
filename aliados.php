@@ -11,7 +11,7 @@
 
 ?> 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <!-- required meta -->
@@ -96,7 +96,7 @@
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="service__card wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.3s">
                             <div class="service__card-icon mb_40 mx-auto">
-                                <img src="<?php echo $URL?>documentos/aliados/<?php echo$row_aliados['imagen'];?>" alt="Icon">
+                                <img src="<?php echo $URL?>documentos/aliados/<?php echo$row_aliados['imagen'];?>" alt="Icon" loading="lazy" decoding="async">
                             </div>
                             <h4 class="mb_30"><?php echo$row_aliados['titulo'];?></h4>
                             <p class="mb_40"><?php echo$row_aliados['intro'];?></p>
@@ -133,8 +133,6 @@
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
     <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- circular-progress-bar -->
-    <script src="https://cdn.jsdelivr.net/gh/tomik23/circular-progress-bar@latest/docs/circularProgressBar.min.js"></script>
     <!-- slick js -->
     <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
     <!-- odometer js -->
