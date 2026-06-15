@@ -77,5 +77,19 @@
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') close();
     });
+
+    // Acordeón "Planes" en mobile: el link padre abre/cierra el submenú en
+    // lugar de navegar. En desktop (>991px) sigue siendo hover + link normal.
+    var dropdown = nav.querySelector('.rd-dropdown');
+    if (dropdown) {
+        var parentLink = dropdown.querySelector('.rd-nav__link');
+        parentLink.addEventListener('click', function (e) {
+            if (window.matchMedia('(max-width: 991px)').matches) {
+                e.preventDefault();
+                var open = dropdown.classList.toggle('is-expanded');
+                parentLink.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+        });
+    }
 })();
 </script>

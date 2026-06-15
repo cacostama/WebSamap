@@ -345,6 +345,10 @@
     scroll-padding-inline:12px;
     scrollbar-width:thin;
     padding-bottom:12px;
+    /* anular margenes negativos del .row de Bootstrap que desbordan la pantalla */
+    margin-left:0;
+    margin-right:0;
+    max-width:100%;
   }
   .rd-hscroll > [class*="col-"]{
     flex:0 0 46%;

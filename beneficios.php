@@ -151,6 +151,11 @@
                     <h3 class="rd-disc__name">Laboratorios</h3>
                     <span class="rd-disc__pct">Hasta 20%<small>de descuento</small></span>
                 </article>
+                <article class="rd-disc rd-disc--more">
+                    <div class="rd-disc__icon"><i class="fas fa-ellipsis-h"></i></div>
+                    <h3 class="rd-disc__name">Y más</h3>
+                    <p class="rd-disc__sub">Nuevos aliados cada mes</p>
+                </article>
                 <article class="rd-disc rd-disc--gym">
                     <div class="rd-disc__brand">
                         <img src="<?php echo $URL?>documentos/aliados/nueva-onda-gimnasio.png" alt="Nueva Onda Gimnasio">
@@ -162,11 +167,6 @@
                             <li>20% en planes para alumnos del gimnasio</li>
                         </ul>
                     </div>
-                </article>
-                <article class="rd-disc rd-disc--more">
-                    <div class="rd-disc__icon"><i class="fas fa-ellipsis-h"></i></div>
-                    <h3 class="rd-disc__name">Y más</h3>
-                    <p class="rd-disc__sub">Nuevos aliados cada mes</p>
                 </article>
             </div>
 

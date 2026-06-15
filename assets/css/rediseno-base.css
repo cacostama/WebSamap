@@ -16,6 +16,12 @@
   --radius: 16px;
 }
 
+/* ---------- Anti-overflow horizontal (mobile) ---------- */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* ---------- Botones compartidos ---------- */
 .rd-btn {
   display: inline-flex;
@@ -343,7 +349,7 @@
   .rd-nav__link:hover,
   .rd-nav__link:focus-visible { background: rgba(255, 255, 255, .1); color: #fff; }
 
-  /* Dropdown planes en mobile: siempre visible, anidado */
+  /* Dropdown planes en mobile: acordeón (colapsado por defecto) */
   .rd-dropdown__menu {
     position: static;
     opacity: 1;
@@ -351,9 +357,24 @@
     transform: none;
     box-shadow: none;
     background: rgba(0, 0, 0, .18);
+    padding: 0 .5rem;
+    margin: 0;
+    border-radius: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease, padding .3s ease, margin .3s ease;
+  }
+  .rd-dropdown.is-expanded .rd-dropdown__menu {
+    max-height: 600px;
     padding: .25rem .5rem;
     margin: .25rem 0 .5rem;
-    border-radius: 10px;
+  }
+  /* chevron gira al abrir */
+  .rd-dropdown > .rd-nav__link .fa-chevron-down {
+    transition: transform .25s ease;
+  }
+  .rd-dropdown.is-expanded > .rd-nav__link .fa-chevron-down {
+    transform: rotate(180deg);
   }
   .rd-dropdown__item { color: rgba(255, 255, 255, .85); }
   .rd-dropdown__item:hover { background: rgba(255, 255, 255, .1); color: #fff; }
