@@ -36,10 +36,6 @@
             </a>
             <ul class="rd-footer__contact">
                 <li>
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:asistente.ventas1@samap.com.py">asistente.ventas1@samap.com.py</a>
-                </li>
-                <li>
                     <i class="fas fa-phone"></i>
                     <a href="tel:+595212196700">021 219 6700</a>
                 </li>
@@ -59,20 +55,6 @@
                 <li><a href="<?php echo $URL?>aliados/">Alianzas</a></li>
                 <li><a href="<?php echo $URL?>nosotros/">Nosotros</a></li>
                 <li><a href="<?php echo $URL?>contactos/">Contacto</a></li>
-            </ul>
-        </div>
-
-        <div class="rd-footer__col">
-            <h5>Atención al cliente</h5>
-            <ul class="rd-footer__menu">
-                <li><a href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener">Visaciones</a></li>
-                <li><a href="https://api.whatsapp.com/send?phone=595972520828" target="_blank" rel="noopener">Facturación Electrónica</a></li>
-                <?php do { ?>
-                    <li><a href="<?php echo $URL?>beneficios/"><?php echo $row_serviciosCH['titulo'];?></a></li>
-                <?php
-                    $row_serviciosCH = mysqli_fetch_assoc($serviciosCH);
-                } while ($row_serviciosCH);   //end horizontal looper
-                ?>
             </ul>
         </div>
 

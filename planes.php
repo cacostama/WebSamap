@@ -46,6 +46,9 @@
     
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <!-- rediseno css -->
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css">
 
 </head>
 
@@ -58,63 +61,50 @@
     <?php include 'header.php'; ?>
     <!-- header-section end -->
 
-    <!-- Banner Start -->
-    <section class="banner">
-        <div class="container ">
-            <div class="row ">
-                <div class="col-lg-12">
-                    <div class="banner__content">
-                        <h1 class="banner__title wow fadeInLeft" data-wow-duration="1.2s">Planes</h1> 
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb wow fadeInRight" data-wow-duration="1.2s">
-                                <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Planes</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+    <div class="rd-cv">
+    <!-- Hero Start -->
+    <section class="rd-hero">
+        <div class="rd-container rd-hero__inner">
+            <h1 class="rd-hero__title">Nuestros <span>Planes</span></h1>
+            <p class="rd-hero__lead">Una amplia gama de planes pensados para cada etapa de tu vida: individuales, familiares y corporativos. Encontrá la cobertura ideal con la mejor red de prestadores.</p>
+            <nav class="rd-hero__crumb" aria-label="breadcrumb">
+                <a href="<?php echo $URL;?>">Inicio</a> <span>/</span> <span>Planes</span>
+            </nav>
         </div>
     </section>
-    <!-- Banner End -->
+    <!-- Hero End -->
 
-    <!-- Service start -->
-    <section class="section service">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="section__header">
-                        <h2 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">UN PLAN para cada necesidad</h2>
-                        <p class=" wow fadeInDown" data-wow-duration="1.5s">Descubre la tranquilidad de estar protegido con SAMAP. Nuestra amplia gama de planes esta diseñada para adaptarse a tus requerimientos individuales, familiares y corporativos, brindandote la cobertura ideal para cada etapa de tu vida.<br><br>
-En SAMAP entendemos que cada persona es única, por eso ofrecemos diferentes opciones para que encuentres el plan que se ajuste a tus necesidades. Con nuestra amplia red de los mejores prestadores a nivel nacional, obtén la seguridad y el respaldo que mereces, porque en SAMAP estamos, CUIDÁNDOTE SIEMPRE.</p>
-                    </div>
-                </div>
+    <!-- Planes (datos DB: tbl_planes) Start -->
+    <section class="rd-section">
+        <div class="rd-container">
+            <div class="rd-section__header">
+                <span class="rd-eyebrow">Cuidándote siempre</span>
+                <h2 class="rd-title">Un plan para cada necesidad</h2>
+                <p class="rd-subtitle">En SAMAP entendemos que cada persona es única. Por eso ofrecemos distintas opciones para que encuentres el plan que mejor se ajuste a vos y a tu familia.</p>
             </div>
-            <div class="row gy-3 gy-md-4">
 
-                <?php do { ?>
-
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="service__card wow fadeInUp" data-wow-duration="1.2s">
-                           
-                                <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="Icon">
-                            
-                            <h4 class="mb_30"><?php echo $row_planes['titulo']; ?></h4>
-                            <p class="mb_40" style="font-size: 15px"><?php echo $row_planes['detalle']; ?></p>
-                            <a target="_blank" href="https://wa.link/gza9hk" class="service__card-read-more">Consultar</a>
+            <div class="rd-grid">
+                <?php if ($totalRows_planes > 0) { do { ?>
+                    <article class="rd-card">
+                        <div class="rd-card__logo">
+                            <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
                         </div>
-                    </div>
-
-                <?php 
+                        <h3 class="rd-card__title"><?php echo $row_planes['titulo']; ?></h3>
+                        <p class="rd-card__text"><?php echo $row_planes['detalle']; ?></p>
+                        <a target="_blank" rel="noopener" href="https://wa.link/gza9hk" class="rd-card__link">Consultar</a>
+                    </article>
+                <?php
                     $row_planes = mysqli_fetch_assoc($planes);
-                    } while ($row_planes);   //end horizontal looper 
-                ?>
-    
+                    } while ($row_planes); }
+                else { ?>
+                    <p class="rd-empty">Pronto publicaremos nuestros planes.</p>
+                <?php } ?>
             </div>
-            
         </div>
     </section>
-    <!-- Service End -->
+    <!-- Planes End -->
+    </div><!-- /.rd-cv -->
+
  
     <!-- newsletter Start -->
     <?php include 'newsletter.php'; ?>

@@ -14,6 +14,14 @@
     $row_ciudad = mysqli_fetch_assoc($ciudad);
     $totalRows_ciudad = mysqli_num_rows($ciudad);
 
+    // Inicializacion de variables para evitar warnings cuando no hay busqueda
+    $VARespecialidad = '';
+    $VACiudad = '';
+    $VAMedico = '';
+    $row_especialidad2 = null;
+    $row_ciudad2 = null;
+    $editFormAction = $_SERVER['PHP_SELF'] ?? '';
+
     if ((isset($_POST["MM_search"])) && ($_POST["MM_search"] == "form2")) {
 
         $VARespecialidad= $_POST["Especialidad"];
@@ -425,13 +433,13 @@
             <div class="row gy-3 gy-md-4">
                 <p class=" wow fadeInDown" data-wow-duration="1.5s">
                 <strong style='color: red'><?php echo $totalRows_guia;?> </strong> Resultado/s encontrado/s para: 
-                <strong style='color: red'><?php echo $row_especialidad2['nombre'];?>, </strong>
-                <strong style='color: red'><?php echo $row_ciudad2['nombre'];?>, </strong>
+                <strong style='color: red'><?php echo $row_especialidad2['nombre'] ?? '';?>, </strong>
+                <strong style='color: red'><?php echo $row_ciudad2['nombre'] ?? '';?>, </strong>
                 <strong style='color: red'><?php echo $VAMedico; ?> </strong>
                 </p>
                 <table width="100%" border="0" cellspacing="10" cellpadding="10" class="table table-striped table-hover">
 
-                    <?php do { ?> 
+                    <?php if ($totalRows_guia > 0) { do { ?>
 
                       <tr >
                         <td style="border: solid 1px;">
@@ -453,9 +461,9 @@
 
                     <?php 
                         $row_guia = mysqli_fetch_assoc($guia);
-                        } while ($row_guia);   //end horizontal looper 
+                        } while ($row_guia); } //end horizontal looper
                     ?>
-                 
+
                 </table>
 
                 

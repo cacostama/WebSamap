@@ -12,10 +12,11 @@ mysqli_set_charset($connect, 'utf8');
 
 
 
-$esHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
-    || (($_SERVER['SERVER_PORT'] ?? '') == 443);
-$URL = ($esHttps ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].'/';
+// URL protocol-relative: los assets/links cargan siempre con el mismo
+// esquema que la pagina (http en local, https detras de un tunel/proxy
+// como tunnelmole, que no siempre envia X-Forwarded-Proto). Evita el
+// bloqueo de "mixed content" al compartir el sitio por HTTPS.
+$URL = '//'.$_SERVER['HTTP_HOST'].'/';
 
 $ruta = '../documentos/';
 $ruta_marca = '../documentos/marca/';

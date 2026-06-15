@@ -189,7 +189,7 @@
                 <?php do { ?>
                     <div class="rd-card rd-plan__card">
                         <a href="<?php echo $URL;?>plan-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_planes['titulo']); ?>/cod/<?php echo $row_planes['id']; ?>/" class="rd-plan__thumb">
-                            <img src="<?php echo $URL?>documentos/planes/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
+                            <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
                         </a>
                         <div class="rd-plan__body">
                             <h4 class="rd-plan__name"><?php echo $row_planes['titulo']; ?></h4>
@@ -224,116 +224,6 @@
     </section>
     <!-- Banda buscador guía médica End -->
 
-    <!-- Service start -->
-    <section class="section service wow fadeInUp" data-wow-duration="0.4s">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="section__header">
-                        <div class="section__header-sub-title word d-inline-flex">
-                            <span data-wow-delay=".1s" class="letter headingFour wow fadeInDown">B</span>
-                            <span data-wow-delay="0.2s" class="letter headingFour wow fadeInDown">e</span>
-                            <span data-wow-delay="0.3s" class="letter headingFour wow fadeInDown">n</span>
-                            <span data-wow-delay="0.4s" class="letter headingFour wow fadeInDown">e</span>
-                            <span data-wow-delay="0.5s" class="letter headingFour wow fadeInDown">f</span>
-                            <span data-wow-delay="0.6s" class="letter headingFour wow fadeInDown">i</span>
-                            <span data-wow-delay="0.7s" class="letter headingFour wow fadeInDown">c</span>
-                            <span data-wow-delay="0.8s" class="letter headingFour wow fadeInDown">i</span>
-                            <span data-wow-delay="0.9s" class="letter headingFour wow fadeInDown">o</span>
-                            <span data-wow-delay="1.0s" class="letter headingFour wow fadeInDown">s</span>
-                        </div>
-                        <h2 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">¿Por qué elegir SAMAP?</h2>
-                        <p class="section__header-content wow fadeInDown" data-wow-duration="1.5s">Con un enfoque dedicado y profesionales comprometidos, te ofrecemos atención integral para tu salud. </p>
-                    </div>
-                </div>
-            </div>
-            <div class="row gy-3 gy-md-4">
-                
-                <?php do { ?>
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="service__card wow fadeInUp" data-wow-duration="1.2s" data-wow-delay="0.3s">
-                            <div class="service__card-icon mb_40 mx-auto">
-                                <img src="<?php echo $URL?>documentos/servicios/<?php echo$row_servicios['imagen'];?>" alt="Icon">
-                            </div>
-                            <h4 class="mb_30"><?php echo $row_servicios['titulo'];?></h4>
-                            <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_servicios['titulo']); ?>/cod/<?php echo $row_servicios['id']; ?>/" class="service__card-read-more">Más info</a><!--<p class="mb_40"><?php echo$row_servicios['intro'];?></p> 
-                            <a href="#" class="service__card-read-more">Más info</a>-->
-                        </div>
-                    </div>
-                <?php 
-                    $row_servicios = mysqli_fetch_assoc($servicios);
-                    } while ($row_servicios);   //end horizontal looper 
-                ?>
-                
-            </div>
-            <div class="col-12 mx-auto">
-                <div class="section__cta wow fadeInLeft" data-wow-duration="1.2s">
-                    <a href="<?php echo $URL?>beneficios/" class="btn_theme">Ver más</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Service End -->
-
-    <!-- Team start -->
-    <section class="section team">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="section__header text-center">
-                        <div class="section__header-sub-title word d-inline-flex">
-                            <span data-wow-delay=".1s" class="letter text-white headingFour wow fadeInDown">D</span>
-                            <span data-wow-delay="0.2s" class="letter text-white headingFour wow fadeInDown">o</span>
-                            <span data-wow-delay="0.3s" class="letter text-white headingFour wow fadeInDown">c</span>
-                            <span data-wow-delay="0.4s" class="letter text-white headingFour wow fadeInDown">t</span>
-                            <span data-wow-delay="0.5s" class="letter text-white headingFour wow fadeInDown">o</span>
-                            <span data-wow-delay="0.6s" class="letter text-white headingFour wow fadeInDown">r</span>
-                        </div>
-                        <h2 class="section__header-title text-white wow fadeInUp" data-wow-duration="1.2s">MÉDICOS SAMAP</h2>
-                        <p class="section__header-content text-white wow fadeInDown" data-wow-duration="1.5s">En SAMAP, entendemos la importancia de elegir a los profesionales adecuados para tu salud. Nuestra red de médicos altamente calificados y comprometidos está aquí para brindarte la atención que mereces. </p>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="team__slider">
-                        <?php do { ?>
-                            <div class="team__slider-card text-center wow fadeInUp" data-wow-duration="1.2s">
-                                <div class="team__slider-card-thumb">
-                                    <a href="doctor-details.html">
-                                        <div style="width: 300px; height: 350px; overflow: hidden;">
-                                            <img style="width: 100%; height: 100%; object-fit: cover; object-position: center;" src="<?php echo $URL?>documentos/medicos/<?php echo$row_medicos['imagen'];?>" alt="Image">
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="" style=" width: 100%; /* Esto mantiene la proporción cuadrada */  background-color: #274266; position: relative; padding:10px;">
-                                    <h5 class="text-white" style="font-size: 15px;"><?php echo$row_medicos['titulo'];?> <?php echo$row_medicos['nombre'];?></h5>
-                                    <p class="text-white mb_12" style="font-size: 13px;"><?php echo$row_medicos['especialidad'];?><br>
-                                    <a href="tel:+122-212-2155" class="text-white" style="font-size: 15px;">Teléfono: (021) 219 6700</a></p>
-                                </div>
-                            </div>
-                        <?php 
-                            $row_medicos = mysqli_fetch_assoc($medicos);
-                            } while ($row_medicos);   //end horizontal looper 
-                        ?>
-                        
-
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="slider-navigation wow fadeInLeft" data-wow-duration="1.2s">
-                        <button class="prev-team pagination-button">
-                            <i class="fa-solid fa-angle-left"></i>
-                        </button>
-                        <div class="news__dots"></div>
-                        
-                        <button class="next-team pagination-button">
-                            <i class="fa-solid fa-angle-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-   <!-- Team End -->
 
     <!-- Testimonial start 
     <section class="section testimonial wow fadeInUp" data-wow-duration="0.4s">
@@ -419,7 +309,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row gy-4">
+            <div class="row gy-4 rd-hscroll">
                 <?php do { ?>
                 <div class="col-12 col-md-6">
                     <div class="blog-articles__card wow fadeInUp" data-wow-duration="1.2s">

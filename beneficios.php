@@ -151,10 +151,17 @@
                     <h3 class="rd-disc__name">Laboratorios</h3>
                     <span class="rd-disc__pct">Hasta 20%<small>de descuento</small></span>
                 </article>
-                <article class="rd-disc">
-                    <div class="rd-disc__icon"><i class="fas fa-dumbbell"></i></div>
-                    <h3 class="rd-disc__name">Gimnasios</h3>
-                    <span class="rd-disc__pct">Hasta 15%<small>de descuento</small></span>
+                <article class="rd-disc rd-disc--gym">
+                    <div class="rd-disc__brand">
+                        <img src="<?php echo $URL?>documentos/aliados/nueva-onda-gimnasio.png" alt="Nueva Onda Gimnasio">
+                    </div>
+                    <div class="rd-disc__benefits">
+                        <h3 class="rd-disc__name">Nueva Onda Gimnasio</h3>
+                        <ul>
+                            <li>Costo preferencial en las cuotas para asegurados de SAMAP</li>
+                            <li>20% en planes para alumnos del gimnasio</li>
+                        </ul>
+                    </div>
                 </article>
                 <article class="rd-disc rd-disc--more">
                     <div class="rd-disc__icon"><i class="fas fa-ellipsis-h"></i></div>

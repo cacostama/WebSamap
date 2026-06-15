@@ -308,16 +308,63 @@
   .rd-hero__grid{ grid-template-columns:1fr; gap:32px; }
   .rd-hero{ padding:100px 0 48px; }
   .rd-hero__media{ order:-1; }
-  .rd-why__grid{ grid-template-columns:repeat(2,1fr); }
-  .rd-planes__grid{ grid-template-columns:repeat(2,1fr); }
+
+  /* Beneficios y Planes en carrusel horizontal (tablet/celular) */
+  .rd-why__grid,
+  .rd-planes__grid{
+    display:flex;
+    grid-template-columns:none;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    gap:16px;
+    margin-inline:-20px;            /* sangría para que el primer/último card respire */
+    padding:4px 20px 14px;
+    scroll-padding-inline:20px;
+    scrollbar-width:thin;
+  }
+  .rd-why__grid > *,
+  .rd-planes__grid > *{
+    flex:0 0 46%;                   /* ~2 cards visibles en tablet */
+    scroll-snap-align:center;
+  }
+  .rd-why__grid::-webkit-scrollbar,
+  .rd-planes__grid::-webkit-scrollbar{ height:6px; }
+  .rd-why__grid::-webkit-scrollbar-thumb,
+  .rd-planes__grid::-webkit-scrollbar-thumb{
+    background:rgba(39,71,103,.25); border-radius:999px;
+  }
+
+  /* Carrusel horizontal para la seccion "Beneficios" (cards de tbl_servicios,
+     que usan grid Bootstrap .row > .col). Evita el corrido largo en vertical. */
+  .rd-hscroll{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scroll-padding-inline:12px;
+    scrollbar-width:thin;
+    padding-bottom:12px;
+  }
+  .rd-hscroll > [class*="col-"]{
+    flex:0 0 46%;
+    max-width:46%;
+    scroll-snap-align:center;
+  }
+  .rd-hscroll::-webkit-scrollbar{ height:6px; }
+  .rd-hscroll::-webkit-scrollbar-thumb{
+    background:rgba(39,71,103,.25); border-radius:999px;
+  }
 }
 @media (max-width:640px){
   .rd-section{ padding:48px 0; }
   .rd-hero__cta{ flex-direction:column; align-items:stretch; }
   .rd-hero__cta .rd-btn{ width:100%; }
   .rd-stats{ grid-template-columns:1fr; gap:16px; padding:22px; }
-  .rd-why__grid,
-  .rd-planes__grid{ grid-template-columns:1fr; }
+  /* en celular se ve ~1 card y se asoma el siguiente, invitando a deslizar */
+  .rd-why__grid > *,
+  .rd-planes__grid > *{ flex:0 0 80%; }
+  .rd-hscroll > [class*="col-"]{ flex:0 0 78%; max-width:78%; }
   .rd-band__inner{ flex-direction:column; align-items:stretch; text-align:center; }
   .rd-band__search{ max-width:100%; }
 }
