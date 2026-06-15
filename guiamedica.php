@@ -431,12 +431,20 @@
                 </div>
             </div>
             <div class="row gy-3 gy-md-4">
-                <p class=" wow fadeInDown" data-wow-duration="1.5s">
-                <strong style='color: red'><?php echo $totalRows_guia;?> </strong> Resultado/s encontrado/s para: 
-                <strong style='color: red'><?php echo $row_especialidad2['nombre'] ?? '';?>, </strong>
-                <strong style='color: red'><?php echo $row_ciudad2['nombre'] ?? '';?>, </strong>
-                <strong style='color: red'><?php echo $VAMedico; ?> </strong>
-                </p>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2" style="margin-bottom:8px;">
+                    <p class="wow fadeInDown m-0" data-wow-duration="1.5s">
+                    <strong style='color: red'><?php echo $totalRows_guia;?> </strong> Resultado/s encontrado/s para:
+                    <strong style='color: red'><?php echo $row_especialidad2['nombre'] ?? '';?>, </strong>
+                    <strong style='color: red'><?php echo $row_ciudad2['nombre'] ?? '';?>, </strong>
+                    <strong style='color: red'><?php echo $VAMedico; ?> </strong>
+                    </p>
+                    <a href="<?php echo $URL?>guiamedica-pdf.php?esp=<?php echo urlencode($VARespecialidad);?>&amp;ciu=<?php echo urlencode($VACiudad);?>&amp;med=<?php echo urlencode($VAMedico);?>"
+                       target="_blank" rel="noopener"
+                       class="btn_theme"
+                       style="padding:9px 20px; white-space:nowrap; display:inline-flex; align-items:center; gap:8px;">
+                        <i class="fas fa-file-pdf"></i> Descargar PDF
+                    </a>
+                </div>
                 <table width="100%" border="0" cellspacing="10" cellpadding="10" class="table table-striped table-hover">
 
                     <?php if ($totalRows_guia > 0) { do { ?>

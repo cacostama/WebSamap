@@ -48,8 +48,8 @@
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
 
     <!-- rediseño -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-nosotros.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-nosotros.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-nosotros.css'); ?>">
 
 </head>
 

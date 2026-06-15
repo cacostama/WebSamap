@@ -79,8 +79,8 @@
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
     <!-- rediseno css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-home.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-home.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-home.css'); ?>">
 
 </head>
 

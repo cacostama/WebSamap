@@ -47,8 +47,8 @@
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
     <!-- rediseno css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-convenios.css'); ?>">
 
 </head>
 

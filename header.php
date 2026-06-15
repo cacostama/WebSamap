@@ -5,7 +5,7 @@
     $row_planesH = mysqli_fetch_assoc($planesH);
     $totalRows_planesH = mysqli_num_rows($planesH);
 ?>
-<link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css">
+<link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
 <header class="rd-nav" id="rdNav">
     <div class="rd-nav__inner">
         <a class="rd-nav__brand" href="<?php echo $URL?>">
