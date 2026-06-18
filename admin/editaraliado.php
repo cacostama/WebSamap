@@ -47,18 +47,25 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_aliados SET titulo='".$_POST['titulo']."', detalle='".$_POST['detalle']."'"; 
+			$categoria = $_POST['categoria'] ?? '';
+			$descuento = $_POST['descuento'] ?? '';
+			$orden     = (int) ($_POST['orden'] ?? 0);
+
+			$sql_update = "UPDATE tbl_aliados SET titulo='".$_POST['titulo']."', categoria='".$categoria."', descuento='".$descuento."', orden=".$orden.", detalle='".$_POST['detalle']."'";
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('ALIADO MODIFICADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+			echo"<script>alert('Listo, el aliado se actualizó correctamente.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
 
 	}
+
+	// Categorias disponibles para agrupar aliados en "Descuentos Exclusivos".
+	$categorias_aliado = ['Farmacias', 'Ópticas', 'Laboratorios', 'Gimnasios', 'Cooperativas', 'Ortopedia', 'Otros'];
 
 } else{
 
@@ -132,8 +139,30 @@ if (isset($_SESSION['ADM_Username'])){
 
 								<fieldset>
 									<div class="form-group">
+										<label class="col-lg-2 control-label">Categoría</label>
+										<div class="col-lg-4">
+											<select name="categoria" class="form-control">
+												<option value="">— Elegí una categoría —</option>
+												<?php foreach ($categorias_aliado as $cat) {
+													$sel = ($row_plan['categoria'] === $cat) ? ' selected' : '';
+												?>
+													<option value="<?php echo $cat; ?>"<?php echo $sel; ?>><?php echo $cat; ?></option>
+												<?php } ?>
+											</select>
+											<span class="help-block">Agrupa el comercio en la sección "Descuentos Exclusivos" del sitio.</span>
+										</div>
+										<label class="col-lg-2 control-label">Descuento</label>
+										<div class="col-lg-4">
+											<input type="text" name="descuento" placeholder="Ej: Hasta 25%" value="<?php echo htmlspecialchars((string) $row_plan['descuento'], ENT_QUOTES, 'UTF-8'); ?>" class="form-control">
+											<span class="help-block">Texto que se muestra al socio. Dejalo vacío si no aplica.</span>
+										</div>
+									</div>
+								</fieldset>
+
+								<fieldset>
+									<div class="form-group">
 										<label class="col-sm-2 control-label">Descripcion
-											
+
 										</label>
 										<div class="col-sm-10">
 											<textarea class="form-control" id="code_preview1" name="detalle" style="height: 300px;"><?php echo $row_plan['detalle']?></textarea>

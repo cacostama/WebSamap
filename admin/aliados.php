@@ -98,8 +98,10 @@ if (isset($_SESSION['ADM_Username'])){
 									<thead>
 										<tr>
 											<th>ID</th>
-											
-											<th>Convenio</th>
+
+											<th>Aliado</th>
+											<th>Categoría</th>
+											<th>Descuento</th>
 											<th>Imagen</th>
 											
 											
@@ -112,9 +114,11 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<tr class="gradeX">
 											<td><?php echo $row_convenios['id'];?></td>
-											
+
 											<td><?php echo $row_convenios['titulo'];?></td>
-											
+											<td><?php echo ($row_convenios['categoria'] !== '' && $row_convenios['categoria'] !== null) ? htmlspecialchars($row_convenios['categoria'], ENT_QUOTES, 'UTF-8') : '<span style="color:#bbb;">Sin categoría</span>'; ?></td>
+											<td><?php echo htmlspecialchars((string) $row_convenios['descuento'], ENT_QUOTES, 'UTF-8'); ?></td>
+
 											<td><img  height="30px" src="<?php echo $URL?>documentos/aliados/<?php echo $row_convenios['imagen']; ?>" alt=""/></td>
 											
 											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editaraliado/cod/<?php echo $row_convenios['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>

@@ -27,13 +27,19 @@ if (isset($_SESSION['ADM_Username'])){
 			$nombre = $_POST['nombre'];
 			$detalle= htmlentities( $_POST['detalle']);
 			$IMAGEN = $imagen_real;
+			$categoria = $_POST['categoria'] ?? '';
+			$descuento = $_POST['descuento'] ?? '';
+			$orden     = (int) ($_POST['orden'] ?? 0);
 
-			$insertSQL = "INSERT INTO tbl_aliados (titulo, detalle, imagen) VALUES ('$nombre','$detalle','$IMAGEN')";
+			$insertSQL = "INSERT INTO tbl_aliados (titulo, categoria, descuento, orden, detalle, imagen) VALUES ('$nombre','$categoria','$descuento',$orden,'$detalle','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('ALIADO INSETADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+			echo"<script>alert('Listo, el aliado se agregó correctamente.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
 
 	}
+
+	// Categorias disponibles para agrupar aliados en "Descuentos Exclusivos".
+	$categorias_aliado = ['Farmacias', 'Ópticas', 'Laboratorios', 'Gimnasios', 'Cooperativas', 'Ortopedia', 'Otros'];
 
 } else{
 
@@ -104,8 +110,28 @@ if (isset($_SESSION['ADM_Username'])){
 
 								<fieldset>
 									<div class="form-group">
+										<label class="col-lg-2 control-label">Categoría</label>
+										<div class="col-lg-4">
+											<select name="categoria" class="form-control">
+												<option value="">— Elegí una categoría —</option>
+												<?php foreach ($categorias_aliado as $cat) { ?>
+													<option value="<?php echo $cat; ?>"><?php echo $cat; ?></option>
+												<?php } ?>
+											</select>
+											<span class="help-block">Agrupa el comercio en la sección "Descuentos Exclusivos" del sitio.</span>
+										</div>
+										<label class="col-lg-2 control-label">Descuento</label>
+										<div class="col-lg-4">
+											<input type="text" name="descuento" placeholder="Ej: Hasta 25%" value="" class="form-control">
+											<span class="help-block">Texto que se muestra al socio. Dejalo vacío si no aplica.</span>
+										</div>
+									</div>
+								</fieldset>
+
+								<fieldset>
+									<div class="form-group">
 										<label class="col-sm-2 control-label">Descripcion
-											
+
 										</label>
 										<div class="col-sm-10">
 											<textarea class="form-control" id="code_preview1" name="detalle" style="height: 300px;"></textarea>

@@ -8,8 +8,40 @@
     $row_servicios = mysqli_fetch_assoc($servicios);
     $totalRows_servicios = mysqli_num_rows($servicios);
 
+    // ---- Descuentos Exclusivos: aliados agrupados por categoria (DB) ----
+    // Iconos por categoria (Fase 1: lista fija; la categoria la define el admin).
+    $rd_cat_iconos = [
+        'Farmacias'    => 'fa-prescription-bottle-alt',
+        'Ópticas'      => 'fa-glasses',
+        'Laboratorios' => 'fa-vials',
+        'Gimnasios'    => 'fa-dumbbell',
+        'Cooperativas' => 'fa-handshake',
+        'Ortopedia'    => 'fa-wheelchair',
+    ];
+    $rd_cat_icono_default = 'fa-tags';
 
-?> 
+    $query_aliados = "SELECT id, titulo, categoria, descuento, detalle, imagen
+                      FROM tbl_aliados
+                      WHERE deleted_at IS NULL AND categoria IS NOT NULL AND categoria <> ''
+                      ORDER BY categoria ASC, orden ASC, id ASC";
+    $aliados = mysqli_query($connect, $query_aliados) or die(mysqli_error($connect));
+
+    // Agrupa: $rd_categorias[<categoria>] = ['tope' => 'Hasta 30%', 'items' => [...]]
+    $rd_categorias = [];
+    while ($a = mysqli_fetch_assoc($aliados)) {
+        $cat = $a['categoria'];
+        if (!isset($rd_categorias[$cat])) {
+            $rd_categorias[$cat] = ['tope' => '', 'items' => []];
+        }
+        $rd_categorias[$cat]['items'][] = $a;
+        // "tope": el primer descuento no vacio que aparezca en la categoria.
+        if ($rd_categorias[$cat]['tope'] === '' && trim((string) $a['descuento']) !== '') {
+            $rd_categorias[$cat]['tope'] = $a['descuento'];
+        }
+    }
+
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -138,40 +170,51 @@
                 <p class="rd-subtitle">Aprovechá precios preferenciales en una red de comercios y servicios de salud aliados.</p>
             </div>
 
+            <?php if (!empty($rd_categorias)) { ?>
+            <p class="rd-disc-hint">Tocá una categoría para ver los comercios adheridos.</p>
             <div class="rd-disc-grid">
-                <article class="rd-disc">
-                    <div class="rd-disc__icon"><i class="fas fa-prescription-bottle-alt"></i></div>
-                    <h3 class="rd-disc__name">Farmacias</h3>
-                    <span class="rd-disc__pct">Hasta 25%<small>de descuento</small></span>
-                </article>
-                <article class="rd-disc">
-                    <div class="rd-disc__icon"><i class="fas fa-glasses"></i></div>
-                    <h3 class="rd-disc__name">Ópticas</h3>
-                    <span class="rd-disc__pct">Hasta 30%<small>de descuento</small></span>
-                </article>
-                <article class="rd-disc">
-                    <div class="rd-disc__icon"><i class="fas fa-vials"></i></div>
-                    <h3 class="rd-disc__name">Laboratorios</h3>
-                    <span class="rd-disc__pct">Hasta 20%<small>de descuento</small></span>
-                </article>
+                <?php foreach ($rd_categorias as $cat => $info) {
+                    $icono = $rd_cat_iconos[$cat] ?? $rd_cat_icono_default;
+                    $tope  = $info['tope'];
+                    $items = $info['items'];
+                ?>
+                <details class="rd-disc">
+                    <summary class="rd-disc__summary">
+                        <div class="rd-disc__icon"><i class="fas <?php echo $icono; ?>"></i></div>
+                        <h3 class="rd-disc__name"><?php echo htmlspecialchars($cat, ENT_QUOTES, 'UTF-8'); ?></h3>
+                        <?php if ($tope !== '') { ?>
+                            <span class="rd-disc__pct"><?php echo htmlspecialchars($tope, ENT_QUOTES, 'UTF-8'); ?><small>de descuento</small></span>
+                        <?php } else { ?>
+                            <span class="rd-disc__pct rd-disc__pct--soft">Beneficios para socios</span>
+                        <?php } ?>
+                        <span class="rd-disc__count"><?php echo count($items); ?> <?php echo count($items) === 1 ? 'comercio' : 'comercios'; ?> <i class="fas fa-chevron-down rd-disc__chev"></i></span>
+                    </summary>
+                    <ul class="rd-disc__list">
+                        <?php foreach ($items as $it) { ?>
+                        <li class="rd-disc__item">
+                            <?php if (!empty($it['imagen'])) { ?>
+                            <span class="rd-disc__item-logo">
+                                <img src="<?php echo $URL?>documentos/aliados/<?php echo htmlspecialchars($it['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($it['titulo'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" decoding="async">
+                            </span>
+                            <?php } ?>
+                            <span class="rd-disc__item-body">
+                                <span class="rd-disc__item-name"><?php echo htmlspecialchars($it['titulo'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php if (trim((string) $it['descuento']) !== '') { ?>
+                                    <span class="rd-disc__item-pct"><?php echo htmlspecialchars($it['descuento'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php } ?>
+                            </span>
+                        </li>
+                        <?php } ?>
+                    </ul>
+                </details>
+                <?php } ?>
                 <article class="rd-disc rd-disc--more">
                     <div class="rd-disc__icon"><i class="fas fa-ellipsis-h"></i></div>
                     <h3 class="rd-disc__name">Y más</h3>
                     <p class="rd-disc__sub">Nuevos aliados cada mes</p>
                 </article>
-                <article class="rd-disc rd-disc--gym">
-                    <div class="rd-disc__brand">
-                        <img src="<?php echo $URL?>documentos/aliados/nueva-onda-gimnasio.png" alt="Nueva Onda Gimnasio" loading="lazy" decoding="async">
-                    </div>
-                    <div class="rd-disc__benefits">
-                        <h3 class="rd-disc__name">Nueva Onda Gimnasio</h3>
-                        <ul>
-                            <li>Costo preferencial en las cuotas para asegurados de SAMAP</li>
-                            <li>20% en planes para alumnos del gimnasio</li>
-                        </ul>
-                    </div>
-                </article>
             </div>
+            <?php } ?>
 
             <div class="rd-cv__cta">
                 <a href="<?php echo $URL;?>beneficios/" class="rd-btn rd-btn--ghost">Ver todos los beneficios</a>

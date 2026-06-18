@@ -374,3 +374,25 @@ ALTER TABLE `tbl_sanatorio`    ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NUL
 ALTER TABLE `tbl_servicios`    ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
 ALTER TABLE `tbl_slider`       ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
 ALTER TABLE `tbl_user`         ADD COLUMN `rol` VARCHAR(20) NOT NULL DEFAULT 'admin';
+
+-- ============================================================================
+-- Migracion 003 — Categorias y descuento en aliados
+-- (ver scripts/migracion-003-aliados-categorias.sql)
+-- Hace configurable la seccion "Descuentos Exclusivos" de beneficios.php.
+-- ============================================================================
+SET NAMES utf8mb4;
+ALTER TABLE `tbl_aliados`
+  ADD COLUMN `categoria` VARCHAR(60) NULL AFTER `titulo`,
+  ADD COLUMN `descuento` VARCHAR(60) NULL AFTER `categoria`,
+  ADD COLUMN `orden` INT NOT NULL DEFAULT 0 AFTER `descuento`;
+
+UPDATE `tbl_aliados` SET `categoria`='Farmacias',    `descuento`='Hasta 25%' WHERE id IN (1,6,8);
+UPDATE `tbl_aliados` SET `categoria`='Ópticas',      `descuento`='Hasta 30%' WHERE id IN (2,3);
+UPDATE `tbl_aliados` SET `categoria`='Laboratorios', `descuento`='Hasta 20%' WHERE id IN (5,9);
+UPDATE `tbl_aliados` SET `categoria`='Ortopedia',    `descuento`=NULL        WHERE id IN (4,12);
+UPDATE `tbl_aliados` SET `categoria`='Cooperativas', `descuento`=NULL        WHERE id IN (10,13,14,15,16,17,18);
+
+INSERT INTO `tbl_aliados` (titulo, categoria, descuento, orden, detalle, imagen)
+VALUES ('Nueva Onda Gimnasio', 'Gimnasios', 'Cuota preferencial', 0,
+        'Costo preferencial en las cuotas para asegurados de SAMAP. 20% en planes para alumnos del gimnasio.',
+        'nueva-onda-gimnasio.png');

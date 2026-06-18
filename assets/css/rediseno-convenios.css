@@ -541,6 +541,118 @@
   }
 }
 
+/* ---------- Acordeón de categorías (details/summary, sin JS) ---------- */
+.rd-disc-hint {
+  text-align: center;
+  color: var(--samap-gris);
+  font-size: 0.95rem;
+  margin: 0 0 1.25rem;
+}
+
+/* La tarjeta-categoría ahora es un <details>: ocupa su celda y al abrirse crece. */
+details.rd-disc {
+  padding: 0;
+  text-align: center;
+  align-self: start;
+}
+
+.rd-disc__summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 1.75rem 1.25rem;
+  display: block;
+  position: relative;
+  border-radius: var(--radius);
+  transition: background 0.2s ease;
+}
+.rd-disc__summary::-webkit-details-marker { display: none; }
+.rd-disc__summary:hover { background: #f7fbfc; }
+.rd-disc__summary:focus-visible {
+  outline: 2px solid var(--samap-azul);
+  outline-offset: 2px;
+}
+
+.rd-disc__pct--soft {
+  font-size: 1rem;
+  color: var(--samap-azul);
+  font-weight: 700;
+}
+
+.rd-disc__count {
+  display: block;
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--samap-gris);
+}
+
+.rd-disc__chev {
+  margin-left: 0.35rem;
+  transition: transform 0.25s ease;
+}
+details.rd-disc[open] .rd-disc__chev { transform: rotate(180deg); }
+details.rd-disc[open] { box-shadow: 0 14px 30px rgba(39, 71, 103, 0.14); }
+
+.rd-disc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  text-align: left;
+  animation: rd-disc-reveal 0.25s ease;
+}
+@keyframes rd-disc-reveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rd-disc__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  background: #f7fbfc;
+  border: 1px solid #e7eef2;
+  border-radius: 12px;
+}
+
+.rd-disc__item-logo {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.rd-disc__item-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.rd-disc__item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.rd-disc__item-name {
+  font-weight: 700;
+  color: var(--samap-azul);
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+.rd-disc__item-pct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--samap-verde);
+}
+
 /* ---------- Estado vacío ---------- */
 .rd-empty {
   grid-column: 1 / -1;
