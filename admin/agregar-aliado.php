@@ -27,19 +27,23 @@ if (isset($_SESSION['ADM_Username'])){
 			$nombre = $_POST['nombre'];
 			$detalle= htmlentities( $_POST['detalle']);
 			$IMAGEN = $imagen_real;
-			$categoria = $_POST['categoria'] ?? '';
+			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);
+			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
 			$descuento = $_POST['descuento'] ?? '';
 			$orden     = (int) ($_POST['orden'] ?? 0);
 
-			$insertSQL = "INSERT INTO tbl_aliados (titulo, categoria, descuento, orden, detalle, imagen) VALUES ('$nombre','$categoria','$descuento',$orden,'$detalle','$IMAGEN')";
+			$insertSQL = "INSERT INTO tbl_aliados (titulo, categoria_id, descuento, orden, detalle, imagen) VALUES ('$nombre',$categoria_sql,'$descuento',$orden,'$detalle','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			echo"<script>alert('Listo, el aliado se agregó correctamente.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
 
 	}
 
-	// Categorias disponibles para agrupar aliados en "Descuentos Exclusivos".
-	$categorias_aliado = ['Farmacias', 'Ópticas', 'Laboratorios', 'Gimnasios', 'Cooperativas', 'Ortopedia', 'Otros'];
+	// Categorias disponibles (las administra Marketing en tbl_categorias_aliado).
+	mysqli_select_db($connect, $database);
+	$cat_rs = mysqli_query($connect, "SELECT id, nombre FROM tbl_categorias_aliado WHERE deleted_at IS NULL AND activo = 1 ORDER BY orden ASC, nombre ASC");
+	$categorias_aliado = [];
+	while ($cat_rs && $crow = mysqli_fetch_assoc($cat_rs)) { $categorias_aliado[] = $crow; }
 
 } else{
 
@@ -112,10 +116,10 @@ if (isset($_SESSION['ADM_Username'])){
 									<div class="form-group">
 										<label class="col-lg-2 control-label">Categoría</label>
 										<div class="col-lg-4">
-											<select name="categoria" class="form-control">
+											<select name="categoria_id" class="form-control">
 												<option value="">— Elegí una categoría —</option>
 												<?php foreach ($categorias_aliado as $cat) { ?>
-													<option value="<?php echo $cat; ?>"><?php echo $cat; ?></option>
+													<option value="<?php echo (int) $cat['id']; ?>"><?php echo htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8'); ?></option>
 												<?php } ?>
 											</select>
 											<span class="help-block">Agrupa el comercio en la sección "Descuentos Exclusivos" del sitio.</span>

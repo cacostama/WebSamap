@@ -9,34 +9,36 @@
     $totalRows_servicios = mysqli_num_rows($servicios);
 
     // ---- Descuentos Exclusivos: aliados agrupados por categoria (DB) ----
-    // Iconos por categoria (Fase 1: lista fija; la categoria la define el admin).
-    $rd_cat_iconos = [
-        'Farmacias'    => 'fa-prescription-bottle-alt',
-        'Ópticas'      => 'fa-glasses',
-        'Laboratorios' => 'fa-vials',
-        'Gimnasios'    => 'fa-dumbbell',
-        'Cooperativas' => 'fa-handshake',
-        'Ortopedia'    => 'fa-wheelchair',
-    ];
-    $rd_cat_icono_default = 'fa-tags';
-
-    $query_aliados = "SELECT id, titulo, categoria, descuento, detalle, imagen
-                      FROM tbl_aliados
-                      WHERE deleted_at IS NULL AND categoria IS NOT NULL AND categoria <> ''
-                      ORDER BY categoria ASC, orden ASC, id ASC";
+    // Las categorias (nombre, icono, color, orden) las administra Marketing
+    // desde el admin (tbl_categorias_aliado). Aca solo se leen.
+    $query_aliados = "SELECT a.id, a.titulo, a.descuento, a.detalle, a.imagen,
+                             c.id AS cat_id, c.nombre AS cat_nombre,
+                             c.icono AS cat_icono, c.color AS cat_color, c.orden AS cat_orden
+                      FROM tbl_aliados a
+                      JOIN tbl_categorias_aliado c ON a.categoria_id = c.id
+                      WHERE a.deleted_at IS NULL
+                        AND c.deleted_at IS NULL
+                        AND c.activo = 1
+                      ORDER BY c.orden ASC, c.nombre ASC, a.orden ASC, a.id ASC";
     $aliados = mysqli_query($connect, $query_aliados) or die(mysqli_error($connect));
 
-    // Agrupa: $rd_categorias[<categoria>] = ['tope' => 'Hasta 30%', 'items' => [...]]
+    // Agrupa por categoria: $rd_categorias[<cat_id>] = [nombre, icono, color, tope, items]
     $rd_categorias = [];
     while ($a = mysqli_fetch_assoc($aliados)) {
-        $cat = $a['categoria'];
-        if (!isset($rd_categorias[$cat])) {
-            $rd_categorias[$cat] = ['tope' => '', 'items' => []];
+        $cid = $a['cat_id'];
+        if (!isset($rd_categorias[$cid])) {
+            $rd_categorias[$cid] = [
+                'nombre' => $a['cat_nombre'],
+                'icono'  => $a['cat_icono'] !== '' ? $a['cat_icono'] : 'fa-tags',
+                'color'  => $a['cat_color'],
+                'tope'   => '',
+                'items'  => [],
+            ];
         }
-        $rd_categorias[$cat]['items'][] = $a;
+        $rd_categorias[$cid]['items'][] = $a;
         // "tope": el primer descuento no vacio que aparezca en la categoria.
-        if ($rd_categorias[$cat]['tope'] === '' && trim((string) $a['descuento']) !== '') {
-            $rd_categorias[$cat]['tope'] = $a['descuento'];
+        if ($rd_categorias[$cid]['tope'] === '' && trim((string) $a['descuento']) !== '') {
+            $rd_categorias[$cid]['tope'] = $a['descuento'];
         }
     }
 
@@ -173,14 +175,17 @@
             <?php if (!empty($rd_categorias)) { ?>
             <p class="rd-disc-hint">Tocá una categoría para ver los comercios adheridos.</p>
             <div class="rd-disc-grid">
-                <?php foreach ($rd_categorias as $cat => $info) {
-                    $icono = $rd_cat_iconos[$cat] ?? $rd_cat_icono_default;
+                <?php foreach ($rd_categorias as $info) {
+                    $cat   = $info['nombre'];
+                    $icono = $info['icono'];
+                    $color = trim((string) $info['color']);
                     $tope  = $info['tope'];
                     $items = $info['items'];
+                    $iconStyle = $color !== '' ? ' style="background:' . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . '1a;color:' . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . ';"' : '';
                 ?>
                 <details class="rd-disc">
                     <summary class="rd-disc__summary">
-                        <div class="rd-disc__icon"><i class="fas <?php echo $icono; ?>"></i></div>
+                        <div class="rd-disc__icon"<?php echo $iconStyle; ?>><i class="fas <?php echo htmlspecialchars($icono, ENT_QUOTES, 'UTF-8'); ?>"></i></div>
                         <h3 class="rd-disc__name"><?php echo htmlspecialchars($cat, ENT_QUOTES, 'UTF-8'); ?></h3>
                         <?php if ($tope !== '') { ?>
                             <span class="rd-disc__pct"><?php echo htmlspecialchars($tope, ENT_QUOTES, 'UTF-8'); ?><small>de descuento</small></span>

@@ -79,6 +79,13 @@
 		<span class="item-text">Aliados</span>
 	</a>
 </li>
+
+<li class="">
+	<a href="<?php echo $URL?>admin/categorias/" title="Categorías de aliados" class="has-submenu">
+		<em class="fa fa-tags"></em>
+		<span class="item-text">Categorías</span>
+	</a>
+</li>
 <li class="">
 	<a href="<?php echo $URL?>admin/servicios/" title="Servicios" class="has-submenu">
 		<em class="fa fa-medkit"></em>

@@ -5,7 +5,11 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_convenios= "SELECT * FROM tbl_aliados WHERE deleted_at IS NULL";
+	$query_convenios= "SELECT a.*, c.nombre AS categoria_nombre
+	                   FROM tbl_aliados a
+	                   LEFT JOIN tbl_categorias_aliado c ON a.categoria_id = c.id
+	                   WHERE a.deleted_at IS NULL
+	                   ORDER BY c.orden ASC, a.orden ASC, a.id ASC";
 	$convenios = mysqli_query($connect, $query_convenios) or die(mysqli_error($link));
 	$row_convenios = mysqli_fetch_assoc($convenios);
 	$totalRows_convenios = mysqli_num_rows($convenios);
@@ -116,7 +120,7 @@ if (isset($_SESSION['ADM_Username'])){
 											<td><?php echo $row_convenios['id'];?></td>
 
 											<td><?php echo $row_convenios['titulo'];?></td>
-											<td><?php echo ($row_convenios['categoria'] !== '' && $row_convenios['categoria'] !== null) ? htmlspecialchars($row_convenios['categoria'], ENT_QUOTES, 'UTF-8') : '<span style="color:#bbb;">Sin categoría</span>'; ?></td>
+											<td><?php echo !empty($row_convenios['categoria_nombre']) ? htmlspecialchars($row_convenios['categoria_nombre'], ENT_QUOTES, 'UTF-8') : '<span style="color:#bbb;">Sin categoría</span>'; ?></td>
 											<td><?php echo htmlspecialchars((string) $row_convenios['descuento'], ENT_QUOTES, 'UTF-8'); ?></td>
 
 											<td><img  height="30px" src="<?php echo $URL?>documentos/aliados/<?php echo $row_convenios['imagen']; ?>" alt=""/></td>

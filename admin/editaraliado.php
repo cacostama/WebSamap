@@ -47,11 +47,12 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$categoria = $_POST['categoria'] ?? '';
+			$categoria_id  = (int) ($_POST['categoria_id'] ?? 0);
+			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
 			$descuento = $_POST['descuento'] ?? '';
 			$orden     = (int) ($_POST['orden'] ?? 0);
 
-			$sql_update = "UPDATE tbl_aliados SET titulo='".$_POST['titulo']."', categoria='".$categoria."', descuento='".$descuento."', orden=".$orden.", detalle='".$_POST['detalle']."'";
+			$sql_update = "UPDATE tbl_aliados SET titulo='".$_POST['titulo']."', categoria_id=".$categoria_sql.", descuento='".$descuento."', orden=".$orden.", detalle='".$_POST['detalle']."'";
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'";
@@ -64,8 +65,11 @@ if (isset($_SESSION['ADM_Username'])){
 
 	}
 
-	// Categorias disponibles para agrupar aliados en "Descuentos Exclusivos".
-	$categorias_aliado = ['Farmacias', 'Ópticas', 'Laboratorios', 'Gimnasios', 'Cooperativas', 'Ortopedia', 'Otros'];
+	// Categorias disponibles (las administra Marketing en tbl_categorias_aliado).
+	mysqli_select_db($connect, $database);
+	$cat_rs = mysqli_query($connect, "SELECT id, nombre FROM tbl_categorias_aliado WHERE deleted_at IS NULL AND activo = 1 ORDER BY orden ASC, nombre ASC");
+	$categorias_aliado = [];
+	while ($cat_rs && $crow = mysqli_fetch_assoc($cat_rs)) { $categorias_aliado[] = $crow; }
 
 } else{
 
@@ -141,12 +145,12 @@ if (isset($_SESSION['ADM_Username'])){
 									<div class="form-group">
 										<label class="col-lg-2 control-label">Categoría</label>
 										<div class="col-lg-4">
-											<select name="categoria" class="form-control">
+											<select name="categoria_id" class="form-control">
 												<option value="">— Elegí una categoría —</option>
 												<?php foreach ($categorias_aliado as $cat) {
-													$sel = ($row_plan['categoria'] === $cat) ? ' selected' : '';
+													$sel = ((int) $row_plan['categoria_id'] === (int) $cat['id']) ? ' selected' : '';
 												?>
-													<option value="<?php echo $cat; ?>"<?php echo $sel; ?>><?php echo $cat; ?></option>
+													<option value="<?php echo (int) $cat['id']; ?>"<?php echo $sel; ?>><?php echo htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8'); ?></option>
 												<?php } ?>
 											</select>
 											<span class="help-block">Agrupa el comercio en la sección "Descuentos Exclusivos" del sitio.</span>
