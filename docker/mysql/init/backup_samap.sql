@@ -439,3 +439,15 @@ UPDATE `tbl_servicios` s
     ON c.nombre = 'Farmacias' COLLATE utf8mb4_0900_ai_ci
   SET s.categoria_id = c.id
   WHERE s.titulo LIKE '%Farmacia%' AND s.deleted_at IS NULL;
+
+-- ============================================================================
+-- Migracion 006 — Contenido: desglose de descuentos por farmacia
+-- (ver scripts/migracion-006-detalle-farmacias.sql)
+-- ============================================================================
+SET NAMES utf8mb4;
+UPDATE `tbl_aliados` SET detalle =
+'<p><strong>Descuentos sobre el precio público:</strong></p><ul><li>Medicamentos Nacionales: 30%</li><li>Medicamentos Importados: 20%</li><li>Medicamentos Controlados: 19%</li><li>Productos Hospitalarios: 20%</li><li>Productos Varios: 15%</li><li>Perfumería: 20%</li></ul>'
+WHERE id = 6;
+UPDATE `tbl_aliados` SET detalle =
+'<p><strong>Por compras al contado (efectivo o tarjeta de débito):</strong></p><ul><li>Medicamentos Nacionales: 20% de descuento, todos los días</li><li>Medicamentos Importados: 18% de descuento, todos los días</li><li>Perfumería y Artículos Varios: 15% de descuento, todos los días</li></ul><p><strong>Por compras con tarjeta de crédito:</strong></p><ul><li>Medicamentos Nacionales, Importados, Perfumería y Artículos Varios: 15% de descuento, todos los días</li></ul>'
+WHERE id = 8;
