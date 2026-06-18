@@ -1,0 +1,26 @@
+# Seguridad: esta carpeta solo guarda archivos subidos (imagenes, PDFs).
+# Nunca debe ejecutar codigo. Aunque alguien logre subir un .php disfrazado,
+# aca queda como archivo inerte. Aplica recursivamente a las subcarpetas.
+
+# Apaga el motor PHP (mod_php). php_flag SI esta permitido en .htaccess.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Defensa adicional independiente del SAPI (cubre php-fpm / CGI):
+# nunca tratar estos archivos como ejecutables y negar su acceso directo.
+<FilesMatch "(?i)\.(php|php3|php4|php5|php7|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

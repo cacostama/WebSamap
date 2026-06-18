@@ -14,6 +14,42 @@ if ($username === false || $username === '' || $password === false) {
 $connect = mysqli_connect($hostname, $username, $password) or mysqli_error($connect);
 mysqli_set_charset($connect, 'utf8');
 
+// ---- Mitigacion central de SQL Injection ----
+// Las pantallas de carga/edicion del panel interpolan $_POST/$_GET directo en
+// las queries (codigo legacy). Aca escapamos TODA la entrada una sola vez, de
+// forma recursiva, para neutralizar inyecciones sin reescribir cada archivo.
+// (El fix ideal a futuro son prepared statements; esto cierra el agujero ya.)
+if (!function_exists('samap_escapar_recursivo')) {
+    function samap_escapar_recursivo(&$data, $conn) {
+        foreach ($data as $k => $v) {
+            if (is_array($v)) {
+                samap_escapar_recursivo($data[$k], $conn);
+            } else {
+                $data[$k] = mysqli_real_escape_string($conn, (string)$v);
+            }
+        }
+    }
+}
+// Copia CRUDA de las entradas ANTES de escapar. El escape altera comillas y
+// backslashes, lo que romperia password_verify()/login con contrasenas que
+// tengan caracteres especiales. El login usa estas copias sin tocar.
+$POST_RAW = $_POST;
+$GET_RAW  = $_GET;
+samap_escapar_recursivo($_POST, $connect);
+samap_escapar_recursivo($_GET, $connect);
+// Tambien el NOMBRE de los archivos subidos (se usa en rutas y queries).
+if (!empty($_FILES)) {
+    foreach ($_FILES as $campo => $info) {
+        if (isset($info['name'])) {
+            if (is_array($info['name'])) {
+                samap_escapar_recursivo($_FILES[$campo]['name'], $connect);
+            } else {
+                $_FILES[$campo]['name'] = mysqli_real_escape_string($connect, (string)$info['name']);
+            }
+        }
+    }
+}
+
 
 
 // URL protocol-relative: los assets/links cargan siempre con el mismo
@@ -54,6 +90,7 @@ $especialesComparar = array('16px', '60%');
 $correctosComparar   = array('11px', '99%');
 
 require_once('session.php');
+require_once('seguridad.php');
 
 
 #header("Content-Security-Policy: default-src 'self'");

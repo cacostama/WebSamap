@@ -1,10 +1,43 @@
 <?php
 
-	/*define('DURACION_SESION','14400'); //2 horas
-	ini_set('session.cookie_lifetime','DURACION_SESION');
-	ini_set('session.gc_maxlifetime','DURACION_SESION'); 
-	ini_set('session.save_path','/home/fastrax/tmp');
-	session_cache_expire('DURACION_SESION');*/
-	session_start();
-	//echo "test";
+	// ---- Endurecimiento de la cookie de sesion ----
+	// Solo aplica si la sesion aun no arranco (evita warnings).
+	if (session_status() === PHP_SESSION_NONE) {
+		$secure = (
+			(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+			(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+		);
+		session_set_cookie_params([
+			'lifetime' => 0,
+			'path'     => '/',
+			'httponly' => true,      // la cookie no es accesible desde JS (anti-XSS)
+			'secure'   => $secure,   // solo viaja por HTTPS cuando corresponde
+			'samesite' => 'Lax',     // mitiga CSRF en navegacion cross-site
+		]);
+		session_start();
+	}
+
+	// ---- Expiracion por inactividad (2 horas) ----
+	$TIEMPO_INACTIVIDAD = 7200;
+	if (isset($_SESSION['ADM_last_activity']) &&
+		(time() - $_SESSION['ADM_last_activity']) > $TIEMPO_INACTIVIDAD) {
+		$_SESSION = [];
+		session_destroy();
+	} else {
+		$_SESSION['ADM_last_activity'] = time();
+	}
+
+	// ---- Guard central de autenticacion ----
+	// Todas las paginas del admin incluyen db.php -> session.php. Aca bloqueamos
+	// del lado del SERVIDOR (header + exit) cualquier pagina que requiera sesion.
+	// Las paginas publicas (login / logout) van en la whitelist.
+	$ADM_paginas_publicas = ['index.php', 'logout.php', 'conexion.php'];
+	$ADM_script_actual = basename($_SERVER['SCRIPT_NAME'] ?? '');
+
+	if (!in_array($ADM_script_actual, $ADM_paginas_publicas, true) &&
+		empty($_SESSION['ADM_Username'])) {
+		$destino = (isset($URL) ? $URL : '/') . 'admin/index/';
+		header('Location: ' . $destino);
+		exit;
+	}
 ?>

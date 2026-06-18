@@ -8,54 +8,63 @@ header( 'X-Frame-Options: SAMEORIGIN' );
 
 ?>
 <?php
-    //session_start();
-    //require_once '../class/token.php';
-    //require_once 'recaptchalib.php';
-
     if (isset($_POST['usuario'], $_POST['clave'])){
 
-        $usuario = $_POST['usuario'];
-        $clave = $_POST['clave'];
-        //$IP = $_POST['ip'];
-        
-        if(!empty($usuario) && !empty($clave)){
-            
+        // Usar las entradas CRUDAS (sin el escape de db.php): el escape altera
+        // la contrasena real y romperia password_verify().
+        $usuario     = $POST_RAW['usuario'] ?? '';
+        $contrasena  = $POST_RAW['clave']   ?? '';
 
-                //if ($response != null && $response->success) {
-	
-	
-					session_start();
+        // ---- #6 CSRF: rechazar POST sin token valido ----
+        if (!samap_csrf_validar()) {
+            echo"<script>window.location.href=\"".$URL."admin/index/log/error/\"</script>";
+        }
+        // ---- #6 Rate-limit: bloquear tras 5 intentos fallidos / 15 min por IP ----
+        else if (samap_login_bloqueado()) {
+            $login = 'bloqueado';
+        }
+        else if(!empty($usuario) && !empty($contrasena)){
 
-					include("conexion.php");
-					$usuario = $_POST['usuario'];
-					$contrasena = $_POST['clave'];
+            include("conexion.php");
 
-					$stmt = $conexion->prepare("SELECT * FROM tbl_user WHERE userName = ? AND userPass = md5(?)");
-					$stmt->bind_param('ss', $usuario, $contrasena);
-					$stmt->execute();
-					$proceso = $stmt->get_result();
+            // Buscar SOLO por usuario; la verificacion de clave se hace en PHP.
+            $stmt = $conexion->prepare("SELECT * FROM tbl_user WHERE userName = ?");
+            $stmt->bind_param('s', $usuario);
+            $stmt->execute();
+            $proceso = $stmt->get_result();
 
+            $passOk    = false;
+            $resultado = mysqli_fetch_array($proceso);
 
-					if($resultado = mysqli_fetch_array($proceso)){
+            if ($resultado) {
+                $hashGuardado = (string)$resultado['userPass'];
 
-						$_SESSION['ADM_Username'] = $usuario;
-						$_SESSION['ADM_Nombre'] = $resultado['nombre'];
-						
-						
-						echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
-					}
-					else{
-						
-						echo"<script>window.location.href=\"".$URL."admin/index/log/error/\"</script>";	
+                if (preg_match('/^\$2[aby]\$/', $hashGuardado)) {
+                    // Hash moderno (bcrypt).
+                    $passOk = password_verify($contrasena, $hashGuardado);
+                } else {
+                    // ---- #5 Hash legacy MD5: validar y migrar a bcrypt al vuelo ----
+                    if (hash_equals($hashGuardado, md5($contrasena))) {
+                        $passOk = true;
+                        $nuevoHash = password_hash($contrasena, PASSWORD_BCRYPT);
+                        if ($up = $conexion->prepare("UPDATE tbl_user SET userPass = ? WHERE id = ?")) {
+                            $up->bind_param('si', $nuevoHash, $resultado['id']);
+                            $up->execute();
+                        }
+                    }
+                }
+            }
 
-					}
-					
-					
-				//} else {
-					//echo"<script>window.location.href=\"".$URL."admin/index/captcha/incorrecto/\"</script>";
-				//}
-
-            
+            if ($passOk) {
+                samap_login_limpiar();          // reset del contador de la IP
+                session_regenerate_id(true);    // #7 anti session-fixation
+                $_SESSION['ADM_Username'] = $usuario;
+                $_SESSION['ADM_Nombre']   = $resultado['nombre'];
+                echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
+            } else {
+                samap_login_registrar_fallo();  // suma intento fallido para la IP
+                echo"<script>window.location.href=\"".$URL."admin/index/log/error/\"</script>";
+            }
         }
     }
 ?>
@@ -97,7 +106,7 @@ header( 'X-Frame-Options: SAMEORIGIN' );
 					<strong>REGÍSTRESE PARA CONTINUAR.</strong>
 				</p>
 				<div class="panel-body">
-					<form action="" method="post" name="form1" id="form1" onsubmit="MM_validateForm('usuario','','R','clave','','R');return document.MM_returnValue">
+					<form action="" method="post" name="form1" id="form1" onsubmit="MM_validateForm('usuario','','R','clave','','R');return document.MM_returnValue"><?php echo samap_csrf_field(); ?>
 						
 						<div class="form-group has-feedback">
 							<input name="usuario" type="text" placeholder="Ingrese su Usuario" class="form-control">
@@ -110,7 +119,14 @@ header( 'X-Frame-Options: SAMEORIGIN' );
 							<span class="fa fa-lock form-control-feedback text-muted"></span>
 						</div>
 						<div class="clearfix">
-							<?php if ($login == "error" ) { 
+							<?php if ($login == "bloqueado" ) {
+                                    echo "<div class='alert alert-danger alert-dismissable'>
+                                            <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                                            <strong>Demasiados intentos.</strong> Espere unos minutos antes de volver a intentar.
+                                          </div>
+                                          ";
+                                } ?>
+                                <?php if ($login == "error" ) {
                                     echo "<div class='alert alert-warning alert-dismissable'>
                                             <button type='button' class='close' data-dismiss='alert'>&times;</button>
                                             <strong>¡Cuidado!</strong> Usuario y/o Contraseña Incorrecto/s
