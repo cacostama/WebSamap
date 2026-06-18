@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_planes= "SELECT * FROM tbl_planes";
+	$query_planes= "SELECT * FROM tbl_planes WHERE deleted_at IS NULL";
 	$planes = mysqli_query($connect, $query_planes) or die(mysqli_error($link));
 	$row_planes = mysqli_fetch_assoc($planes);
 	$totalRows_planes = mysqli_num_rows($planes);
@@ -35,8 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 }
 
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_planes WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_planes SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

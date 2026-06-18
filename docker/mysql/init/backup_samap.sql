@@ -357,3 +357,20 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-04-21 17:42:17
+
+-- ============================================================================
+-- Migracion 002 — Soft-delete + Roles (ver scripts/migracion-002-soft-delete-roles.sql)
+-- Se aplica al final para no romper los INSERT posicionales de arriba.
+-- ============================================================================
+ALTER TABLE `tbl_aliados`      ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_blog`         ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_ciudad`       ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_convenios`    ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_especialidad` ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_guiamedica`   ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_medicos`      ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_planes`       ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_sanatorio`    ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_servicios`    ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_slider`       ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL;
+ALTER TABLE `tbl_user`         ADD COLUMN `rol` VARCHAR(20) NOT NULL DEFAULT 'admin';

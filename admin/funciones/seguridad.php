@@ -82,4 +82,22 @@ if (!function_exists('samap_login_bloqueado')) {
 		if (is_file($f)) @unlink($f);
 	}
 }
+
+// ---- #9 Roles (admin | editor | comercial) ----
+if (!function_exists('samap_rol')) {
+	// Rol del usuario logueado (default admin para sesiones viejas sin rol).
+	function samap_rol() {
+		return $_SESSION['ADM_Rol'] ?? 'admin';
+	}
+
+	// True si el rol actual esta entre los permitidos.
+	function samap_rol_es(/* ...$roles */) {
+		return in_array(samap_rol(), func_get_args(), true);
+	}
+
+	// True si el rol puede crear/editar/borrar contenido (admin o editor).
+	function samap_puede_escribir() {
+		return samap_rol_es('admin', 'editor');
+	}
+}
 ?>

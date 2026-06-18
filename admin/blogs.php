@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_blog= "SELECT * FROM tbl_blog ORDER BY id DESC";
+	$query_blog= "SELECT * FROM tbl_blog WHERE deleted_at IS NULL ORDER BY id DESC";
 	$blog = mysqli_query($connect, $query_blog) or die(mysqli_error($link));
 	$row_blog = mysqli_fetch_assoc($blog);
 	$totalRows_blog = mysqli_num_rows($blog);
@@ -34,8 +34,8 @@ if (isset($_SESSION['ADM_Username'])){
     return $theValue;
 }
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_blog WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_blog SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

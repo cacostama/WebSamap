@@ -3,7 +3,7 @@
 <?php 
 
     mysqli_select_db($connect, $database);
-    $query_convenios = 'SELECT * FROM tbl_convenios ORDER BY id DESC';
+    $query_convenios = 'SELECT * FROM tbl_convenios WHERE deleted_at IS NULL ORDER BY id DESC';
     $convenios = mysqli_query($connect, $query_convenios) or die(mysqli_error($link));
     $row_convenios = mysqli_fetch_assoc($convenios);
     $totalRows_convenios = mysqli_num_rows($convenios);

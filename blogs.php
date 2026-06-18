@@ -3,19 +3,19 @@
 <?php 
     
     mysqli_select_db($connect, $database);
-    $query_blog = 'SELECT * FROM tbl_blog ORDER BY id DESC';
+    $query_blog = 'SELECT * FROM tbl_blog WHERE deleted_at IS NULL ORDER BY id DESC';
     $blog = mysqli_query($connect, $query_blog) or die(mysqli_error($link));
     $row_blog = mysqli_fetch_assoc($blog);
     $totalRows_blog = mysqli_num_rows($blog);
 
     mysqli_select_db($connect, $database);
-    $query_blogUltimos = 'SELECT * FROM tbl_blog ORDER BY id DESC LIMIT 7';
+    $query_blogUltimos = 'SELECT * FROM tbl_blog WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 7';
     $blogUltimos = mysqli_query($connect, $query_blogUltimos) or die(mysqli_error($link));
     $row_blogUltimos = mysqli_fetch_assoc($blogUltimos);
     $totalRows_blogUltimos = mysqli_num_rows($blogUltimos);
 
     mysqli_select_db($connect, $database);
-    $query_blogOtros = 'SELECT * FROM tbl_blog ORDER BY id DESC LIMIT 7,3';
+    $query_blogOtros = 'SELECT * FROM tbl_blog WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 7,3';
     $blogOtros = mysqli_query($connect, $query_blogOtros) or die(mysqli_error($link));
     $row_blogOtros = mysqli_fetch_assoc($blogOtros);
     $totalRows_Otros = mysqli_num_rows($blogOtros);

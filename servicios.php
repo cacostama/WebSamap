@@ -3,7 +3,7 @@
 <?php 
 
     mysqli_select_db($connect, $database);
-    $query_servicios = 'SELECT * FROM tbl_servicios ORDER BY id DESC';
+    $query_servicios = 'SELECT * FROM tbl_servicios WHERE deleted_at IS NULL ORDER BY id DESC';
     $servicios = mysqli_query($connect, $query_servicios) or die(mysqli_error($link));
     $row_servicios = mysqli_fetch_assoc($servicios);
     $totalRows_servicios = mysqli_num_rows($servicios);

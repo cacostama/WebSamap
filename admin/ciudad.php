@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_ciudad= "SELECT * FROM tbl_ciudad ORDER BY nombre ASC";
+	$query_ciudad= "SELECT * FROM tbl_ciudad WHERE deleted_at IS NULL ORDER BY nombre ASC";
 	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
 	$row_ciudad = mysqli_fetch_assoc($ciudad);
 	$totalRows_ciudad = mysqli_num_rows($ciudad);
@@ -35,8 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 	  return $theValue;
 	}
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_ciudad WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_ciudad SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

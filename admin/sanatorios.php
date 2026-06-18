@@ -34,8 +34,8 @@ if (isset($_SESSION['ADM_Username'])){
     return $theValue;
 }
 
-    if ($_GET['id'] != "") {
-	  $deleteSQL = sprintf("DELETE FROM tbl_sanatorio WHERE id=%s",
+    if (isset($_GET['borrar']) && $_GET['id'] != "" && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_sanatorio SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

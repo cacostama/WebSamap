@@ -40,4 +40,15 @@
 		header('Location: ' . $destino);
 		exit;
 	}
+
+	// ---- #9 Rol "comercial" = solo lectura ----
+	// Bloquea del lado del servidor las pantallas de alta/edicion (agregar-* /
+	// editar*). Los borrados (via ?borrar) se frenan ademas en cada listado.
+	if (!empty($_SESSION['ADM_Username']) &&
+		($_SESSION['ADM_Rol'] ?? 'admin') === 'comercial' &&
+		preg_match('/^(agregar|editar)/i', $ADM_script_actual)) {
+		$destino_home = (isset($URL) ? $URL : '/') . 'admin/home/';
+		header('Location: ' . $destino_home);
+		exit;
+	}
 ?>

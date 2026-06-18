@@ -22,6 +22,7 @@ if ($med !== '') {
     $medEsc = mysqli_real_escape_string($connect, $med);
     $where[] = "a.nombre LIKE '%$medEsc%'";
 }
+$where[] = "a.deleted_at IS NULL";
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
 $query = "SELECT a.titulo, a.nombre AS medico,

@@ -24,7 +24,8 @@ if (isset($_SESSION['ADM_Username'])){
 					LEFT JOIN tbl_sanatorio c ON
 					    a.idSanatorios = c.id
 					LEFT JOIN tbl_ciudad d ON
-					    c.idCiudad = d.id";
+					    c.idCiudad = d.id
+					WHERE a.deleted_at IS NULL";
 	$guia = mysqli_query($connect, $query_guia) or die(mysqli_error($link));
 	$row_guia= mysqli_fetch_assoc($guia);
 	$totalRows_guia = mysqli_num_rows($guia);
@@ -54,8 +55,8 @@ if (isset($_SESSION['ADM_Username'])){
     return $theValue;
 }
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_guiamedica WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_guiamedica SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_medicos= "SELECT * FROM tbl_medicos";
+	$query_medicos= "SELECT * FROM tbl_medicos WHERE deleted_at IS NULL";
 	$medicos = mysqli_query($connect, $query_medicos) or die(mysqli_error($link));
 	$row_medicos = mysqli_fetch_assoc($medicos);
 	$totalRows_medicos = mysqli_num_rows($medicos);
@@ -35,8 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 }
 
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_medicos WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_medicos SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

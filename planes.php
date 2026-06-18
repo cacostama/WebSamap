@@ -3,7 +3,7 @@
 <?php 
 
     mysqli_select_db($connect, $database);
-    $query_planes = 'SELECT * FROM tbl_planes WHERE especial=0 ORDER BY id ASC';
+    $query_planes = 'SELECT * FROM tbl_planes WHERE especial=0 AND deleted_at IS NULL ORDER BY id ASC';
     $planes = mysqli_query($connect, $query_planes) or die(mysqli_error($link));
     $row_planes = mysqli_fetch_assoc($planes);
     $totalRows_planes = mysqli_num_rows($planes);

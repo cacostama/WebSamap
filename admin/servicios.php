@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_servicios= "SELECT * FROM tbl_servicios";
+	$query_servicios= "SELECT * FROM tbl_servicios WHERE deleted_at IS NULL";
 	$servicios = mysqli_query($connect, $query_servicios) or die(mysqli_error($link));
 	$row_servicios = mysqli_fetch_assoc($servicios);
 	$totalRows_servicios = mysqli_num_rows($servicios);
@@ -35,8 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
     return $theValue;
 }
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_servicios WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_servicios SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

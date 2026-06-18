@@ -3,13 +3,13 @@
 <?php 
 
     mysqli_select_db($connect, $database);
-    $query_especialidad = 'SELECT * FROM tbl_especialidad WHERE estado=1 ORDER BY nombre ASC';
+    $query_especialidad = 'SELECT * FROM tbl_especialidad WHERE estado=1 AND deleted_at IS NULL ORDER BY nombre ASC';
     $especialidad = mysqli_query($connect, $query_especialidad) or die(mysqli_error($link));
     $row_especialidad = mysqli_fetch_assoc($especialidad);
     $totalRows_especialidad = mysqli_num_rows($especialidad);
 
     mysqli_select_db($connect, $database);
-    $query_ciudad = 'SELECT * FROM tbl_ciudad WHERE estado=1 ORDER BY nombre ASC';
+    $query_ciudad = 'SELECT * FROM tbl_ciudad WHERE estado=1 AND deleted_at IS NULL ORDER BY nombre ASC';
     $ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
     $row_ciudad = mysqli_fetch_assoc($ciudad);
     $totalRows_ciudad = mysqli_num_rows($ciudad);
@@ -30,7 +30,7 @@
 
         if ($VARespecialidad!='') {
             mysqli_select_db($connect, $database);
-            $query_especialidad2 = "SELECT * FROM tbl_especialidad WHERE estado=1 AND id=$VARespecialidad ORDER BY nombre ASC";
+            $query_especialidad2 = "SELECT * FROM tbl_especialidad WHERE estado=1 AND deleted_at IS NULL AND id=$VARespecialidad ORDER BY nombre ASC";
             $especialidad2 = mysqli_query($connect, $query_especialidad2) or die(mysqli_error($link));
             $row_especialidad2 = mysqli_fetch_assoc($especialidad2);
             $totalRows_especialidad2 = mysqli_num_rows($especialidad2);
@@ -38,7 +38,7 @@
         
         if ($VACiudad!='') {
             mysqli_select_db($connect, $database);
-            $query_ciudad2 = "SELECT * FROM tbl_ciudad WHERE estado=1 AND id=$VACiudad ORDER BY nombre ASC";
+            $query_ciudad2 = "SELECT * FROM tbl_ciudad WHERE estado=1 AND deleted_at IS NULL AND id=$VACiudad ORDER BY nombre ASC";
             $ciudad2 = mysqli_query($connect, $query_ciudad2) or die(mysqli_error($link));
             $row_ciudad2 = mysqli_fetch_assoc($ciudad2);
             $totalRows_ciudad2 = mysqli_num_rows($ciudad2);
@@ -67,7 +67,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.idEspecialidad= $VARespecialidad ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -98,7 +98,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -129,7 +129,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -160,7 +160,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE c.idCiudad= $VACiudad ORDER BY
+                            WHERE a.deleted_at IS NULL AND c.idCiudad= $VACiudad ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -192,7 +192,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -223,7 +223,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.nombre like '%$VAMedico%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -254,7 +254,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.idEspecialidad= $VARespecialidad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND a.nombre like '%$VAMedico%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -283,7 +283,7 @@
                             LEFT JOIN tbl_sanatorio c ON
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
-                                c.idCiudad = d.id ORDER BY
+                                c.idCiudad = d.id WHERE a.deleted_at IS NULL ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE "%Sanatorio Adventista%" THEN 0 ELSE 1 END,
     c.nombre ASC';
@@ -315,7 +315,7 @@
                         LEFT JOIN tbl_sanatorio c ON
                             a.idSanatorios = c.id
                         LEFT JOIN tbl_ciudad d ON
-                            c.idCiudad = d.id ORDER BY
+                            c.idCiudad = d.id WHERE a.deleted_at IS NULL ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE "%Sanatorio Adventista%" THEN 0 ELSE 1 END,
     c.nombre ASC';

@@ -9,13 +9,13 @@ ini_set('display_errors', 1);
     settype($ID, 'integer');
 
 	mysqli_select_db($connect, $database);
-    $query_plan = "SELECT * FROM tbl_planes WHERE id= $ID";
+    $query_plan = "SELECT * FROM tbl_planes WHERE id= $ID AND deleted_at IS NULL";
     $plan = mysqli_query($connect, $query_plan) or die(mysqli_error($connect));
     $row_plan = mysqli_fetch_assoc($plan);
     $totalRows_plan = mysqli_num_rows($plan);
 /**/
     mysqli_select_db($connect, $database);
-    $query_planes = 'SELECT * FROM tbl_planes ORDER BY id DESC';
+    $query_planes = 'SELECT * FROM tbl_planes WHERE deleted_at IS NULL ORDER BY id DESC';
     $planes = mysqli_query($connect, $query_planes) or die(mysqli_error($link));
     $row_planes = mysqli_fetch_assoc($planes);
     $totalRows_planes = mysqli_num_rows($planes);

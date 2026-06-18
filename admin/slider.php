@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_slider= "SELECT * FROM tbl_slider";
+	$query_slider= "SELECT * FROM tbl_slider WHERE deleted_at IS NULL";
 	$slider = mysqli_query($connect, $query_slider) or die(mysqli_error($link));
 	$row_slider = mysqli_fetch_assoc($slider);
 	$totalRows_slider = mysqli_num_rows($slider);
@@ -35,8 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 	  return $theValue;
 	}
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
-	  $deleteSQL = sprintf("DELETE FROM tbl_slider WHERE id=%s",
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+	  $deleteSQL = sprintf("UPDATE tbl_slider SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);

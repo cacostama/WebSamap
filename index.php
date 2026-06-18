@@ -3,38 +3,38 @@
 <?php 
     
     mysqli_select_db($connect, $database);
-    $query_slider = 'SELECT * FROM tbl_slider ORDER BY id DESC';
+    $query_slider = 'SELECT * FROM tbl_slider WHERE deleted_at IS NULL ORDER BY id DESC';
     $slider = mysqli_query($connect, $query_slider) or die(mysqli_error($link));
     $row_slider = mysqli_fetch_assoc($slider);
     $totalRows_slider = mysqli_num_rows($slider);
 
     mysqli_select_db($connect, $database);
-    $query_slider2 = 'SELECT * FROM tbl_slider ORDER BY id DESC';
+    $query_slider2 = 'SELECT * FROM tbl_slider WHERE deleted_at IS NULL ORDER BY id DESC';
     $slider2 = mysqli_query($connect, $query_slider2) or die(mysqli_error($link));
     $row_slider2 = mysqli_fetch_assoc($slider2);
     $totalRows_slider2 = mysqli_num_rows($slider2);
 
 
     mysqli_select_db($connect, $database);
-    $query_planes = 'SELECT * FROM tbl_planes WHERE especial=0 ORDER BY id ASC';
+    $query_planes = 'SELECT * FROM tbl_planes WHERE especial=0 AND deleted_at IS NULL ORDER BY id ASC';
     $planes = mysqli_query($connect, $query_planes) or die(mysqli_error($link));
     $row_planes = mysqli_fetch_assoc($planes);
     $totalRows_planes = mysqli_num_rows($planes);
 
     mysqli_select_db($connect, $database);
-    $query_servicios = 'SELECT * FROM tbl_servicios ORDER BY id DESC';
+    $query_servicios = 'SELECT * FROM tbl_servicios WHERE deleted_at IS NULL ORDER BY id DESC';
     $servicios = mysqli_query($connect, $query_servicios) or die(mysqli_error($link));
     $row_servicios = mysqli_fetch_assoc($servicios);
     $totalRows_servicios = mysqli_num_rows($servicios);
 
     mysqli_select_db($connect, $database);
-    $query_medicos = "SELECT * FROM tbl_medicos WHERE imagen IS NOT NULL AND imagen <> '' ORDER BY id DESC";
+    $query_medicos = "SELECT * FROM tbl_medicos WHERE imagen IS NOT NULL AND imagen <> '' AND deleted_at IS NULL ORDER BY id DESC";
     $medicos = mysqli_query($connect, $query_medicos) or die(mysqli_error($link));
     $row_medicos = mysqli_fetch_assoc($medicos);
     $totalRows_medicos = mysqli_num_rows($medicos);
 
     mysqli_select_db($connect, $database);
-    $query_blog = 'SELECT * FROM tbl_blog ORDER BY id DESC LIMIT 2';
+    $query_blog = 'SELECT * FROM tbl_blog WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 2';
     $blog = mysqli_query($connect, $query_blog) or die(mysqli_error($link));
     $row_blog = mysqli_fetch_assoc($blog);
     $totalRows_blog = mysqli_num_rows($blog);

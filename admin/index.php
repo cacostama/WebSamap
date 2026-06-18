@@ -60,6 +60,7 @@ header( 'X-Frame-Options: SAMEORIGIN' );
                 session_regenerate_id(true);    // #7 anti session-fixation
                 $_SESSION['ADM_Username'] = $usuario;
                 $_SESSION['ADM_Nombre']   = $resultado['nombre'];
+                $_SESSION['ADM_Rol']      = $resultado['rol'] ?? 'admin'; // #9 roles
                 echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
             } else {
                 samap_login_registrar_fallo();  // suma intento fallido para la IP

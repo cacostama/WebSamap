@@ -3,7 +3,7 @@
 <?php 
 
     mysqli_select_db($connect, $database);
-    $query_aliados = 'SELECT * FROM tbl_aliados ORDER BY id DESC';
+    $query_aliados = 'SELECT * FROM tbl_aliados WHERE deleted_at IS NULL ORDER BY id DESC';
     $aliados = mysqli_query($connect, $query_aliados) or die(mysqli_error($link));
     $row_aliados = mysqli_fetch_assoc($aliados);
     $totalRows_aliados = mysqli_num_rows($aliados);
