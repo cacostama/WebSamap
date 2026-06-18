@@ -1,6 +1,7 @@
 <?php
 /**
- * enviar.php — Procesa el formulario de contacto.
+ * enviar.php — Procesa los formularios de contacto y "trabaje con nosotros".
+ *   El campo oculto "origen" (lista blanca) define el asunto y la pagina de retorno.
  * - Credenciales SMTP desde variables de entorno (no hardcodeadas).
  * - From alineado al dominio propio + Reply-To = email del visitante.
  * - Sanitiza nombre/email para evitar header injection (saltos de linea).
@@ -14,9 +15,8 @@ function limpiar_encabezado($s) {
     // Elimina saltos de linea para prevenir inyeccion de cabeceras de email.
     return trim(str_replace(["\r", "\n", "%0a", "%0d", "%0A", "%0D"], '', (string) $s));
 }
-function volver_con($msg, $ok = false) {
-    $tipo = $ok ? 'ok' : 'error';
-    echo "<script>alert(" . json_encode($msg) . "); location.href='contactos/';</script>";
+function volver_con($msg, $ok = false, $destino = 'contactos/') {
+    echo "<script>alert(" . json_encode($msg) . "); location.href=" . json_encode($destino) . ";</script>";
     exit;
 }
 
@@ -24,15 +24,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     volver_con('Metodo no permitido.');
 }
 
+// --- Origen del formulario: define asunto y pagina de retorno ---
+// Se valida contra una lista blanca para no usar entrada del usuario en el redirect.
+$origenes = [
+    'contacto' => ['destino' => 'contactos/',          'etiqueta' => 'CONTACTO'],
+    'trabajo'  => ['destino' => 'trabajeconnosotros/',  'etiqueta' => 'TRABAJE CON NOSOTROS'],
+];
+$origen   = $_POST['origen'] ?? 'contacto';
+if (!isset($origenes[$origen])) { $origen = 'contacto'; }
+$destino  = $origenes[$origen]['destino'];
+$etiqueta = $origenes[$origen]['etiqueta'];
+
 // --- Honeypot: campo oculto que un humano nunca completa ---
 if (!empty($_POST['website'])) {
     // Probable bot: respondemos "ok" silenciosamente sin enviar nada.
-    volver_con('Su mensaje fue enviado correctamente, gracias por completar el formulario.', true);
+    volver_con('Su mensaje fue enviado correctamente, gracias por completar el formulario.', true, $destino);
 }
 
 // --- Consentimiento obligatorio (Ley 6534/20 datos personales) ---
 if (empty($_POST['consentimiento'])) {
-    volver_con('Debe aceptar la politica de privacidad para enviar el mensaje.');
+    volver_con('Debe aceptar la politica de privacidad para enviar el mensaje.', false, $destino);
 }
 
 // --- Entrada ---
@@ -43,10 +54,10 @@ $mensaje = trim($_POST['mensaje'] ?? '');
 
 // --- Validacion ---
 if ($nombre === '' || $email === '' || $mensaje === '') {
-    volver_con('Por favor complete nombre, correo y mensaje.');
+    volver_con('Por favor complete nombre, correo y mensaje.', false, $destino);
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    volver_con('El correo electronico ingresado no es valido.');
+    volver_con('El correo electronico ingresado no es valido.', false, $destino);
 }
 if (mb_strlen($mensaje) > 5000) {
     $mensaje = mb_substr($mensaje, 0, 5000);
@@ -63,7 +74,7 @@ $leadsBcc = getenv('LEADS_BCC') ?: '';
 
 if (!$smtpHost || !$smtpUser || !$smtpPass) {
     http_response_code(500);
-    volver_con('El servicio de correo no esta configurado. Intente mas tarde.');
+    volver_con('El servicio de correo no esta configurado. Intente mas tarde.', false, $destino);
 }
 
 $fecha = date('d/m/Y H:i:s');
@@ -85,8 +96,10 @@ $mail->AddReplyTo($email, $nombre);
 $mail->AddAddress($leadsTo);
 if ($leadsBcc !== '') { $mail->AddBCC($leadsBcc); }
 
-$mail->Subject = 'MENSAJE DESDE LA WEB: www.samap.com.py';
-$mail->Body = "DATOS PERSONALES
+$mail->Subject = "MENSAJE DESDE LA WEB ($etiqueta): www.samap.com.py";
+$mail->Body = "ORIGEN: $etiqueta
+
+DATOS PERSONALES
 Fecha: $fecha
 Nombre: $nombre
 Telefono: $tel
@@ -97,6 +110,6 @@ $mensaje
 ";
 
 if (!$mail->Send()) {
-    volver_con('No se pudo enviar el mensaje. Por favor intente nuevamente.');
+    volver_con('No se pudo enviar el mensaje. Por favor intente nuevamente.', false, $destino);
 }
-volver_con('Su mensaje fue enviado correctamente, gracias por completar el formulario.', true);
+volver_con('Su mensaje fue enviado correctamente, gracias por completar el formulario.', true, $destino);
