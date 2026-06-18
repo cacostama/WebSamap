@@ -273,6 +273,31 @@
   transform: translateX(4px);
 }
 
+.rd-card__anexo {
+  align-self: center;
+  margin-top: 0.6rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--samap-azul);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--samap-verde);
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rd-card__anexo i {
+  font-size: 0.95rem;
+}
+
+.rd-card__anexo:hover {
+  background: var(--samap-verde);
+  color: #fff;
+}
+
 /* ============================================================
    BENEFICIOS INTERNACIONALES — Assist Card (banda)
    ============================================================ */

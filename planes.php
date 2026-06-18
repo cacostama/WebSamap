@@ -94,7 +94,13 @@
                         </div>
                         <h3 class="rd-card__title"><?php echo $row_planes['titulo']; ?></h3>
                         <p class="rd-card__text"><?php echo $row_planes['detalle']; ?></p>
-                        <a target="_blank" rel="noopener" href="https://wa.link/gza9hk" class="rd-card__link">Consultar</a>
+                        <?php $waPlan = trim($row_planes['url']); ?>
+                        <a target="_blank" rel="noopener" href="<?php echo ($waPlan !== '' && $waPlan !== 'https://') ? htmlspecialchars($waPlan) : 'https://wa.link/gza9hk'; ?>" class="rd-card__link">Consultar</a>
+                        <?php $anexoPlan = trim($row_planes['anexo']); if ($anexoPlan !== '' && is_file(__DIR__ . '/documentos/planes/' . $anexoPlan)) { ?>
+                            <a href="<?php echo $URL?>documentos/planes/<?php echo rawurlencode($anexoPlan); ?>" download class="rd-card__anexo">
+                                <i class="fas fa-file-pdf"></i> Descargar anexo
+                            </a>
+                        <?php } ?>
                     </article>
                 <?php
                     $row_planes = mysqli_fetch_assoc($planes);
