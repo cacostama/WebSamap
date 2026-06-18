@@ -12,7 +12,11 @@ if (isset($_SESSION['ADM_Username'])){
 	$row_plan = mysqli_fetch_assoc($plan);
 	$totalRows_plan = mysqli_num_rows($plan);
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
+	mysqli_select_db($connect, $database);
+	$query_categorias = "SELECT id, nombre FROM tbl_categorias_aliado WHERE deleted_at IS NULL AND activo = 1 ORDER BY orden ASC, nombre ASC";
+	$categorias = mysqli_query($connect, $query_categorias) or die(mysqli_error($connect));
+
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir()) {
 
 		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
@@ -33,10 +37,13 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_servicios SET titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', detalle='".$_POST['detalle']."'"; 
+			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);
+			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
+
+			$sql_update = "UPDATE tbl_servicios SET titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', detalle='".$_POST['detalle']."', categoria_id=".$categoria_sql;
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
@@ -155,7 +162,22 @@ if (isset($_SESSION['ADM_Username'])){
 										</div>
 
 									</div>
-								</fieldset>	
+								</fieldset>
+
+								<fieldset>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Comercios adheridos</label>
+										<div class="col-sm-6">
+											<select name="categoria_id" class="form-control">
+												<option value="0">— Ninguno (usar solo el texto de arriba) —</option>
+												<?php while ($cat = mysqli_fetch_assoc($categorias)) { ?>
+													<option value="<?php echo (int) $cat['id']; ?>" <?php echo ((int) $row_plan['categoria_id'] === (int) $cat['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8'); ?></option>
+												<?php } ?>
+											</select>
+											<span class="help-block">Si elegís una categoría, esta página mostrará automáticamente los comercios adheridos (logo + descuento) que cargaste en <strong>Aliados</strong>. Dejala en "Ninguno" para beneficios que no son una lista de comercios.</span>
+										</div>
+									</div>
+								</fieldset>
 
 								<input type="hidden" name="id" value="<?php echo $row_plan['id']; ?>" />
 

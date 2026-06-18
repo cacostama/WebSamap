@@ -2,10 +2,12 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
 
+	mysqli_select_db($connect, $database);
+	$query_categorias = "SELECT id, nombre FROM tbl_categorias_aliado WHERE deleted_at IS NULL AND activo = 1 ORDER BY orden ASC, nombre ASC";
+	$categorias = mysqli_query($connect, $query_categorias) or die(mysqli_error($connect));
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir()) {
 
 		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
@@ -27,8 +29,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$nombre = $_POST['nombre'];
 			$detalle= htmlentities( $_POST['detalle']);
 			$IMAGEN = $imagen_real;
+			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);
+			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
 
-			$insertSQL = "INSERT INTO tbl_servicios (titulo, intro, detalle, url, imagen) VALUES ('$nombre', '$intro','$detalle','','$IMAGEN')";
+			$insertSQL = "INSERT INTO tbl_servicios (titulo, intro, detalle, url, imagen, categoria_id) VALUES ('$nombre', '$intro','$detalle','','$IMAGEN',$categoria_sql)";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			echo"<script>alert('SERVICIO INSERTADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/servicios/\"</script>";
@@ -129,12 +133,27 @@ if (isset($_SESSION['ADM_Username'])){
 										<label name="imagen" class="col-sm-2 control-label">Imagen</label>
 										<div class="col-sm-4">
 											<input name="imagen" type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-											
-											
+
+
 										</div>
-										
+
 									</div>
-								</fieldset>	
+								</fieldset>
+
+								<fieldset>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Comercios adheridos</label>
+										<div class="col-sm-6">
+											<select name="categoria_id" class="form-control">
+												<option value="0">— Ninguno (usar solo el texto de arriba) —</option>
+												<?php while ($cat = mysqli_fetch_assoc($categorias)) { ?>
+													<option value="<?php echo (int) $cat['id']; ?>"><?php echo htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8'); ?></option>
+												<?php } ?>
+											</select>
+											<span class="help-block">Si elegís una categoría, esta página mostrará automáticamente los comercios adheridos (logo + descuento) que cargaste en <strong>Aliados</strong>. Dejala en "Ninguno" para beneficios que no son una lista de comercios.</span>
+										</div>
+									</div>
+								</fieldset>
 
 								<input type="hidden" name="id" value="" />
 								<input type="hidden" name="MM_insert" value="form2" />

@@ -1,7 +1,7 @@
 <?php require_once('funciones/db.php');?>
 
-<?php 
-    
+<?php
+
     $ID = $_GET['cod'];
     settype($ID, 'integer');
 
@@ -11,19 +11,39 @@
     $row_blog = mysqli_fetch_assoc($blog);
     $totalRows_blog = mysqli_num_rows($blog);
 
+    // Si no existe el beneficio, volver al listado.
+    if (!$row_blog) {
+        echo '<script>window.location.href="'.$URL.'beneficios/"</script>';
+        exit;
+    }
+
+    // ---- Comercios adheridos (si el beneficio referencia una categoria) ----
+    // Cuando tbl_servicios.categoria_id apunta a una categoria de aliados, la
+    // pagina arma sola la grilla de comercios (logo + descuento + detalle).
+    $cat_id = (int) ($row_blog['categoria_id'] ?? 0);
+    $comercios = [];
+    $cat_nombre = '';
+    if ($cat_id > 0) {
+        $q_com = "SELECT a.id, a.titulo, a.descuento, a.detalle, a.imagen, c.nombre AS cat_nombre
+                  FROM tbl_aliados a
+                  JOIN tbl_categorias_aliado c ON a.categoria_id = c.id
+                  WHERE a.categoria_id = ".$cat_id."
+                    AND a.deleted_at IS NULL
+                    AND c.deleted_at IS NULL AND c.activo = 1
+                  ORDER BY a.orden ASC, a.id ASC";
+        $rs_com = mysqli_query($connect, $q_com) or die(mysqli_error($connect));
+        while ($r = mysqli_fetch_assoc($rs_com)) {
+            $cat_nombre = $r['cat_nombre'];
+            $comercios[] = $r;
+        }
+    }
+
+    // Otros beneficios (sidebar).
     mysqli_select_db($connect, $database);
     $query_blogUltimos = 'SELECT * FROM tbl_servicios WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 7';
     $blogUltimos = mysqli_query($connect, $query_blogUltimos) or die(mysqli_error($link));
-    $row_blogUltimos = mysqli_fetch_assoc($blogUltimos);
-    $totalRows_blogUltimos = mysqli_num_rows($blogUltimos);
 
-    mysqli_select_db($connect, $database);
-    $query_blogOtros = 'SELECT * FROM tbl_servicios WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 7,3';
-    $blogOtros = mysqli_query($connect, $query_blogOtros) or die(mysqli_error($link));
-    $row_blogOtros = mysqli_fetch_assoc($blogOtros);
-    $totalRows_Otros = mysqli_num_rows($blogOtros);
-
-?>  
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -36,32 +56,27 @@
     <!-- #favicon -->
     <link rel="shortcut icon" href="<?php echo $URL?>assets/images/favicon.png" type="image/x-icon">
     <!-- #title -->
-    <title>SAMAP - <?php echo $row_blog['titulo']; ?></title>
-    <!-- #keywords -->
-    <meta name="keywords" content="pharmaceutical, Medical">
-    <!-- #description -->
-    <meta name="description" content="Medical HTML5 Template">
+    <title>SAMAP - <?php echo htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8'); ?></title>
+    <!-- #seo -->
+    <?php
+        $seoTitle = htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8').' — SAMAP Medicina Prepaga';
+        $seoDesc  = 'Beneficios y descuentos exclusivos para socios de SAMAP. Conocé los comercios adheridos y aprovechá precios preferenciales.';
+        $seoKeywords = 'beneficios SAMAP, descuentos socios, comercios adheridos';
+        @include 'funciones/seo.php';
+    ?>
 
     <!--  css dependencies start  -->
-
-    <!-- bootstrap five css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/bootstrap/css/bootstrap.min.css">
-    <!-- font awesome six css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/font-awesome/css/fontawesome.min.css">
-    <!-- magnific popup css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/magnific-popup/css/magnific-popup.css">
-    <!-- slick css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/slick/css/slick.css">
-    <!-- odometer css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/odometer/css/odometer.css">
-    <!-- animate css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/vendor/animate/animate.css">
-    <!-- google icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
     <!--  / css dependencies end  -->
-    
+
     <!-- main css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <!-- rediseno css -->
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-convenios.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-beneficio-detalle.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-beneficio-detalle.css'); ?>">
 
 </head>
 
@@ -69,93 +84,116 @@
     <!--  Preloader  -->
     <div id="pre_loader"></div>
 
-
     <!--header-section start-->
     <?php include 'header.php'; ?>
     <!-- header-section end -->
 
-    <!-- Blog Banner Section Start -->
-    <section class="banner">
-        <div class="container ">
-            <div class="row ">
-                <div class="col-lg-12">
-                    <div class="banner__content">
-                        <h1 class="banner__title wow fadeInLeft" data-wow-duration="1.2s"><?php echo $row_blog['titulo']; ?></h1> 
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb wow fadeInRight" data-wow-duration="1.2s">
-                                <li class="breadcrumb-item"><a href="<?php echo $URL?>">Home</a></li>
-                                <li class="breadcrumb-item"><a href="<?php echo $URL?>blogs/">Beneficios</a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><?php echo $row_blog['titulo']; ?></li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+    <div class="rd-cv">
+
+    <!-- Hero Start -->
+    <section class="rd-hero">
+        <div class="rd-container rd-hero__inner">
+            <h1 class="rd-hero__title"><?php echo htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8'); ?></h1>
+            <?php if (!empty($row_blog['intro'])) { ?>
+                <p class="rd-hero__lead"><?php echo htmlspecialchars($row_blog['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
+            <?php } ?>
+            <nav class="rd-hero__crumb" aria-label="breadcrumb">
+                <a href="<?php echo $URL;?>">Inicio</a> <span>/</span>
+                <a href="<?php echo $URL;?>beneficios/">Beneficios</a> <span>/</span>
+                <span><?php echo htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8'); ?></span>
+            </nav>
         </div>
     </section>
-    <!-- Blog Banner Section End -->
-    
-    <!-- Blog Start -->
-    <section class="section blog-details wow fadeInUp" data-wow-duration="0.4s">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="blog-details__wrapper">
-                        <div class="blog-details__inner">
-                            <div class="blog-details__thumb wow fadeInUp" data-wow-duration="1.2">
-    							<div style="text-align: center;">
-                                <img width="40%" src="<?php echo $URL?>documentos/servicios/<?php echo $row_blog['imagen']; ?>" alt="Image">
-    </div>
-                            </div>
-                            <div class="blog-details__content">
-                                
-                                <h2 class="mb_30 wow fadeInUp" data-wow-duration="1.2s"><?php echo $row_blog['titulo']; ?></h2>
-                                <p class="blog-details__content-text">
-                                    <?php echo $row_blog['detalle']; ?>
-                                </p>
-                            </div>
-                        </div>
-                        
-                    </div>
+    <!-- Hero End -->
+
+    <section class="rd-section">
+        <div class="rd-container rd-bd">
+
+            <!-- Columna principal -->
+            <div class="rd-bd__main">
+
+                <?php if (!empty($row_blog['imagen'])) { ?>
+                <div class="rd-bd__cover">
+                    <img src="<?php echo $URL?>documentos/servicios/<?php echo htmlspecialchars($row_blog['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" decoding="async">
                 </div>
+                <?php } ?>
 
-                <div class="col-md-10 col-lg-4">
-                    <div class="sidebar mt-5 mt-lg-0 wow fadeInRight" data-wow-duration="1.2s">
-                        
-                        
-                        <div class="sidebar__latest-post mb_40">
-                            <h4 class="mb_30">Otros Beneficios</h4>
+                <?php if (!empty($comercios)) { ?>
+                    <!-- Grilla de comercios adheridos (data-driven) -->
+                    <div class="rd-bd__intro">
+                        <span class="rd-eyebrow">Comercios adheridos</span>
+                        <h2 class="rd-title rd-title--left"><?php echo htmlspecialchars($cat_nombre, ENT_QUOTES, 'UTF-8'); ?> con descuento</h2>
+                        <p class="rd-subtitle rd-subtitle--left">Presentá tu credencial de socio SAMAP en cualquiera de estos comercios y accedé a precios preferenciales.</p>
+                    </div>
 
-                            <?php do { ?>
-                            <div class="sidebar__post-single">
-                                <div class="latest-post__thumb">
-                                    <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogUltimos['titulo']); ?>/cod/<?php echo $row_blogUltimos['id']; ?>/" title="Read More">
-                                        <img src="<?php echo $URL?>documentos/servicios/<?php echo $row_blogUltimos['imagen']; ?>" alt="Blog">
-                                    </a>
+                    <div class="rd-com-grid">
+                        <?php foreach ($comercios as $com) { ?>
+                        <article class="rd-com">
+                            <div class="rd-com__head">
+                                <div class="rd-com__logo">
+                                    <?php if (!empty($com['imagen'])) { ?>
+                                        <img src="<?php echo $URL?>documentos/aliados/<?php echo htmlspecialchars($com['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($com['titulo'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" decoding="async">
+                                    <?php } else { ?>
+                                        <i class="fas fa-store"></i>
+                                    <?php } ?>
                                 </div>
-                                <div class="latest-post__content">
-                                    <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogUltimos['titulo']); ?>/cod/<?php echo $row_blogUltimos['id']; ?>/"><?php echo $row_blogUltimos['titulo']; ?></a>
-                                   
+                                <div class="rd-com__head-text">
+                                    <h3 class="rd-com__name"><?php echo htmlspecialchars($com['titulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                    <?php if (trim((string) $com['descuento']) !== '') { ?>
+                                        <span class="rd-com__badge"><?php echo htmlspecialchars($com['descuento'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <?php } ?>
                                 </div>
                             </div>
-                            <?php 
-                                $row_blogUltimos = mysqli_fetch_assoc($blogUltimos);
-                                } while ($row_blogUltimos);   //end horizontal looper 
-                            ?>
-                            
-                            
-                        </div>
-                        
+                            <?php if (trim((string) $com['detalle']) !== '') { ?>
+                                <div class="rd-com__detail"><?php echo $com['detalle']; ?></div>
+                            <?php } ?>
+                        </article>
+                        <?php } ?>
                     </div>
+                <?php } else { ?>
+                    <!-- Fallback: texto enriquecido del beneficio -->
+                    <div class="rd-bd__richtext">
+                        <?php echo $row_blog['detalle']; ?>
+                    </div>
+                <?php } ?>
+
+                <div class="rd-bd__cta">
+                    <a href="<?php echo $URL;?>contactos/" class="rd-btn rd-btn--azul">Quiero más información</a>
+                    <a href="<?php echo $URL;?>beneficios/" class="rd-btn rd-btn--ghost">Ver todos los beneficios</a>
                 </div>
             </div>
+
+            <!-- Sidebar: Otros Beneficios -->
+            <aside class="rd-bd__aside">
+                <div class="rd-aside-card">
+                    <h4 class="rd-aside-card__title">Otros Beneficios</h4>
+                    <ul class="rd-aside-list">
+                        <?php while ($u = mysqli_fetch_assoc($blogUltimos)) {
+                            if ((int) $u['id'] === (int) $row_blog['id']) { continue; }
+                            $link = $URL.'beneficio-detalle/titulo/'.str_replace($especiales, $correctos, $u['titulo']).'/cod/'.$u['id'].'/';
+                        ?>
+                        <li class="rd-aside-item">
+                            <a href="<?php echo $link; ?>">
+                                <span class="rd-aside-item__thumb">
+                                    <?php if (!empty($u['imagen'])) { ?>
+                                        <img src="<?php echo $URL?>documentos/servicios/<?php echo htmlspecialchars($u['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($u['titulo'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" decoding="async">
+                                    <?php } else { ?>
+                                        <i class="fas fa-gift"></i>
+                                    <?php } ?>
+                                </span>
+                                <span class="rd-aside-item__name"><?php echo htmlspecialchars($u['titulo'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <i class="fas fa-chevron-right rd-aside-item__arrow"></i>
+                            </a>
+                        </li>
+                        <?php } ?>
+                    </ul>
+                </div>
+            </aside>
+
         </div>
     </section>
-    <!-- Blog End -->
 
-    <!-- Others Blog Start-->
-   
-    <!-- Others Blog end-->
+    </div><!-- /.rd-cv -->
 
     <!-- newsletter Start -->
     <?php include 'newsletter.php'; ?>
@@ -164,31 +202,14 @@
     <!-- Footer Area Start -->
     <?php include 'footer.php'; ?>
     <!-- Footer Area End -->
-    
+
     <!-- scroll to top -->
     <a href="#" class="scrollToTop"><i class="fas fa-angle-double-up"></i></a>
 
     <!--  js dependencies start  -->
-
-    <!-- jquery -->
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
-    <!-- bootstrap five js -->
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- magnific popup js -->
-    <script src="<?php echo $URL?>assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
-    <!-- slick js -->
-    <script src="<?php echo $URL?>assets/vendor/slick/js/slick.min.js"></script>
-    <!-- odometer js -->
-    <script src="<?php echo $URL?>assets/vendor/odometer/js/odometer.min.js"></script>
-    <!-- viewport js -->
-    <script src="<?php echo $URL?>assets/vendor/viewport/viewport.jquery.js"></script>
-    <!-- jquery ui js -->
-    <script src="<?php echo $URL?>assets/vendor/jquery-ui/jquery-ui.min.js"></script>
-    <!-- wow js -->
     <script src="<?php echo $URL?>assets/vendor/wow/wow.min.js"></script>
-    
-    <script src="<?php echo $URL?>assets/vendor/jquery-validate/jquery.validate.min.js"></script> 
-
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->

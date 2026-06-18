@@ -1,0 +1,271 @@
+/* ============================================================================
+   Beneficio / detalle — rediseno
+   Depende de rediseno-base.css y rediseno-convenios.css (hero, container,
+   botones, eyebrow, title). Aca solo el layout de detalle y las tarjetas de
+   comercios adheridos.
+   ============================================================================ */
+
+:root {
+    --rd-azul: #274767;
+    --rd-verde: #6CA3AB;
+    --rd-tinta: #2F2E2D;
+}
+
+/* Layout de dos columnas */
+.rd-bd {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 2.5rem;
+    align-items: start;
+}
+
+@media (max-width: 991px) {
+    .rd-bd {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Portada (icono/imagen del beneficio) */
+.rd-bd__cover {
+    text-align: center;
+    background: linear-gradient(160deg, #f4f8f9 0%, #eef3f5 100%);
+    border: 1px solid #e3ebee;
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.rd-bd__cover img {
+    max-width: 220px;
+    width: 60%;
+    height: auto;
+}
+
+/* Encabezado de seccion alineado a la izquierda */
+.rd-title--left,
+.rd-subtitle--left {
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.rd-bd__intro {
+    margin-bottom: 1.75rem;
+}
+
+/* Texto enriquecido (fallback) */
+.rd-bd__richtext {
+    color: #41525f;
+    line-height: 1.75;
+    font-size: 1.02rem;
+}
+
+.rd-bd__richtext h1,
+.rd-bd__richtext h2,
+.rd-bd__richtext h3,
+.rd-bd__richtext h4,
+.rd-bd__richtext strong,
+.rd-bd__richtext u {
+    color: var(--rd-azul);
+}
+
+.rd-bd__richtext img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ---- Grilla de comercios adheridos ---- */
+.rd-com-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+@media (max-width: 575px) {
+    .rd-com-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rd-com {
+    background: #fff;
+    border: 1px solid #e6edf0;
+    border-radius: 16px;
+    padding: 1.25rem 1.35rem 1.4rem;
+    box-shadow: 0 6px 18px rgba(39, 71, 103, .05);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.rd-com:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(39, 71, 103, .12);
+    border-color: var(--rd-verde);
+}
+
+.rd-com__head {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    margin-bottom: .9rem;
+}
+
+.rd-com__logo {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: #f4f8f9;
+    border: 1px solid #e6edf0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.rd-com__logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.rd-com__logo i {
+    font-size: 1.6rem;
+    color: var(--rd-verde);
+}
+
+.rd-com__head-text {
+    min-width: 0;
+}
+
+.rd-com__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--rd-azul);
+    margin: 0 0 .35rem;
+    line-height: 1.25;
+}
+
+.rd-com__badge {
+    display: inline-block;
+    background: rgba(108, 163, 171, .16);
+    color: #2a6b75;
+    font-weight: 700;
+    font-size: .82rem;
+    padding: .22rem .65rem;
+    border-radius: 999px;
+}
+
+.rd-com__detail {
+    color: #51616d;
+    font-size: .92rem;
+    line-height: 1.6;
+    border-top: 1px dashed #e3ebee;
+    padding-top: .85rem;
+}
+
+.rd-com__detail p {
+    margin: 0 0 .4rem;
+}
+
+.rd-com__detail strong,
+.rd-com__detail b {
+    color: var(--rd-azul);
+}
+
+/* CTA */
+.rd-bd__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .85rem;
+    margin-top: 2.2rem;
+}
+
+/* ---- Sidebar Otros Beneficios ---- */
+.rd-aside-card {
+    background: #fff;
+    border: 1px solid #e6edf0;
+    border-radius: 18px;
+    padding: 1.4rem 1.25rem;
+    box-shadow: 0 8px 24px rgba(39, 71, 103, .06);
+    position: sticky;
+    top: 1.5rem;
+}
+
+.rd-aside-card__title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--rd-azul);
+    margin: 0 0 1rem;
+    padding-bottom: .75rem;
+    border-bottom: 2px solid #eef3f5;
+}
+
+.rd-aside-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.rd-aside-item + .rd-aside-item {
+    margin-top: .4rem;
+}
+
+.rd-aside-item a {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .55rem .5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background .15s ease;
+}
+
+.rd-aside-item a:hover {
+    background: #f4f8f9;
+}
+
+.rd-aside-item__thumb {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: #f4f8f9;
+    border: 1px solid #e6edf0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.rd-aside-item__thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.rd-aside-item__thumb i {
+    color: var(--rd-verde);
+}
+
+.rd-aside-item__name {
+    flex: 1 1 auto;
+    color: var(--rd-tinta);
+    font-weight: 600;
+    font-size: .94rem;
+    line-height: 1.3;
+}
+
+.rd-aside-item a:hover .rd-aside-item__name {
+    color: var(--rd-azul);
+}
+
+.rd-aside-item__arrow {
+    color: #c2ced4;
+    font-size: .8rem;
+    transition: transform .15s ease, color .15s ease;
+}
+
+.rd-aside-item a:hover .rd-aside-item__arrow {
+    color: var(--rd-verde);
+    transform: translateX(3px);
+}

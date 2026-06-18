@@ -427,3 +427,15 @@ UPDATE `tbl_aliados` a
   JOIN `tbl_categorias_aliado` c
     ON a.categoria = c.nombre COLLATE utf8mb4_0900_ai_ci
   SET a.categoria_id = c.id;
+
+-- ============================================================================
+-- Migracion 005 — Servicios/Beneficios vinculables a una categoria de aliados
+-- (ver scripts/migracion-005-servicios-categoria.sql)
+-- ============================================================================
+SET NAMES utf8mb4;
+ALTER TABLE `tbl_servicios` ADD COLUMN `categoria_id` INT NULL AFTER `imagen`;
+UPDATE `tbl_servicios` s
+  JOIN `tbl_categorias_aliado` c
+    ON c.nombre = 'Farmacias' COLLATE utf8mb4_0900_ai_ci
+  SET s.categoria_id = c.id
+  WHERE s.titulo LIKE '%Farmacia%' AND s.deleted_at IS NULL;
