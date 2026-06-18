@@ -19,8 +19,15 @@
 
 						<span class="user-block-name item-text"><?php echo $_SESSION['ADM_Nombre'];?></span>
 						<span class="user-block-role">
-							Administrador
-
+							<?php
+								$rolesEtiqueta = [
+									'admin'     => 'Administrador',
+									'editor'    => 'Editor de contenidos',
+									'comercial' => 'Comercial',
+								];
+								$rolActual = $_SESSION['ADM_Rol'] ?? 'admin';
+								echo $rolesEtiqueta[$rolActual] ?? 'Administrador';
+							?>
 						</span>
 
 						<div class="btn-group user-block-status">
@@ -126,7 +133,7 @@
 
 	<div class="btn-group text-center">
 		<a href="<?php echo $URL?>admin/logout/">
-			<button type="button" data-toggle="tooltip" data-title="Logout" class="btn btn-link">
+			<button type="button" data-toggle="tooltip" data-title="Cerrar sesión" class="btn btn-link">
 				<em class="fa fa-sign-out text-muted"></em>
 			</button>
         </a>

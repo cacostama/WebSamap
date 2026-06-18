@@ -126,7 +126,7 @@ if (isset($_SESSION['ADM_Username'])){
 											
 											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarsanatorio/cod/<?php echo $row_sanatorios['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
 
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sanatorios.php?id=<?php echo $row_sanatorios['id']; ?>&borrar=si"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sanatorios.php?id=<?php echo $row_sanatorios['id']; ?>&borrar=si" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 											
 										</tr>
 	                                  <?php

@@ -144,7 +144,7 @@ if (isset($_SESSION['ADM_Username'])){
 																					<td><?php echo $row_guia['direccion'];?></td>
 																					<td><?php echo $row_guia['telefono'];?></td>
 																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarguia/cod/<?php echo $row_guia['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/guia.php?id=<?php echo $row_guia['id']; ?>&borrar=si"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/guia.php?id=<?php echo $row_guia['id']; ?>&borrar=si" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 																					
 																				</tr>
                                                                               <?php
