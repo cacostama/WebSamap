@@ -41,7 +41,7 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('BLOG ELIMINADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/blogs/\"</script>";
+	  echo"<script>alert('Listo, el artículo se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/blogs/\"</script>";
 	}
 
 } else{

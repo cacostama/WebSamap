@@ -42,7 +42,7 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
-	  echo"<script>alert('SERVICIO ELIMINADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/servicios/\"</script>";
+	  echo"<script>alert('Listo, el servicio se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/servicios/\"</script>";
 	}
 
 } else{
