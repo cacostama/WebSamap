@@ -24,9 +24,12 @@
 
     if ((isset($_POST["MM_search"])) && ($_POST["MM_search"] == "form2")) {
 
-        $VARespecialidad= $_POST["Especialidad"];
-        $VACiudad= $_POST["Ciudad"];
-        $VAMedico= $_POST["medico"];
+        // #2 SQLi: los IDs van a SQL en contexto numerico (sin comillas), donde el
+        // escapeo de db.php no protege. Casteamos a entero; mantenemos '' cuando
+        // no hay seleccion para no romper la logica de ramas de abajo (!= "").
+        $VARespecialidad = ($_POST["Especialidad"] ?? '') !== '' ? (int) $_POST["Especialidad"] : '';
+        $VACiudad        = ($_POST["Ciudad"] ?? '') !== '' ? (int) $_POST["Ciudad"] : '';
+        $VAMedico        = $_POST["medico"] ?? ''; // usado solo en LIKE entre comillas (ya escapado por db.php)
 
         if ($VARespecialidad!='') {
             mysqli_select_db($connect, $database);
