@@ -31,5 +31,9 @@ Thumbs.db
 # Claude Code local config
 .claude/
 
+# Agent tooling local artifacts
+.agents/
+skills-lock.json
+
 # Misc
 tsconfig.tsbuildinfo
