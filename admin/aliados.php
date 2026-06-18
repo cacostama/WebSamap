@@ -108,7 +108,7 @@ if (isset($_SESSION['ADM_Username'])){
 										</tr>
 									</thead>
 									<tbody>
-	                                 <?php do { ?>
+	                                 <?php if ($totalRows_convenios > 0) { do { ?>
 
 										<tr class="gradeX">
 											<td><?php echo $row_convenios['id'];?></td>
@@ -124,7 +124,7 @@ if (isset($_SESSION['ADM_Username'])){
 										</tr>
 	                                  <?php
 	                                        $row_convenios = mysqli_fetch_assoc($convenios);
-	                                        } while ($row_convenios);   //end horizontal looper 
+	                                        } while ($row_convenios); } else { ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">Todavía no hay registros cargados.</td></tr><?php }   //end horizontal looper 
 	                                    ?>  
 									</tbody>
 								</table>

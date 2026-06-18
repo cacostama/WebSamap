@@ -107,7 +107,7 @@ if (isset($_SESSION['ADM_Username'])){
 										</tr>
 									</thead>
 									<tbody>
-	                                 <?php do { ?>
+	                                 <?php if ($totalRows_slider > 0) { do { ?>
 
 										<tr class="gradeX">
 											<td><?php echo $row_slider['id'];?></td>
@@ -122,7 +122,7 @@ if (isset($_SESSION['ADM_Username'])){
 										</tr>
 	                                  <?php
 	                                        $row_slider = mysqli_fetch_assoc($slider);
-	                                        } while ($row_slider);   //end horizontal looper 
+	                                        } while ($row_slider); } else { ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">Todavía no hay registros cargados.</td></tr><?php }   //end horizontal looper 
 	                                    ?>  
 									</tbody>
 								</table>
