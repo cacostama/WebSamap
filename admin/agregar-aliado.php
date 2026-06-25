@@ -5,23 +5,14 @@ if (isset($_SESSION['ADM_Username'])){
 	
 
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
-		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
-	    //--------INICIO IMAGEN1---------//
-		$imagen_real=$_FILES['imagen']['name'];
-
-		if ($_FILES['imagen']['name'] != "") { 
-
-			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
-			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaAliados.$imagen_real);
-			$img_original = "$rutaAliados/".$imagen_real;
-			$type = @getimagesize($img_original);
-
-		}   
-		
-	    //--------FIN IMAGEN1---------//
+		try {
+			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaAliados);
+		} catch (RuntimeException $e) {
+			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			exit;
+		}
 
 			$ciudad = $_POST['ciudad'];
 			$nombre = $_POST['nombre'];
@@ -100,6 +91,7 @@ if (isset($_SESSION['ADM_Username'])){
 					<div class="panel-heading">Formulario de Carga</div>
 					<div class="panel-body">
 						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+							<?php echo samap_csrf_field(); ?>
 
 
 								<fieldset>

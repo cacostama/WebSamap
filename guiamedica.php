@@ -395,10 +395,11 @@
                         <h2 class="section__header-title wow fadeInUp" data-wow-duration="1.2s">Guía Médica</h2>
                         <p class=" wow fadeInDown" data-wow-duration="1.5s">Encuentre a su médico aquí: <br><br></p>
 
-                        <form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+                        <form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2" aria-label="Buscar en la guía médica">
                             <div class="row gy-3 gy-md-4">
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="Especialidad" class="form-select" aria-label="Default select example">
+                                    <label class="rd-visually-hidden" for="guia-especialidad">Especialidad médica</label>
+                                    <select name="Especialidad" id="guia-especialidad" class="form-select" aria-label="Filtrar por especialidad médica">
                                       <option selected value="" >Especialidad</option>
 
                                         <?php do { ?>
@@ -411,7 +412,8 @@
                                     </select>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="Ciudad" class="form-select" aria-label="Default select example">
+                                    <label class="rd-visually-hidden" for="guia-ciudad">Ciudad</label>
+                                    <select name="Ciudad" id="guia-ciudad" class="form-select" aria-label="Filtrar por ciudad">
                                       <option selected value="">Ciudad</option>
                                       <?php do { ?>
                                           <option value="<?php echo$row_ciudad['id'];?>" <?php if ($row_ciudad['id'] == $VACiudad) { echo "selected=\"selected\""; } ?>><?php echo$row_ciudad['nombre'];?></option>
@@ -423,12 +425,13 @@
                                     </select>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-5">
-                                    <input type="text" name="medico" value='<?php if ($VAMedico != '') { echo "$VAMedico"; } ?>' class="form-control" style="border: var(--bs-border-width) solid var(--bs-border-color);" id="formGroupExampleInput" placeholder="Médico">
+                                    <label class="rd-visually-hidden" for="guia-medico">Nombre del médico</label>
+                                    <input type="text" name="medico" value='<?php if ($VAMedico != '') { echo "$VAMedico"; } ?>' class="form-control" style="border: var(--bs-border-width) solid var(--bs-border-color);" id="guia-medico" placeholder="Médico" autocomplete="name">
 
 
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-1">
-                                    <button type="submit" class="btn_theme " style="padding: 7px 37px;" name="submit" id="submit">Buscar</button>
+                                    <button type="submit" class="btn_theme " style="padding: 7px 37px;" name="submit" id="submit" aria-label="Buscar profesionales en la guía médica">Buscar</button>
                                  </div>
                             </div>
                             <input type="hidden" name="MM_search" value="form2" />
@@ -438,7 +441,7 @@
             </div>
             <div class="row gy-3 gy-md-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2" style="margin-bottom:8px;">
-                    <p class="wow fadeInDown m-0" data-wow-duration="1.5s">
+                    <p class="wow fadeInDown m-0" data-wow-duration="1.5s" role="status" aria-live="polite">
                     <strong style='color: red'><?php echo $totalRows_guia;?> </strong> Resultado/s encontrado/s para:
                     <strong style='color: red'><?php echo $row_especialidad2['nombre'] ?? '';?>, </strong>
                     <strong style='color: red'><?php echo $row_ciudad2['nombre'] ?? '';?>, </strong>
@@ -447,11 +450,13 @@
                     <a href="<?php echo $URL?>guiamedica-pdf.php?esp=<?php echo urlencode($VARespecialidad);?>&amp;ciu=<?php echo urlencode($VACiudad);?>&amp;med=<?php echo urlencode($VAMedico);?>"
                        target="_blank" rel="noopener"
                        class="btn_theme"
+                       aria-label="Descargar resultados de la guía médica en PDF"
                        style="padding:9px 20px; white-space:nowrap; display:inline-flex; align-items:center; gap:8px;">
-                        <i class="fas fa-file-pdf"></i> Descargar PDF
+                        <i class="fas fa-file-pdf" aria-hidden="true"></i> Descargar PDF
                     </a>
                 </div>
                 <table width="100%" border="0" cellspacing="10" cellpadding="10" class="table table-striped table-hover">
+                    <caption class="rd-visually-hidden">Resultados de profesionales de la guía médica</caption>
 
                     <?php if ($totalRows_guia > 0) { do { ?>
 

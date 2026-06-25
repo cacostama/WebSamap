@@ -80,15 +80,15 @@
                         <p class="section__content-text wow fadeInDown" data-wow-duration="1.5s">¡Conéctate con nosotros en SAMAP! Estamos aquí para responder todas tus preguntas y brindarte la información que necesitas sobre nuestros planes de seguros médicos y convenios. </p>
                         <div class="contact__info mt_40">        
                             <div class="between_part customGapThree mb_30">
-                                <span class="material-symbols-outlined"> mail </span>
-                                <p class="headingFive"><a href="mailto:asistente.ventas1@samap.com.py" class="__cf_email__">asistente.ventas1@samap.com.py</a></p>
+                                <span class="material-symbols-outlined" aria-hidden="true"> mail </span>
+                                <p class="headingFive"><a href="mailto:asistente.ventas1@samap.com.py" class="__cf_email__" aria-label="Enviar correo a asistente.ventas1@samap.com.py">asistente.ventas1@samap.com.py</a></p>
                             </div>
                             <div class="between_part customGapThree mb_30">
-                                <span class="material-symbols-outlined"> phone_in_talk </span>
-                                <p class="headingFive">021 219 6700</p>
+                                <span class="material-symbols-outlined" aria-hidden="true"> phone_in_talk </span>
+                                <p class="headingFive"><a href="tel:+595212196700" aria-label="Llamar al 021 219 6700">021 219 6700</a></p>
                             </div>
                             <div class="between_part customGapThree mb_30">
-                                <span class="material-symbols-outlined"> location_on </span>
+                                <span class="material-symbols-outlined" aria-hidden="true"> location_on </span>
                                 <p class="headingFive">Paí Pérez y Petirossi, Asunción</p>
                             </div>
                         </div>
@@ -96,18 +96,22 @@
                 </div>
                 <div class="col-xl-6">
                     <div class="contact__form mt-5 mt-xl-0 wow fadeInRight" data-wow-duration="1.5s">
-                        <form method="post" action="<?php echo $URL?>enviar.php" class="contact__form-mail text-center" novalidate="novalidate">
+                        <form method="post" action="<?php echo $URL?>enviar.php" class="contact__form-mail text-center" novalidate="novalidate" aria-describedby="msg">
                             <div class="in-box mb_20">
-                                <input type="text" class="form-control" name="nombre" id="name" placeholder="Nombre" required>
+                                <label class="rd-visually-hidden" for="name">Nombre y apellido</label>
+                                <input type="text" class="form-control" name="nombre" id="name" placeholder="Nombre" autocomplete="name" required aria-required="true">
                             </div>
                             <div class="in-box mb_20">
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Correo" required>
+                                <label class="rd-visually-hidden" for="email">Correo electrónico</label>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Correo" autocomplete="email" required aria-required="true">
                             </div>
                             <div class="in-box mb_20">
-                                <input type="tel" class="form-control" name="tel" id="phone" placeholder="Número" required>
+                                <label class="rd-visually-hidden" for="phone">Número de teléfono</label>
+                                <input type="tel" class="form-control" name="tel" id="phone" placeholder="Número" autocomplete="tel" required aria-required="true">
                             </div>
                             <div class="in-box">
-                                <textarea class="form-control" id="message" name="mensaje" rows="5" placeholder="Mensaje" required></textarea>
+                                <label class="rd-visually-hidden" for="message">Mensaje</label>
+                                <textarea class="form-control" id="message" name="mensaje" rows="5" placeholder="Mensaje" required aria-required="true"></textarea>
                             </div>
 
                             <!-- Honeypot anti-spam: oculto para humanos, los bots lo completan -->
@@ -118,13 +122,13 @@
                             </div>
 
                             <div class="in-box mb_20 text-start" style="margin-top:15px;">
-                                <label style="font-size:14px;display:flex;gap:8px;align-items:flex-start;">
-                                    <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px;">
+                                <label for="consentimiento" style="font-size:14px;display:flex;gap:8px;align-items:flex-start;">
+                                    <input type="checkbox" name="consentimiento" id="consentimiento" value="1" required aria-required="true" style="margin-top:4px;">
                                     <span>Acepto que mis datos sean utilizados para responder mi consulta, conforme a la <a href="<?php echo $URL?>privacidad/" target="_blank" rel="noopener">política de privacidad</a> (Ley 6534/20).</span>
                                 </label>
                             </div>
 
-                            <span id="msg"></span>
+                            <span id="msg" role="status" aria-live="polite"></span>
 
                             <button type="submit" class="btn_theme mt_40" name="submit" id="submit">Enviar</button>
                         </form>

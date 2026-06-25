@@ -22,6 +22,18 @@ html, body {
   overflow-x: hidden;
 }
 
+.rd-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* ---------- Botones compartidos ---------- */
 .rd-btn {
   display: inline-flex;
@@ -180,6 +192,25 @@ html, body {
   cursor: pointer;
   align-items: center;
   justify-content: center;
+}
+.rd-nav__mobile-close { display: none; }
+.rd-nav__close {
+  border: 0;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: .65rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.rd-nav__close:focus-visible {
+  outline: 3px solid var(--samap-verde-2);
+  outline-offset: 2px;
 }
 .rd-nav__overlay { display: none; }
 
@@ -344,6 +375,12 @@ html, body {
     z-index: 1300;
   }
   .rd-nav.is-open .rd-nav__menu { transform: translateX(0); }
+
+  .rd-nav__mobile-close {
+    display: flex;
+    justify-content: flex-end;
+    margin: -3.75rem 0 1.25rem;
+  }
 
   .rd-nav__link { color: #fff; padding: .85rem .5rem; border-radius: 10px; }
   .rd-nav__link:hover,

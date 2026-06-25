@@ -100,4 +100,50 @@ if (!function_exists('samap_rol')) {
 		return samap_rol_es('admin', 'editor');
 	}
 }
+
+// ---- Uploads de imagen ----
+if (!function_exists('samap_guardar_imagen_upload')) {
+	function samap_guardar_imagen_upload($campo, $directorio, $requerido = false) {
+		if (empty($_FILES[$campo]) || ($_FILES[$campo]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+			if ($requerido) {
+				throw new RuntimeException('Debe seleccionar una imagen.');
+			}
+			return '';
+		}
+
+		$archivo = $_FILES[$campo];
+		if (($archivo['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+			throw new RuntimeException('No se pudo recibir la imagen.');
+		}
+		if (($archivo['size'] ?? 0) > 5 * 1024 * 1024) {
+			throw new RuntimeException('La imagen supera el limite de 5 MB.');
+		}
+
+		$permitidos = [
+			'image/jpeg' => 'jpg',
+			'image/png'  => 'png',
+			'image/webp' => 'webp',
+		];
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$mime = $finfo->file($archivo['tmp_name']);
+		if (!isset($permitidos[$mime]) || @getimagesize($archivo['tmp_name']) === false) {
+			throw new RuntimeException('Formato de imagen no permitido. Use JPG, PNG o WEBP.');
+		}
+
+		if (!is_dir($directorio) && !@mkdir($directorio, 0755, true)) {
+			throw new RuntimeException('No se pudo preparar el directorio de destino.');
+		}
+
+		$base = pathinfo((string)$archivo['name'], PATHINFO_FILENAME);
+		$base = preg_replace('/[^a-zA-Z0-9_-]+/', '-', iconv('UTF-8', 'ASCII//TRANSLIT', $base) ?: $base);
+		$base = trim($base, '-_') ?: 'imagen';
+		$nombre = strtolower($base) . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $permitidos[$mime];
+		$destino = rtrim($directorio, '/\\') . DIRECTORY_SEPARATOR . $nombre;
+
+		if (!move_uploaded_file($archivo['tmp_name'], $destino)) {
+			throw new RuntimeException('No se pudo guardar la imagen.');
+		}
+		return $nombre;
+	}
+}
 ?>

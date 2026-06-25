@@ -35,7 +35,12 @@ if (isset($_SESSION['ADM_Username'])){
 	  return $theValue;
 	}
 
-    if ((isset($_GET['borrar'])) && ($_GET['id'] != "") && samap_puede_escribir()) {
+    if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
+	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
+	    echo"<script>alert('No se pudo eliminar la imagen del slider. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/slider/\"</script>";
+	    exit;
+	  }
+
 	  $deleteSQL = sprintf("UPDATE tbl_slider SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
@@ -117,7 +122,7 @@ if (isset($_SESSION['ADM_Username'])){
 											<td>Medida recomendada: 838 × 960 px</td>
 											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarslider/cod/<?php echo $row_slider['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
 
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/slider.php?id=<?php echo $row_slider['id']; ?>&borrar=si" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/slider.php?id=<?php echo $row_slider['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 											
 										</tr>
 	                                  <?php

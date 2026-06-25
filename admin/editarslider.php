@@ -12,23 +12,14 @@ if (isset($_SESSION['ADM_Username'])){
 	$row_sponsor = mysqli_fetch_assoc($sponsor);
 	$totalRows_sponsor = mysqli_num_rows($sponsor);
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
-		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
-	    //--------INICIO IMAGEN1---------//
-		$imagen_real=$_FILES['imagen']['name'];
-
-		if ($_FILES['imagen']['name'] != "") { 
-
-			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
-			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaSlider.$imagen_real);
-			$img_original = "$rutaSlider/".$imagen_real;
-			$type = @getimagesize($img_original);
-
-		}   
-		
-	    //--------FIN IMAGEN1---------//
+		try {
+			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaSlider);
+		} catch (RuntimeException $e) {
+			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			exit;
+		}
 
 			$sql_update = "UPDATE tbl_slider SET nombre='".$_POST['titulo']."'"; 
 
@@ -98,6 +89,7 @@ if (isset($_SESSION['ADM_Username'])){
 					<div class="panel-heading">Formulario de Edición</div>
 					<div class="panel-body">
 						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+							<?php echo samap_csrf_field(); ?>
 
 
 								<fieldset>

@@ -2,7 +2,7 @@
 // Inicializar la sesión.
 // Si está usando session_name("algo"), ¡no lo olvide ahora!
 session_start();
-$URL = 'https://'.$_SERVER['HTTP_HOST'].'/2023/';
+$URL = '//'.$_SERVER['HTTP_HOST'].'/';
 // Destruir todas las variables de sesión.
 $_SESSION = array();
 
@@ -19,4 +19,3 @@ if (ini_get("session.use_cookies")) {
 // Finalmente, destruir la sesión.
 session_destroy();
 echo"<script>window.location.href=\"".$URL."admin/\"</script>";
-?>

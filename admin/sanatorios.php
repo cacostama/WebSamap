@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	
 	mysqli_select_db($connect, $database);
-	$query_sanatorios= "SELECT a.id, a.nombre,b.nombre AS ciudad, a.direccion, a. estado FROM tbl_sanatorio a LEFT JOIN tbl_ciudad b ON a.idCiudad=b.id";
+	$query_sanatorios= "SELECT a.id, a.nombre,b.nombre AS ciudad, a.direccion, a. estado FROM tbl_sanatorio a LEFT JOIN tbl_ciudad b ON a.idCiudad=b.id WHERE a.deleted_at IS NULL";
 	$sanatorios = mysqli_query($connect, $query_sanatorios) or die(mysqli_error($link));
 	$row_sanatorios = mysqli_fetch_assoc($sanatorios);
 	$totalRows_sanatorios = mysqli_num_rows($sanatorios);
@@ -34,7 +34,12 @@ if (isset($_SESSION['ADM_Username'])){
     return $theValue;
 }
 
-    if (isset($_GET['borrar']) && $_GET['id'] != "" && samap_puede_escribir()) {
+    if (isset($_GET['borrar']) && $_GET['id'] != "") {
+	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
+	    echo"<script>alert('No se pudo eliminar el sanatorio. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/sanatorios/\"</script>";
+	    exit;
+	  }
+
 	  $deleteSQL = sprintf("UPDATE tbl_sanatorio SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
@@ -126,7 +131,7 @@ if (isset($_SESSION['ADM_Username'])){
 											
 											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarsanatorio/cod/<?php echo $row_sanatorios['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
 
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sanatorios.php?id=<?php echo $row_sanatorios['id']; ?>&borrar=si" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sanatorios.php?id=<?php echo $row_sanatorios['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 											
 										</tr>
 	                                  <?php

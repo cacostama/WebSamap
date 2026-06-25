@@ -16,7 +16,14 @@
             <i class="fas fa-bars"></i>
         </button>
 
-        <ul class="rd-nav__menu" id="rdNavMenu">
+        <ul class="rd-nav__menu" id="rdNavMenu" aria-label="Navegación principal">
+            <li class="rd-nav__mobile-close">
+                <button class="rd-nav__close" type="button" id="rdNavClose" aria-label="Cerrar menú">
+                    <span>Cerrar</span>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </li>
+
             <li><a class="rd-nav__link" href="<?php echo $URL?>">Inicio</a></li>
 
             <li class="rd-dropdown">
@@ -61,18 +68,22 @@
 (function () {
     var nav = document.getElementById('rdNav');
     var toggle = document.getElementById('rdNavToggle');
+    var closeButton = document.getElementById('rdNavClose');
     var overlay = document.getElementById('rdNavOverlay');
     if (!nav || !toggle) return;
     function close() {
         nav.classList.remove('is-open');
         document.body.classList.remove('rd-nav-open');
         toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Abrir menú');
     }
     toggle.addEventListener('click', function () {
         var open = nav.classList.toggle('is-open');
         document.body.classList.toggle('rd-nav-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     });
+    if (closeButton) closeButton.addEventListener('click', close);
     if (overlay) overlay.addEventListener('click', close);
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') close();

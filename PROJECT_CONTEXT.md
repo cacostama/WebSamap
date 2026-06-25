@@ -51,11 +51,9 @@ docker compose up -d --build
   (copia de `backup_samap.sql.gz`), montado en `/docker-entrypoint-initdb.d`.
 - El código se monta como volumen en `/var/www/html`.
 
-**Credenciales de DB (definidas en docker-compose.yml y en el código):**
-base `web_samap`, user `webadmin`, host `db`. ⚠️ La contraseña está **hardcodeada** en
-`funciones/db.php`, `admin/funciones/db.php` y `admin/conexion.php`. Es deuda técnica de
-seguridad conocida (ver §8). No la repliques en código nuevo: idealmente mover a variables
-de entorno.
+**Credenciales de DB:** se leen desde variables de entorno (`DB_HOST`, `DB_NAME`, `DB_USER`,
+`DB_PASS`) inyectadas por `docker-compose.yml` / `.env`. `.env` es local y gitignored; usar
+`.env.example` como plantilla.
 
 ---
 
@@ -87,16 +85,17 @@ de entorno.
 └── documentos/           → imágenes subidas desde el admin (blog, medicos, slider, servicios, aliados…)
 
 /admin                    → PANEL CMS
-├── index.php             → login (POST usuario/clave → tbl_user, password con MD5)
+├── index.php             → login (POST usuario/clave → tbl_user; bcrypt con migración MD5 al vuelo)
 ├── home.php              → dashboard (protegido por $_SESSION['ADM_Username'])
 ├── header.php / aside.php→ layout del admin
 ├── conexion.php          → conexión mysqli (OO) a web_samap
 ├── funciones/db.php      → conexión + rutas de upload del admin
 ├── agregar-*.php         → formularios de ALTA (plan, blog, medico, slider, servicio, aliado, ciudad, convenio, guia, sanatorio, galeria, etc.)
 ├── editar*.php           → formularios de EDICIÓN equivalentes
-├── proceso.php           → endpoint de procesamiento de algunos formularios
+├── logout.php            → cierre de sesión
 ├── <recurso>.php         → listados (planes.php, blogs.php, medicos.php, slider.php, …)
-├── class/                → PHPMailer + token.php (CSRF/sesión, mayormente comentado)
+├── funciones/seguridad.php → CSRF, rate-limit, roles y helper de uploads
+├── class/                → PHPMailer + token.php legacy
 ├── pages/                → plantillas HTML del login (login.html, recover.html, etc.)
 └── app/                  → css/img/js del tema del admin
 ```
@@ -124,7 +123,7 @@ como flags int, imágenes guardadas como nombre de archivo (no BLOB) en `documen
 | `tbl_especialidad` | Catálogo especialidades | id, nombre, estado |
 | `tbl_sanatorio` | Sanatorios/sedes | id, **idCiudad**, nombre, direccion, telefono, estado |
 | `tbl_ciudad` | Catálogo ciudades | id, nombre, estado |
-| `tbl_user` | Usuarios del admin | id, nombre, userName, **userPass (MD5)** |
+| `tbl_user` | Usuarios del admin | id, nombre, userName, **userPass (bcrypt o MD5 legacy)**, rol |
 
 Relaciones: `tbl_guiamedica.idEspecialidad → tbl_especialidad.id`,
 `tbl_guiamedica.idSanatorios → tbl_sanatorio.id`, `tbl_sanatorio.idCiudad → tbl_ciudad.id`.
@@ -154,9 +153,11 @@ No hay foreign keys declaradas; las relaciones se resuelven por JOIN/consultas e
 `plan-detalle/titulo/<slug>/cod/<id>/` y el rewrite los mapea a
 `plan-detalle.php?titulo=<slug>&cod=<id>`. (Soporta 1 a 4 pares clave/valor.)
 
-**Admin** — login en `admin/index.php`: `POST usuario/clave`, consulta
-`tbl_user WHERE userName=? AND userPass=md5(?)`, setea `$_SESSION['ADM_Username']` y redirige
-a `admin/home/`. Cada página del admin chequea `isset($_SESSION['ADM_Username'])` o redirige al login.
+**Admin** — login en `admin/index.php`: `POST usuario/clave`, busca usuario con prepared statement,
+verifica `password_verify()` si el hash es bcrypt, o valida MD5 legacy y lo migra a bcrypt al vuelo.
+Setea `$_SESSION['ADM_Username']`, `$_SESSION['ADM_Nombre']`, `$_SESSION['ADM_Rol']` y redirige
+a `admin/home/`. Cada página del admin pasa por `admin/funciones/session.php`, que centraliza sesión,
+expiración por inactividad y guard de autenticación.
 CRUD = trío `agregar-<x>.php` (form alta) / `editar<x>.php` (form edición) / `<x>.php` (listado),
 con upload de imágenes a `documentos/<categoria>/`.
 
@@ -180,14 +181,18 @@ con upload de imágenes a `documentos/<categoria>/`.
   (fallback a defaults) en `funciones/db.php`, `admin/funciones/db.php`, `admin/conexion.php`.
   Valores reales en `.env` (gitignored) e inyectados por `docker-compose.yml`. Plantilla en `.env.example`.
 - ✅ **SQL injection en login**: `admin/index.php` usa **prepared statement** (`prepare`+`bind_param`).
+- ✅ **Passwords admin**: `admin/index.php` soporta bcrypt y migra hashes MD5 legacy al vuelo tras login exitoso.
+- ✅ **CSRF/rate-limit base**: `admin/funciones/seguridad.php` provee token CSRF y limitación de intentos de login por IP.
+- ✅ **Borrados admin principales**: listados de planes, servicios, aliados, blogs, slider, médicos, guía y sanatorios validan `samap_puede_escribir()` + `samap_csrf_validar()`.
+- ✅ **Uploads principales**: altas/ediciones de blog, planes, médicos, slider y aliados usan helper central con whitelist JPG/PNG/WEBP, MIME real, tamaño máximo y nombre generado.
 - ✅ Warnings de login corregidos (`$login`/`$captcha` con `?? ''`, y `?>` final removido de `admin/funciones/db.php`).
 
 **Pendiente (NO empeorar):**
-- ⚠️ **Passwords de admin en MD5** (`tbl_user.userPass`) — algoritmo roto; migrar a `password_hash()`/`password_verify()`.
 - ⚠️ **SQL injection en el resto**: front concatena `$_GET`/`$_POST` (`cod`/`id`) en muchas páginas. Toda query
   nueva debe ser **parametrizada** (mysqli prepared statements).
-- ⚠️ CSRF/token y reCAPTCHA existen pero **comentados** (`admin/class/token.php`, `recaptchalib.php`).
-- ⚠️ Headers de seguridad (CSP) y validación de uploads por magic bytes.
+- ⚠️ CSRF aún no cubre todos los formularios CRUD legacy ni todos los hard deletes secundarios.
+- ⚠️ ReCAPTCHA existe como librería legacy, pero no está integrado de forma confiable.
+- ⚠️ Headers de seguridad (CSP) y validación de uploads pendiente en CRUDs no migrados.
 - Datos de salud = datos sensibles (Ley 6534/20 Paraguay). Cuidá PII en logs y formularios.
 
 Al tocar estas zonas: corregí hacia lo seguro, no repliques el patrón inseguro.
@@ -227,7 +232,7 @@ SITIO PÚBLICO (http://localhost:8081/)
 
 PANEL ADMIN (http://localhost:8081/admin/)
 │
-├── /admin/index/                     index.php   Login (POST usuario+clave → tbl_user, md5)
+├── /admin/index/                     index.php   Login (POST usuario+clave → tbl_user, bcrypt/MD5 legacy)
 │        └─ ok → $_SESSION['ADM_Username'] → /admin/home/
 │        └─ error → /admin/index/log/error/
 ├── /admin/home/                      home.php    Dashboard (requiere sesión)
@@ -241,21 +246,18 @@ PANEL ADMIN (http://localhost:8081/admin/)
 
 ---
 
-## 8c. Plan de remediación de seguridad (pendiente — NO ejecutado aún)
+## 8c. Plan de remediación de seguridad (estado parcial)
 
 Orden sugerido, de mayor a menor impacto. Cada punto debe hacerse y probarse aislado
 (la app está en producción/Docker y los cambios pueden romperla):
 
-1. **Credenciales fuera del código** → leer DB host/user/pass de variables de entorno
-   (`getenv()`), inyectadas por `docker-compose.yml` / `/etc/samap/env`. Hoy están en
-   `funciones/db.php`, `admin/funciones/db.php`, `admin/conexion.php`.
-2. **Passwords de admin** → migrar `tbl_user.userPass` de `md5()` a `password_hash()` /
-   `password_verify()`. Requiere re-hashear o forzar reset de la única cuenta existente.
-3. **SQL injection** → reemplazar concatenación de `$_GET`/`$_POST` por **prepared statements**
+1. **Credenciales fuera del código** → hecho en los tres conectores DB.
+2. **Passwords de admin** → hecho de forma compatible: bcrypt + migración MD5 al vuelo.
+3. **CSRF + permisos admin** → aplicado en login y borrados/listados principales; falta completar formularios y recursos legacy secundarios.
+4. **Uploads** → helper central aplicado a CRUDs principales; falta extender al resto del admin.
+5. **SQL injection** → reemplazar concatenación de `$_GET`/`$_POST` por **prepared statements**
    (`mysqli_prepare` + `bind_param`), empezando por login y por las páginas que reciben `cod`/`id` en la URL.
-4. **Reactivar CSRF + reCAPTCHA** en login y formularios (la lógica existe comentada en
-   `admin/class/token.php` y `recaptchalib.php`).
-5. **Endurecer headers** (CSP, X-Frame-Options consistente) y validar uploads por magic bytes en el admin.
+6. **Endurecer headers** (CSP, X-Frame-Options consistente) y definir política de reCAPTCHA.
 
 > Recomendación: abordar de a uno, con backup de DB previo, y verificar HTTP 200 + login tras cada cambio.
 
@@ -302,11 +304,33 @@ Datos reales cargados (7 planes, 85 médicos, 325 guía médica, 210 sanatorios,
   `Fatal error: Class "IntlDateFormatter" not found` en `index.php:460`, cortaba el HTML
   antes de los `<script>` y dejaba el **preloader colgado** (logo SAMAP girando).
 
+### Cambios aplicados en esta ronda (feat/rediseno-web)
+
+**Admin / seguridad**
+- Borrados de `admin/blogs.php`, `admin/aliados.php`, `admin/planes.php`, `admin/servicios.php`,
+  `admin/slider.php`, `admin/medicos.php`, `admin/guia.php` y `admin/sanatorios.php` ahora validan
+  permiso de escritura y token CSRF.
+- Agregado helper `samap_guardar_imagen_upload()` en `admin/funciones/seguridad.php` para validar
+  JPG/PNG/WEBP por MIME real, tamaño máximo 5 MB y nombres únicos.
+- Altas/ediciones de blog, planes, médicos, slider y aliados incorporan CSRF, permiso de escritura
+  y el helper central de uploads.
+- `admin/logout.php` ya no fuerza `/2023/`; usa host actual y URL protocol-relative.
+- Eliminado `admin/proceso.php`, endpoint legacy de login con `tbl_usuarios`, MD5 y SQL interpolado.
+
+**Frontend / accesibilidad**
+- `header.php` incorpora botón visible de cierre del menú móvil y aria dinámico.
+- `contactos.php` y `guiamedica.php` agregan labels/aria más descriptivos sin cambiar la lógica PHP.
+- `assets/css/rediseno-base.css` agrega estilos para el cierre móvil y clase visualmente oculta.
+
+**Despliegue / contexto**
+- Agregado `.dockerignore` para excluir `.env`, `.git`, zips/backups, `_notes`, logs y artefactos locales del build Docker.
+- Actualizado este `PROJECT_CONTEXT.md` para reflejar bcrypt, CSRF, roles, uploads y cambios de esta ronda.
+
 ### Pendientes de seguridad (sin hacer)
-- Passwords admin en MD5 (`tbl_user.userPass`) → migrar a `password_hash()`/`password_verify()`.
 - Prepared statements en el resto de páginas que reciben `cod`/`id` por URL (front concatena `$_GET`/`$_POST`).
-- Reactivar CSRF/token + reCAPTCHA (existen comentados en `admin/class/token.php`, `recaptchalib.php`).
-- Headers CSP + validación de uploads por magic bytes.
+- Completar CSRF en formularios CRUD y recursos legacy secundarios no cubiertos por esta ronda.
+- Extender helper de uploads al resto de formularios admin.
+- Headers CSP + política de reCAPTCHA.
 - (Opcional) Borrar/limpiar el registro basura `tbl_medicos` id=92.
 
 ### Notas para retomar

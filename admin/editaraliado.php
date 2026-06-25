@@ -12,40 +12,16 @@ if (isset($_SESSION['ADM_Username'])){
 	$row_plan = mysqli_fetch_assoc($plan);
 	$totalRows_plan = mysqli_num_rows($plan);
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
-
-		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
-		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
-	    //--------INICIO IMAGEN1---------//
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
 	    $detalle= htmlentities( $_POST['detalle']);
 
-		$imagen_real=$_FILES['imagen']['name'];
-
-		if (!empty($_FILES['imagen']['name']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-
-    $rutaAliados = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/documentos/aliados/';
-
-    // Sanitizar nombre
-    $imagen_real = str_replace($especiales, $correctos, $_FILES['imagen']['name']);
-    $imagen_real = basename($imagen_real);
-
-    $destino = $rutaAliados . $imagen_real;
-
-    // Mover archivo
-    if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $destino)) {
-        die("Error al mover archivo a: " . $destino);
-    }
-
-    // Validar que sea imagen (opcional pero recomendado)
-    if (@getimagesize($destino) === false) {
-        // unlink($destino); // si querés borrar lo que no sea imagen
-        die("El archivo subido no es una imagen válida.");
-    }
-}
-  
-		
-	    //--------FIN IMAGEN1---------//
+		try {
+			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaAliados);
+		} catch (RuntimeException $e) {
+			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			exit;
+		}
 
 			$categoria_id  = (int) ($_POST['categoria_id'] ?? 0);
 			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
@@ -126,6 +102,7 @@ if (isset($_SESSION['ADM_Username'])){
 					<div class="panel-heading">Formulario de Edición</div>
 					<div class="panel-body">
 						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+							<?php echo samap_csrf_field(); ?>
 
 
 							
