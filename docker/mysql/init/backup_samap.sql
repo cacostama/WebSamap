@@ -451,3 +451,138 @@ WHERE id = 6;
 UPDATE `tbl_aliados` SET detalle =
 '<p><strong>Por compras al contado (efectivo o tarjeta de débito):</strong></p><ul><li>Medicamentos Nacionales: 20% de descuento, todos los días</li><li>Medicamentos Importados: 18% de descuento, todos los días</li><li>Perfumería y Artículos Varios: 15% de descuento, todos los días</li></ul><p><strong>Por compras con tarjeta de crédito:</strong></p><ul><li>Medicamentos Nacionales, Importados, Perfumería y Artículos Varios: 15% de descuento, todos los días</li></ul>'
 WHERE id = 8;
+
+-- ============================================================================
+-- Migracion 007 — Crear las 8 tablas referenciadas por admin/ que faltaban en
+-- el seed original. Mantener sincronizado con
+-- migrations/001-create-missing-tables.sql (mismo esquema, distintas formas
+-- del bloque CREATE: ahi se usa IF NOT EXISTS para poder re-ejecutar en una DB
+-- ya inicializada; aca se usa DROP/CREATE para fresh installs).
+-- ============================================================================
+SET NAMES utf8;
+
+DROP TABLE IF EXISTS `tbl_fotos`;
+CREATE TABLE `tbl_fotos` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(250) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL,
+  `ruta` varchar(500) DEFAULT NULL,
+  `galeria_id` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_fotos_galeria_id` (`galeria_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_apoyan`;
+CREATE TABLE `tbl_apoyan` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(250) DEFAULT NULL,
+  `URL` varchar(500) DEFAULT NULL,
+  `imagen` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_sponsor`;
+CREATE TABLE `tbl_sponsor` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(250) DEFAULT NULL,
+  `URL` varchar(500) DEFAULT NULL,
+  `imagen` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_speaker`;
+CREATE TABLE `tbl_speaker` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(250) DEFAULT NULL,
+  `titulo` varchar(250) DEFAULT NULL,
+  `intro` varchar(500) DEFAULT NULL,
+  `texto` text DEFAULT NULL,
+  `linkedin` varchar(500) DEFAULT NULL,
+  `ig` varchar(500) DEFAULT NULL,
+  `fb` varchar(500) DEFAULT NULL,
+  `tw` varchar(500) DEFAULT NULL,
+  `web` varchar(500) DEFAULT NULL,
+  `idNacionalidad` int DEFAULT NULL,
+  `imagen` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_speaker_idNacionalidad` (`idNacionalidad`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_nacionalidad`;
+CREATE TABLE `tbl_nacionalidad` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nacionalidad` varchar(250) DEFAULT NULL,
+  `bandera` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_galeria`;
+CREATE TABLE `tbl_galeria` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_agenda_detalle`;
+CREATE TABLE `tbl_agenda_detalle` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idAgenda` int DEFAULT NULL,
+  `titulo` varchar(250) DEFAULT NULL,
+  `horario` varchar(100) DEFAULT NULL,
+  `lugar` varchar(250) DEFAULT NULL,
+  `texto` text DEFAULT NULL,
+  `idSpeaker1` int DEFAULT NULL,
+  `idSpeaker2` int DEFAULT NULL,
+  `idSpeaker3` int DEFAULT NULL,
+  `idSpeaker4` int DEFAULT NULL,
+  `idSpeaker5` int DEFAULT NULL,
+  `idSpeaker6` int DEFAULT NULL,
+  `idSpeaker7` int DEFAULT NULL,
+  `idSpeaker8` int DEFAULT NULL,
+  `idSpeaker9` int DEFAULT NULL,
+  `idSpeaker10` int DEFAULT NULL,
+  `imagen` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_agenda_detalle_idAgenda` (`idAgenda`),
+  KEY `idx_agenda_detalle_idSpeaker1` (`idSpeaker1`),
+  KEY `idx_agenda_detalle_idSpeaker2` (`idSpeaker2`),
+  KEY `idx_agenda_detalle_idSpeaker3` (`idSpeaker3`),
+  KEY `idx_agenda_detalle_idSpeaker4` (`idSpeaker4`),
+  KEY `idx_agenda_detalle_idSpeaker5` (`idSpeaker5`),
+  KEY `idx_agenda_detalle_idSpeaker6` (`idSpeaker6`),
+  KEY `idx_agenda_detalle_idSpeaker7` (`idSpeaker7`),
+  KEY `idx_agenda_detalle_idSpeaker8` (`idSpeaker8`),
+  KEY `idx_agenda_detalle_idSpeaker9` (`idSpeaker9`),
+  KEY `idx_agenda_detalle_idSpeaker10` (`idSpeaker10`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+DROP TABLE IF EXISTS `tbl_agenda`;
+CREATE TABLE `tbl_agenda` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(250) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
