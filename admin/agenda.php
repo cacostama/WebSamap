@@ -2,8 +2,8 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
-	
+
+
 	mysqli_select_db($connect, $database);
 	$query_agenda = "SELECT
 							a.id,
@@ -46,17 +46,15 @@ if (isset($_SESSION['ADM_Username'])){
 						LEFT JOIN tbl_speaker l ON
 						    a.idSpeaker10 = l.id";
 	$agenda = mysqli_query($connect, $query_agenda) or die(mysqli_error($link));
-	$row_agenda = mysqli_fetch_assoc($agenda);
-	$totalRows_agenda = mysqli_num_rows($agenda);
-    
-    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+
+    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
 	  $theValue = addslashes($theValue);
 
 	  switch ($theType) {
 	    case "text":
 	      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-	      break;    
+	      break;
 	    case "long":
 	    case "int":
 	      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
@@ -89,12 +87,40 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('AGENDA ELIMINADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/agenda/\"</script>";
 	}
 
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Agenda';
+	$btn_agregar_label   = 'Agregar Agenda';
+	$btn_agregar_url     = 'admin/agregar-agenda.php';
+	$edit_url_pattern    = 'admin/editaragenda/cod/{id}/';
+	$delete_url_pattern  = 'admin/agenda.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar este registro de agenda? No se puede deshacer.';
+	$empty_message       = 'Todavía no hay registros de agenda cargados.';
+
+	$columns = [
+		['th' => 'ID',      'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
+		['th' => 'Título',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['titulo'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Fecha',   'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['fecha'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Horario', 'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['horario'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Lugar',   'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['lugar'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Speakers','td_html' => function($r) {
+			$parts = [];
+			for ($i = 1; $i <= 10; $i++) {
+				$key = 'speaker' . $i;
+				$val = (string)($r[$key] ?? '');
+				if ($val !== '') {
+					$parts[] = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+				}
+			}
+			return '<td>' . implode('<br>', $parts) . '</td>';
+		}],
+	];
+
 } else{
 
 	echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
 
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -132,64 +158,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Agenda</h3>
-				<!--<div data-toggle="notify" data-onload data-message="&lt;b&gt;New Updates Available!&lt;/b&gt; Don't forget to check them!" data-options="{&quot;status&quot;:&quot;danger&quot;, &quot;pos&quot;:&quot;top-right&quot;}" class="hidden-xs"></div>-->
-				<div class="row">
-																<div class="panel panel-default">
-																	<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-agenda.php" class="btn btn-primary" >Agregar Agenda</a></div>
-																	<div class="panel-body">
-																		<table id="datatable1" class="table table-striped table-hover">
-																			<thead>
-																				<tr>
-																					<th>ID</th>
-																					<th>Titulo</th>
-																					<th>Fecha</th>
-																					<th>Horario</th>
-																					<th>Lugar</th>
-																					<th>Speaker/s</th>
-																					<th colspan="2" class="sort-alpha">Acciones</th>
-																				</tr>
-																			</thead>
-																			<tbody>
-                                                                             <?php do { // horizontal looper
-
-                                                                             	
-
-                                                                             ?>
-
-																				<tr class="gradeX">
-																					<td><?php echo $row_agenda['id'];?></td>
-																					<td><?php echo $row_agenda['titulo'];?></td>
-																					<td><?php echo $row_agenda['fecha'];?></td>
-																					<td><?php echo $row_agenda['horario'];?></td>
-																					<td><?php echo $row_agenda['lugar'];?></td>
-																					<td>
-																						<?php echo $row_agenda['speaker1']; ?>
-																						<?php echo $row_agenda['speaker2'];?>
-																						<?php echo $row_agenda['speaker3'];?>
-																						<?php echo $row_agenda['speaker4'];?>
-																						<?php echo $row_agenda['speaker5'];?>
-																						<?php echo $row_agenda['speaker6'];?>
-																						<?php echo $row_agenda['speaker7'];?>
-																						<?php echo $row_agenda['speaker8'];?>
-																						<?php echo $row_agenda['speaker9'];?>
-																						<?php echo $row_agenda['speaker10'];?>
-																					</td>
-																					
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editaragenda/cod/<?php echo $row_agenda['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/agenda.php?id=<?php echo $row_agenda['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro de agenda? No se puede deshacer.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-																					
-																				</tr>
-                                                                              <?php
-									                                                $row_agenda = mysqli_fetch_assoc($agenda);
-									                                                } while ($row_agenda);   //end horizontal looper 
-									                                            ?>  
-																			</tbody>
-																		</table>
-																	</div>
-																</div>
-															</div>
-														</div>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
+				<?php if (isset($agenda)) { $rows = $agenda; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>
@@ -218,14 +188,13 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
 
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]
+	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
 	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
 
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>-->
-
 	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+
 </body>
 </html>

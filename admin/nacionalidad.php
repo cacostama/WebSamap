@@ -2,22 +2,20 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
-	
+
+
 	mysqli_select_db($connect, $database);
 	$query_nacionalidad = "SELECT * FROM tbl_nacionalidad";
 	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($link));
-	$row_nacionalidad = mysqli_fetch_assoc($nacionalidad);
-	$totalRows_nacionalidad = mysqli_num_rows($nacionalidad);
-    
-    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+
+    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
 	  $theValue = addslashes($theValue);
 
 	  switch ($theType) {
 	    case "text":
 	      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-	      break;    
+	      break;
 	    case "long":
 	    case "int":
 	      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
@@ -50,12 +48,31 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('NACIONALIDAD ELIMINADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/nacionalidad/\"</script>";
 	}
 
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Nacionalidades';
+	$btn_agregar_label   = 'Agregar Nacionalidad';
+	$btn_agregar_url     = 'admin/agregar-nacionalidad.php';
+	$edit_url_pattern    = 'admin/editarnacionalidad/cod/{id}/';
+	$delete_url_pattern  = 'admin/nacionalidad.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar esta nacionalidad? No se puede deshacer.';
+	$empty_message       = 'Todavía no hay nacionalidades cargadas.';
+
+	$URL_BASE = $URL;
+	$columns = [
+		['th' => 'ID',           'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
+		['th' => 'Nacionalidad', 'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nacionalidad'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Bandera',      'td_html' => function($r) use ($URL_BASE) {
+			$img = htmlspecialchars((string)($r['bandera'] ?? ''), ENT_QUOTES, 'UTF-8');
+			return '<td><img height="18px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/bandera/' . $img . '" alt=""/> 28x18 px</td>';
+		}],
+	];
+
 } else{
 
 	echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
 
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,50 +110,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Nacionalidades</h3>
-				
-				<div class="row">
-						<div class="panel panel-default">
-							<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-nacionalidad.php" class="btn btn-primary" >Agregar Nacionalidad</a></div>
-							<div class="panel-body">
-								<table id="datatable1" class="table table-striped table-hover">
-									<thead>
-										<tr>
-											<th>ID</th>
-											<th>Nacionalidad</th>
-											<th>Bandera</th>
-											
-											
-											<th colspan="2" class="sort-alpha">Acciones</th>
-										</tr>
-									</thead>
-									<tbody>
-                                     <?php do { // horizontal looper
-
-                                     	
-
-                                     ?>
-
-										<tr class="gradeX">
-											<td><?php echo $row_nacionalidad['id'];?></td>
-											<td><?php echo $row_nacionalidad['nacionalidad'];?></td>
-											<td><img  height="18px" src="<?php echo $URL?>documentos/bandera/<?php echo $row_nacionalidad['bandera'];?>" alt=""/> 28x18 px</td>
-
-											
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarnacionalidad/cod/<?php echo $row_nacionalidad['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/nacionalidad.php?id=<?php echo $row_nacionalidad['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar esta nacionalidad? No se puede deshacer.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-											
-										</tr>
-                                      <?php
-                                            $row_nacionalidad = mysqli_fetch_assoc($nacionalidad);
-                                            } while ($row_nacionalidad);   //end horizontal looper 
-                                        ?>  
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
+				<?php if (isset($nacionalidad)) { $rows = $nacionalidad; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>
@@ -165,13 +140,11 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
 
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]
+	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
 	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>-->
 
 	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
 

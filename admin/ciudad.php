@@ -2,22 +2,20 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
-	
+
+
 	mysqli_select_db($connect, $database);
 	$query_ciudad= "SELECT * FROM tbl_ciudad WHERE deleted_at IS NULL ORDER BY nombre ASC";
 	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
-	$row_ciudad = mysqli_fetch_assoc($ciudad);
-	$totalRows_ciudad = mysqli_num_rows($ciudad);
-    
-    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+
+    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
 	  $theValue = addslashes($theValue);
 
 	  switch ($theType) {
 	    case "text":
 	      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-	      break;    
+	      break;
 	    case "long":
 	    case "int":
 	      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
@@ -50,12 +48,32 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('Listo, la ciudad se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/ciudad/\"</script>";
 	}
 
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Ciudades';
+	$btn_agregar_label   = 'Agregar Ciudad';
+	$btn_agregar_url     = 'admin/agregar-ciudad.php';
+	$edit_url_pattern    = 'admin/editarciudad/cod/{id}/';
+	$delete_url_pattern  = 'admin/ciudad.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar esta ciudad? Dejará de mostrarse en el sitio web.';
+	$empty_message       = 'Todavía no hay ciudades cargadas.';
+
+	$columns = [
+		['th' => 'ID',      'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
+		['th' => 'Nombre',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nombre'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Estado',  'td_html' => function($r) {
+			$activo = ((int)($r['estado'] ?? 0)) === 1;
+			$cls = $activo ? 'btn-success' : 'btn-danger';
+			$lbl = $activo ? 'ACTIVO' : 'IN ACTIVO';
+			return '<td><div class="btn ' . $cls . '">' . $lbl . '</div></td>';
+		}],
+	];
+
 } else{
 
 	echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
 
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,54 +111,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Ciudad</h3>
-				<!--<div data-toggle="notify" data-onload data-message="&lt;b&gt;New Updates Available!&lt;/b&gt; Don't forget to check them!" data-options="{&quot;status&quot;:&quot;danger&quot;, &quot;pos&quot;:&quot;top-right&quot;}" class="hidden-xs"></div>-->
-				<div class="row">
-						<div class="panel panel-default">
-							<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-ciudad.php" class="btn btn-primary" >Agregar Ciudad</a></div>
-							<div class="panel-body">
-								<table id="datatable1" class="table table-striped table-hover">
-									<thead>
-										<tr>
-											<th>ID</th>
-											<th>Nombre</th>
-											<th>Estado</th>
-											
-											<th colspan="2" class="sort-alpha">Acciones</th>
-										</tr>
-									</thead>
-									<tbody>
-	                                 <?php if ($totalRows_ciudad > 0) { do { ?>
-
-										<tr class="gradeX">
-											<td><?php echo $row_ciudad['id'];?></td>
-											<td><?php echo $row_ciudad['nombre'];?></td>
-											<td>
-												
-												<?php if($row_ciudad['estado']==1){?>
-													<div class="btn btn-success">ACTIVO</div>
-											
-												<?php } else {?>
-													<div class="btn btn-danger">IN ACTIVO</div>
-												<?php } ?>
-
-											</td>
-											
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarciudad/cod/<?php echo $row_ciudad['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/ciudad.php?id=<?php echo $row_ciudad['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-											
-										</tr>
-	                                  <?php
-	                                        $row_ciudad = mysqli_fetch_assoc($ciudad);
-	                                        } while ($row_ciudad); } else { ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">Todavía no hay registros cargados.</td></tr><?php }   //end horizontal looper 
-	                                    ?>  
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
+				<?php if (isset($ciudad)) { $rows = $ciudad; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>
@@ -169,13 +141,11 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
 
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]
+	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
 	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>-->
 
 	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
 

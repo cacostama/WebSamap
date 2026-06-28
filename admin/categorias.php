@@ -9,8 +9,6 @@ if (isset($_SESSION['ADM_Username'])){
 	                     WHERE c.deleted_at IS NULL
 	                     ORDER BY c.orden ASC, c.nombre ASC";
 	$categorias = mysqli_query($connect, $query_categorias) or die(mysqli_error($connect));
-	$row_categorias = mysqli_fetch_assoc($categorias);
-	$totalRows_categorias = mysqli_num_rows($categorias);
 
 	if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
@@ -23,6 +21,37 @@ if (isset($_SESSION['ADM_Username'])){
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 	  echo"<script>alert('Listo, la categoría se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
 	}
+
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Categorías de Aliados';
+	$btn_agregar_label   = 'Agregar Categoría';
+	$btn_agregar_url     = 'admin/agregar-categoria.php';
+	$edit_url_pattern    = 'admin/editarcategoria/cod/{id}/';
+	$delete_url_pattern  = 'admin/categorias.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar esta categoría? Los comercios que la usaban quedarán sin categoría.';
+	$empty_message       = 'Todavía no hay categorías cargadas.';
+
+	$columns = [
+		['th' => 'Orden',    'td_html' => function($r) { return '<td>' . (int)$r['orden'] . '</td>'; }],
+		['th' => 'Nombre',   'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nombre'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Ícono',    'td_html' => function($r) {
+			$icon = htmlspecialchars((string)($r['icono'] ?? ''), ENT_QUOTES, 'UTF-8');
+			return '<td><i class="fa ' . $icon . '"></i> <small style="color:#999;">' . $icon . '</small></td>';
+		}],
+		['th' => 'Color',    'td_html' => function($r) {
+			$col = (string)($r['color'] ?? '');
+			if ($col === '') {
+				return '<td><span style="color:#bbb;">Color por defecto</span></td>';
+			}
+			$col_e = htmlspecialchars($col, ENT_QUOTES, 'UTF-8');
+			return '<td><span style="display:inline-block;width:16px;height:16px;border-radius:3px;vertical-align:middle;background:' . $col_e . '"></span> ' . $col_e . '</td>';
+		}],
+		['th' => 'Comercios','td_html' => function($r) { return '<td>' . (int)$r['aliados'] . '</td>'; }],
+		['th' => 'Estado',   'td_html' => function($r) {
+			$activo = ((int)($r['activo'] ?? 0)) === 1;
+			return '<td><div class="btn ' . ($activo ? 'btn-success' : 'btn-danger') . ' btn-xs">' . ($activo ? 'ACTIVA' : 'OCULTA') . '</div></td>';
+		}],
+	];
 
 } else{
 
@@ -67,63 +96,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Categorías de Aliados</h3>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
 				<p style="color:#888;margin-top:-.5rem;">Definí las categorías que agrupan a los comercios adheridos en la sección "Descuentos Exclusivos" del sitio.</p>
-				<div class="row">
-						<div class="panel panel-default">
-							<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-categoria.php" class="btn btn-primary" >Agregar Categoría</a></div>
-							<div class="panel-body">
-								<table id="datatable1" class="table table-striped table-hover">
-									<thead>
-										<tr>
-											<th>Orden</th>
-											<th>Nombre</th>
-											<th>Ícono</th>
-											<th>Color</th>
-											<th>Comercios</th>
-											<th>Estado</th>
-											<th colspan="2" class="sort-alpha">Acciones</th>
-										</tr>
-									</thead>
-									<tbody>
-	                                 <?php if ($totalRows_categorias > 0) { do { ?>
-
-										<tr class="gradeX">
-											<td><?php echo (int) $row_categorias['orden'];?></td>
-											<td><?php echo htmlspecialchars($row_categorias['nombre'], ENT_QUOTES, 'UTF-8');?></td>
-											<td><i class="fa <?php echo htmlspecialchars($row_categorias['icono'], ENT_QUOTES, 'UTF-8');?>"></i> <small style="color:#999;"><?php echo htmlspecialchars($row_categorias['icono'], ENT_QUOTES, 'UTF-8');?></small></td>
-											<td>
-												<?php if (!empty($row_categorias['color'])) { ?>
-													<span style="display:inline-block;width:16px;height:16px;border-radius:3px;vertical-align:middle;background:<?php echo htmlspecialchars($row_categorias['color'], ENT_QUOTES, 'UTF-8');?>"></span>
-													<?php echo htmlspecialchars($row_categorias['color'], ENT_QUOTES, 'UTF-8');?>
-												<?php } else { ?>
-													<span style="color:#bbb;">Color por defecto</span>
-												<?php } ?>
-											</td>
-											<td><?php echo (int) $row_categorias['aliados'];?></td>
-											<td>
-												<?php if ($row_categorias['activo']==1){?>
-													<div class="btn btn-success btn-xs">ACTIVA</div>
-												<?php } else {?>
-													<div class="btn btn-danger btn-xs">OCULTA</div>
-												<?php } ?>
-											</td>
-
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarcategoria/cod/<?php echo $row_categorias['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-
-											<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/categorias.php?id=<?php echo $row_categorias['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar esta categoría? Los comercios que la usaban quedarán sin categoría.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-
-										</tr>
-	                                  <?php
-	                                        $row_categorias = mysqli_fetch_assoc($categorias);
-	                                        } while ($row_categorias); } else { ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">Todavía no hay categorías cargadas.</td></tr><?php }
-	                                    ?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
+				<?php if (isset($categorias)) { $rows = $categorias; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>

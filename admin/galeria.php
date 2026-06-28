@@ -2,22 +2,20 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
-	
+
+
 	mysqli_select_db($connect, $database);
 	$query_galeria = "SELECT * FROM tbl_galeria";
 	$galeria = mysqli_query($connect, $query_galeria) or die(mysqli_error($link));
-	$row_galeria = mysqli_fetch_assoc($galeria);
-	$totalRows_galeria = mysqli_num_rows($galeria);
-    
-    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+
+    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
 	  $theValue = addslashes($theValue);
 
 	  switch ($theType) {
 	    case "text":
 	      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-	      break;    
+	      break;
 	    case "long":
 	    case "int":
 	      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
@@ -50,12 +48,26 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('GALERIA ELIMINADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/galeria/\"</script>";
 	}
 
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Galerías';
+	$btn_agregar_label   = 'Agregar Galeria';
+	$btn_agregar_url     = 'admin/agregar-galeria.php';
+	$edit_url_pattern    = 'admin/editargaleria/cod/{id}/';
+	$delete_url_pattern  = 'admin/galeria.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar esta galería y todas sus fotos? No se puede deshacer.';
+	$empty_message       = 'Todavía no hay galerías cargadas.';
+
+	$columns = [
+		['th' => 'ID',     'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
+		['th' => 'Nombre', 'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nombre'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
+	];
+
 } else{
 
 	echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
 
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,49 +105,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Galerías</h3>
-				<!--<div data-toggle="notify" data-onload data-message="&lt;b&gt;New Updates Available!&lt;/b&gt; Don't forget to check them!" data-options="{&quot;status&quot;:&quot;danger&quot;, &quot;pos&quot;:&quot;top-right&quot;}" class="hidden-xs"></div>-->
-				<div class="row">
-																<div class="panel panel-default">
-																	<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-galeria.php" class="btn btn-primary" >Agregar Galeria</a></div>
-																	<div class="panel-body">
-																		<table id="datatable1" class="table table-striped table-hover">
-																			<thead>
-																				<tr>
-																					<th>ID</th>
-																					<th>Nombre</th>
-																					
-																					
-																					
-																					<th colspan="2" class="sort-alpha">Acciones</th>
-																				</tr>
-																			</thead>
-																			<tbody>
-                                                                             <?php do { // horizontal looper
-
-                                                                             	
-
-                                                                             ?>
-
-																				<tr class="gradeX">
-																					<td><?php echo $row_galeria['id'];?></td>
-																					<td><?php echo $row_galeria['nombre'];?></td>
-																					
-																					
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editargaleria/cod/<?php echo $row_galeria['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/galeria.php?id=<?php echo $row_galeria['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro? No se puede deshacer.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-																					
-																				</tr>
-                                                                              <?php
-									                                                $row_galeria = mysqli_fetch_assoc($galeria);
-									                                                } while ($row_galeria);   //end horizontal looper 
-									                                            ?>  
-																			</tbody>
-																		</table>
-																	</div>
-																</div>
-															</div>
-														</div>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
+				<?php if (isset($galeria)) { $rows = $galeria; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>

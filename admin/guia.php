@@ -2,8 +2,8 @@
 require_once('funciones/db.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
-	
+
+
 	mysqli_select_db($connect, $database);
 	$query_guia = "SELECT
 					    a.id,
@@ -27,17 +27,15 @@ if (isset($_SESSION['ADM_Username'])){
 					    c.idCiudad = d.id
 					WHERE a.deleted_at IS NULL";
 	$guia = mysqli_query($connect, $query_guia) or die(mysqli_error($link));
-	$row_guia= mysqli_fetch_assoc($guia);
-	$totalRows_guia = mysqli_num_rows($guia);
-    
-    
-    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+
+
+    function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
     // Escapar el valor dependiendo del tipo
     switch ($theType) {
         case "text":
             $theValue = ($theValue != "") ? "'" . addslashes($theValue) . "'" : "NULL";
-            break;    
+            break;
         case "long":
         case "int":
             $theValue = ($theValue != "") ? intval($theValue) : "NULL";
@@ -70,12 +68,35 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('Listo, el médico se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/guia/\"</script>";
 	}
 
+	// ---- Inputs para partials/tabla-searchable.php ----
+	$tabla_titulo        = 'Guía Médica';
+	$btn_agregar_label   = 'Agregar Médico';
+	$btn_agregar_url     = 'admin/agregar-guia.php';
+	$edit_url_pattern    = 'admin/editarguia/cod/{id}/';
+	$delete_url_pattern  = 'admin/guia.php?id={id}&borrar=si&csrf_token={csrf}';
+	$delete_confirm      = '¿Querés eliminar este registro de la guía? Dejará de mostrarse en el sitio web.';
+	$empty_message       = 'Todavía no hay registros cargados.';
+
+	$columns = [
+		['th' => 'ID',            'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
+		['th' => 'Médico',        'td_html' => function($r) {
+			$t = htmlspecialchars((string)($r['titulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+			$n = htmlspecialchars((string)($r['medico'] ?? ''), ENT_QUOTES, 'UTF-8');
+			return '<td>' . $t . ' ' . $n . '</td>';
+		}],
+		['th' => 'Especialidad',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['especialidad'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Sanatorio',     'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['sanatorio'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Ciudad',        'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['ciudad'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Dirección',     'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['direccion'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+		['th' => 'Teléfono',      'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['telefono'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
+	];
+
 } else{
 
 	echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
 
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -113,55 +134,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 			<section class="main-content">
 
-				<h3>Guía Médica</h3>
-				<!--<div data-toggle="notify" data-onload data-message="&lt;b&gt;New Updates Available!&lt;/b&gt; Don't forget to check them!" data-options="{&quot;status&quot;:&quot;danger&quot;, &quot;pos&quot;:&quot;top-right&quot;}" class="hidden-xs"></div>-->
-				<div class="row">
-																<div class="panel panel-default">
-																	<div class="panel-heading"><a href="<?php echo $URL?>admin/agregar-guia.php" class="btn btn-primary" >Agregar Médico</a></div>
-																	<div class="panel-body">
-																		<table id="datatable1" class="table table-striped table-hover">
-																			<thead>
-																				<tr>
-																					<th>ID</th>
-																					<th>Médico</th>
-																					<th>Especialidad</th>
-																					<th>Sanatorio</th>
-																					<th>Ciudad</th>
-																					<th>Direccion</th>
-																					<th>Telefono</th>
-																					<th class="sort-alpha">Editar</th>
-																					<th class="sort-alpha">Borrar</th>
-																				</tr>
-																			</thead>
-																			<tbody>
-                                                                             <?php if ($totalRows_guia > 0) { do { // horizontal looper
-
-                                                                             	
-
-                                                                             ?>
-
-																				<tr class="gradeX">
-																					<td><?php echo $row_guia['id'];?></td>
-																					<td><?php echo $row_guia['titulo'];?> <?php echo $row_guia['medico'];?></td>
-																					<td><?php echo $row_guia['especialidad'];?></td>
-																					<td><?php echo $row_guia['sanatorio'];?></td>
-																					<td><?php echo $row_guia['ciudad'];?></td>
-																					<td><?php echo $row_guia['direccion'];?></td>
-																					<td><?php echo $row_guia['telefono'];?></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarguia/cod/<?php echo $row_guia['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/guia.php?id=<?php echo $row_guia['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este registro? Dejará de mostrarse en el sitio web.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
-																					
-																				</tr>
-                                                                              <?php
-									                                                $row_guia = mysqli_fetch_assoc($guia);
-									                                                } while ($row_guia); } else { ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">Todavía no hay registros cargados.</td></tr><?php }   //end horizontal looper 
-									                                            ?>  
-																			</tbody>
-																		</table>
-																	</div>
-																</div>
-															</div>
-														</div>
+				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
+				<?php if (isset($guia)) { $rows = $guia; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>
