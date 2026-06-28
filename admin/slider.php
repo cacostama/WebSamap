@@ -4,7 +4,8 @@ require_once('funciones/db.php');
 if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
-	$query_slider= "SELECT * FROM tbl_slider WHERE deleted_at IS NULL";
+	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
+	$query_slider= "SELECT * FROM tbl_slider WHERE " . ($papelera ? "deleted_at IS NOT NULL" : "deleted_at IS NULL");
 	$slider = mysqli_query($connect, $query_slider) or die(mysqli_error($link));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
@@ -47,6 +48,26 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('Listo, la imagen del slider se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/slider/\"</script>";
 	}
 
+	// ---- Papelera: restaurar un registro soft-deleted ----
+	if (isset($_GET['restaurar']) && $_GET['restaurar'] === 'si' && ($_GET['id'] ?? '') != '' && samap_puede_escribir() && samap_csrf_validar()) {
+		$id = (int)$_GET['id'];
+		$restSQL = sprintf("UPDATE tbl_slider SET deleted_at = NULL WHERE id = %d", $id);
+		mysqli_select_db($connect, $database);
+		@mysqli_query($connect, $restSQL);
+		echo "<script>alert('La imagen del slider fue restaurada. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/slider/?papelera=1\"</script>";
+		exit;
+	}
+
+	// ---- Papelera: borrar definitivamente (DELETE fisico) ----
+	if (isset($_GET['borrar_def']) && $_GET['borrar_def'] === 'si' && ($_GET['id'] ?? '') != '' && samap_puede_escribir() && samap_csrf_validar()) {
+		$id = (int)$_GET['id'];
+		$defSQL = sprintf("DELETE FROM tbl_slider WHERE id = %d", $id);
+		mysqli_select_db($connect, $database);
+		@mysqli_query($connect, $defSQL);
+		echo "<script>alert('La imagen del slider fue eliminada definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/slider/?papelera=1\"</script>";
+		exit;
+	}
+
 	// ---- Inputs para partials/tabla-searchable.php ----
 	$tabla_titulo        = 'Sliders';
 	$btn_agregar_label   = 'Agregar Slider';
@@ -55,6 +76,14 @@ if (isset($_SESSION['ADM_Username'])){
 	$delete_url_pattern  = 'admin/slider.php?id={id}&borrar=si&csrf_token={csrf}';
 	$delete_confirm      = '¿Querés eliminar este slider? Dejará de mostrarse en el sitio web.';
 	$empty_message       = 'Todavía no hay sliders cargados.';
+	$slug                = 'slider';
+	$papelera_activa     = $papelera;
+	$trash_count         = 0;
+	if (!$papelera) {
+		@mysqli_select_db($connect, $database);
+		$rcRes = @mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_slider WHERE deleted_at IS NOT NULL");
+		if ($rcRes) { $rcRow = mysqli_fetch_assoc($rcRes); $trash_count = (int)($rcRow['c'] ?? 0); }
+	}
 
 	$URL_BASE = $URL; // captura para closures
 	$columns = [
@@ -111,7 +140,8 @@ if (isset($_SESSION['ADM_Username'])){
 			<section class="main-content">
 
 				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
-				<?php if (isset($slider)) { $rows = $slider; include 'partials/tabla-searchable.php'; } ?>
+				<?php include 'partials/papelera-toggle.php'; ?>
+				<?php $papelera_activa = $papelera; if (isset($slider)) { $rows = $slider; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>

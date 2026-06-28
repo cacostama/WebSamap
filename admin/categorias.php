@@ -4,9 +4,10 @@ require_once('funciones/db.php');
 if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
+	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_categorias = "SELECT c.*, (SELECT COUNT(*) FROM tbl_aliados a WHERE a.categoria_id = c.id AND a.deleted_at IS NULL) AS aliados
 	                     FROM tbl_categorias_aliado c
-	                     WHERE c.deleted_at IS NULL
+	                     WHERE " . ($papelera ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL") . "
 	                     ORDER BY c.orden ASC, c.nombre ASC";
 	$categorias = mysqli_query($connect, $query_categorias) or die(mysqli_error($connect));
 
@@ -22,6 +23,26 @@ if (isset($_SESSION['ADM_Username'])){
 	  echo"<script>alert('Listo, la categoría se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
 	}
 
+	// ---- Papelera: restaurar un registro soft-deleted ----
+	if (isset($_GET['restaurar']) && $_GET['restaurar'] === 'si' && ($_GET['id'] ?? '') != '' && samap_puede_escribir() && samap_csrf_validar()) {
+		$id = (int)$_GET['id'];
+		$restSQL = sprintf("UPDATE tbl_categorias_aliado SET deleted_at = NULL WHERE id = %d", $id);
+		mysqli_select_db($connect, $database);
+		@mysqli_query($connect, $restSQL);
+		echo "<script>alert('La categoría fue restaurada. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/categorias/?papelera=1\"</script>";
+		exit;
+	}
+
+	// ---- Papelera: borrar definitivamente (DELETE fisico) ----
+	if (isset($_GET['borrar_def']) && $_GET['borrar_def'] === 'si' && ($_GET['id'] ?? '') != '' && samap_puede_escribir() && samap_csrf_validar()) {
+		$id = (int)$_GET['id'];
+		$defSQL = sprintf("DELETE FROM tbl_categorias_aliado WHERE id = %d", $id);
+		mysqli_select_db($connect, $database);
+		@mysqli_query($connect, $defSQL);
+		echo "<script>alert('La categoría fue eliminada definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/categorias/?papelera=1\"</script>";
+		exit;
+	}
+
 	// ---- Inputs para partials/tabla-searchable.php ----
 	$tabla_titulo        = 'Categorías de Aliados';
 	$btn_agregar_label   = 'Agregar Categoría';
@@ -30,6 +51,14 @@ if (isset($_SESSION['ADM_Username'])){
 	$delete_url_pattern  = 'admin/categorias.php?id={id}&borrar=si&csrf_token={csrf}';
 	$delete_confirm      = '¿Querés eliminar esta categoría? Los comercios que la usaban quedarán sin categoría.';
 	$empty_message       = 'Todavía no hay categorías cargadas.';
+	$slug                = 'categorias';
+	$papelera_activa     = $papelera;
+	$trash_count         = 0;
+	if (!$papelera) {
+		@mysqli_select_db($connect, $database);
+		$rcRes = @mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_categorias_aliado WHERE deleted_at IS NOT NULL");
+		if ($rcRes) { $rcRow = mysqli_fetch_assoc($rcRes); $trash_count = (int)($rcRow['c'] ?? 0); }
+	}
 
 	$columns = [
 		['th' => 'Orden',    'td_html' => function($r) { return '<td>' . (int)$r['orden'] . '</td>'; }],
@@ -98,7 +127,8 @@ if (isset($_SESSION['ADM_Username'])){
 
 				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
 				<p style="color:#888;margin-top:-.5rem;">Definí las categorías que agrupan a los comercios adheridos en la sección "Descuentos Exclusivos" del sitio.</p>
-				<?php if (isset($categorias)) { $rows = $categorias; include 'partials/tabla-searchable.php'; } ?>
+				<?php include 'partials/papelera-toggle.php'; ?>
+				<?php $papelera_activa = $papelera; if (isset($categorias)) { $rows = $categorias; include 'partials/tabla-searchable.php'; } ?>
 			</section>
 
 		</section>

@@ -2,6 +2,7 @@
 // ============================================================================
 // Partial: tabla-searchable.php
 // Tabla buscable + exportable a CSV, con DataTables ES, botonera y acciones.
+// Soporta vista de papelera (registros soft-deleted) cuando $papelera_activa=true.
 //
 // Variables esperadas (definidas en el padre ANTES del include):
 //   $tabla_titulo        string  default 'Listado'
@@ -16,10 +17,12 @@
 //   $table_id            string  default 'datatable1'
 //   $datatables_options  array   default ['pageLength' => 25, 'order' => []]
 //   $URL                 string  REQUERIDO  base protocol-relative (provista por db.php)
+//   $slug                string  default 'listado'  slug del padre (para links papelera)
+//   $papelera_activa     bool    default false  si true, muestra la papelera
 //
 // Salida:
 //   <div class="row"> <div class="panel panel-default"> con
-//     - panel-heading: [Exportar CSV] ............... [+ Agregar]
+//     - panel-heading: [Exportar CSV] ............... [+ Agregar] | [Volver] en papelera
 //     - panel-body: <table id="$table_id"> con thead/tbody (incluye 2 columnas Acciones)
 //     - panel-footer: Total: N registros
 //     - <script src> jquery.dataTables + bootstrap
@@ -42,13 +45,23 @@ $datatables_options = (isset($datatables_options) && is_array($datatables_option
                         ? $datatables_options
                         : ['pageLength' => 25];
 $columns            = (isset($columns) && is_array($columns)) ? $columns : [];
+$slug               = isset($slug)               ? (string)$slug               : 'listado';
+$papelera_activa    = !empty($papelera_activa);
+
+// En papelera el "agregar" y el "borrar" no aplican. El padre debe pasar
+// edit_url_pattern vacio si tampoco quiere editar; nosotros igual lo dejamos
+// caer si la papelera esta activa.
+$show_edit   = ($edit_url_pattern   !== '' && !$papelera_activa);
+$show_delete = ($delete_url_pattern !== '' && !$papelera_activa);
 
 $e_url      = htmlspecialchars($URL, ENT_QUOTES, 'UTF-8');
+$e_slug     = htmlspecialchars($slug, ENT_QUOTES, 'UTF-8');
 $e_titulo   = htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8');
 $e_btn_lbl  = htmlspecialchars($btn_agregar_label, ENT_QUOTES, 'UTF-8');
 $e_btn_url  = htmlspecialchars($btn_agregar_url, ENT_QUOTES, 'UTF-8');
 $e_table_id = htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8');
 $e_empty    = htmlspecialchars($empty_message, ENT_QUOTES, 'UTF-8');
+$e_papelera = $papelera_activa ? '1' : '0';
 
 // Nombre del archivo CSV: solo [a-z0-9_], derivado del titulo.
 $csv_filename = strtolower(preg_replace('/[^a-z0-9]+/i', '_', $tabla_titulo));
@@ -66,6 +79,9 @@ $has_rows  = (isset($rows) && $rows instanceof mysqli_result);
 if ($has_rows) {
     mysqli_data_seek($rows, 0);
 }
+
+// CSRF para los links de restaurar / borrar definitivamente (papelera)
+$csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : '';
 ?>
 <div class="row">
     <div class="panel panel-default">
@@ -75,12 +91,33 @@ if ($has_rows) {
                     <em class="fa fa-download"></em> Exportar CSV
                 </button>
             </div>
-            <div class="pull-right">
-                <a href="<?= $e_url . $e_btn_url ?>" class="btn btn-primary">
-                    <em class="fa fa-plus"></em> <?= $e_btn_lbl ?>
-                </a>
+            <?php if ($papelera_activa): ?>
+                <div class="pull-left" style="margin-right:10px;">
+                    <a href="<?= $e_url ?>admin/<?= $e_slug ?>/" class="btn btn-primary">
+                        <em class="fa fa-arrow-left"></em> Volver a registros activos
+                    </a>
+                </div>
+                <div class="pull-right">
+                    <span style="color:#888;line-height:34px;">
+                        <em class="fa fa-trash"></em> Total en papelera: <strong><?= (int)$row_count ?></strong>
+                    </span>
+                </div>
+            <?php else: ?>
+                <div class="pull-right">
+                    <a href="<?= $e_url . $e_btn_url ?>" class="btn btn-primary">
+                        <em class="fa fa-plus"></em> <?= $e_btn_lbl ?>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php if ($papelera_activa): ?>
+        <div class="panel-body" style="padding-top:0;padding-bottom:0;">
+            <div class="alert alert-warning" style="background:#ffc61d;color:#333;border:none;padding:10px 15px;border-radius:4px;margin:10px 0;">
+                <strong><em class="fa fa-trash"></em> Estás viendo la papelera.</strong>
+                Los registros están ocultos del sitio web pero pueden restaurarse.
             </div>
         </div>
+        <?php endif; ?>
         <div class="panel-body">
             <table id="<?= $e_table_id ?>" class="table table-striped table-hover">
                 <thead>
@@ -88,8 +125,15 @@ if ($has_rows) {
                         <?php foreach ($columns as $col): ?>
                             <th><?= htmlspecialchars((string)($col['th'] ?? ''), ENT_QUOTES, 'UTF-8') ?></th>
                         <?php endforeach; ?>
-                        <th class="sort-alpha">Editar</th>
-                        <th class="sort-alpha">Borrar</th>
+                        <?php if ($show_edit): ?>
+                            <th class="sort-alpha">Editar</th>
+                        <?php endif; ?>
+                        <?php if ($show_delete): ?>
+                            <th class="sort-alpha">Borrar</th>
+                        <?php elseif ($papelera_activa): ?>
+                            <th class="sort-alpha">Restaurar</th>
+                            <th class="sort-alpha">Borrar def.</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,6 +149,9 @@ if ($has_rows) {
                             );
                             $e_edit_url   = htmlspecialchars($edit_url, ENT_QUOTES, 'UTF-8');
                             $e_delete_url = htmlspecialchars($delete_url, ENT_QUOTES, 'UTF-8');
+                            $e_rid        = htmlspecialchars($rid, ENT_QUOTES, 'UTF-8');
+                            $restaurar_url   = $e_url . 'admin/' . $e_slug . '/?restaurar=si&id=' . $e_rid . '&csrf_token=' . $csrf;
+                            $borrar_def_url  = $e_url . 'admin/' . $e_slug . '/?borrar_def=si&id=' . $e_rid . '&csrf_token=' . $csrf;
                         ?>
                             <tr>
                                 <?php foreach ($columns as $col):
@@ -113,20 +160,37 @@ if ($has_rows) {
                                         : '<td></td>';
                                     echo $cb;
                                 endforeach; ?>
-                                <td width="20px"><div align="center"><a href="<?= $e_url . $e_edit_url ?>"><img width="20px" src="<?= $e_url ?>admin/app/img/editar.png" alt="Editar"/></a></div></td>
-                                <td width="20px"><div align="center"><a href="<?= $e_url . $e_delete_url ?>" onclick="return confirm(<?= json_encode($delete_confirm, JSON_UNESCAPED_UNICODE) ?>);"><img width="20px" src="<?= $e_url ?>admin/app/img/borrar.png" alt="Borrar"/></a></div></td>
+                                <?php if ($show_edit): ?>
+                                    <td width="20px"><div align="center"><a href="<?= $e_url . $e_edit_url ?>"><img width="20px" src="<?= $e_url ?>admin/app/img/editar.png" alt="Editar"/></a></div></td>
+                                <?php endif; ?>
+                                <?php if ($show_delete): ?>
+                                    <td width="20px"><div align="center"><a href="<?= $e_url . $e_delete_url ?>" onclick="return confirm(<?= json_encode($delete_confirm, JSON_UNESCAPED_UNICODE) ?>);"><img width="20px" src="<?= $e_url ?>admin/app/img/borrar.png" alt="Borrar"/></a></div></td>
+                                <?php elseif ($papelera_activa): ?>
+                                    <td width="20px"><div align="center"><a href="<?= $restaurar_url ?>" title="Restaurar" onclick="return confirm(<?= json_encode('¿Restaurar este registro? Volverá a mostrarse en el sitio web.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-undo" style="font-size:18px;color:#01b6ad;"></em></a></div></td>
+                                    <td width="20px"><div align="center"><a href="<?= $borrar_def_url ?>" title="Borrar definitivamente" onclick="return confirm(<?= json_encode('¿Borrar DEFINITIVAMENTE? Esta acción no se puede deshacer.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-times-circle" style="font-size:18px;color:#f6504d;"></em></a></div></td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     <?php endif; ?>
 
                     <?php if ($row_count === 0): ?>
-                        <tr><td colspan="<?= (int)(count($columns) + 2) ?>" style="text-align:center;color:#888;padding:18px;"><?= $e_empty ?></td></tr>
+                        <tr><td colspan="<?= (int)(count($columns) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
+                            <?php if ($papelera_activa): ?>
+                                La papelera está vacía.
+                            <?php else: ?>
+                                <?= $e_empty ?>
+                            <?php endif; ?>
+                        </td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
         <div class="panel-footer">
-            Total: <?= (int)$row_count ?> registros
+            <?php if ($papelera_activa): ?>
+                Registros en papelera: <strong><?= (int)$row_count ?></strong>
+            <?php else: ?>
+                Total: <?= (int)$row_count ?> registros
+            <?php endif; ?>
         </div>
 
         <script src="<?= $e_url ?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
@@ -138,6 +202,7 @@ if ($has_rows) {
             var pageLen   = <?= (int)($datatables_options['pageLength'] ?? 25) ?>;
             var orderOpt  = <?= json_encode($datatables_options['order'] ?? [], JSON_UNESCAPED_UNICODE) ?>;
             var exportBtnId = 'btn-export-csv-' + tableId;
+            var isPapelera = <?= $e_papelera ?>;
 
             // El partial se incluye ANTES del <script src="jquery.min.js"> del
             // padre, asi que jQuery todavia no esta cargado cuando este bloque
@@ -158,6 +223,8 @@ if ($has_rows) {
             function runInit() {
                 var $ = window.jQuery;
                 $(function() {
+                    // En papelera: ocultar la barra de busqueda (no tiene sentido
+                    // sobre un set pequeno y casi siempre ordenado por fecha).
                     var t = $('#' + tableId).DataTable({
                         pageLength: pageLen,
                         order: orderOpt,
@@ -183,8 +250,8 @@ if ($has_rows) {
                             var $cells = $(this.node()).find('td');
                             var last = $cells.length - 1;
                             $cells.each(function(idx) {
-                                if (idx === last) return;     // Borrar
-                                if (idx === last - 1) return; // Editar
+                                if (idx === last) return;     // Ultima accion (Borrar / Borrar def.)
+                                if (idx === last - 1) return; // Penultima (Editar / Restaurar)
                                 var text = $(this).text().trim().replace(/"/g, '""');
                                 row.push('"' + text + '"');
                             });
