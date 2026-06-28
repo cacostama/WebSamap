@@ -1,3 +1,4 @@
+<?php $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? ''); ?>
 <aside class="aside">
 
 	<nav class="sidebar">
@@ -17,7 +18,7 @@
 					<div class="user-block-info">
 				
 
-						<span class="user-block-name item-text"><?php echo $_SESSION['ADM_Nombre'];?></span>
+						<span class="user-block-name item-text"><?php echo htmlspecialchars((string)($_SESSION['ADM_Nombre'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
 						<span class="user-block-role">
 							<?php
 								$rolesEtiqueta = [
@@ -45,7 +46,7 @@
 </li>
 
 
-<li class="active">
+<li class="<?php echo ($currentScript === 'home.php' || $currentScript === 'perfil.php') ? 'active' : ''; ?>">
 	<a href="<?php echo $URL?>admin/home/" title="Escritorio">
 		<em class="fa fa-dashboard"></em>
 		<span class="item-text">Escritorio</span>
