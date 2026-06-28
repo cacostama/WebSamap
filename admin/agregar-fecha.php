@@ -94,7 +94,7 @@ if (isset($_SESSION['ADM_Username'])){
 								<fieldset>
 									<div class="form-group">
 										<div class="col-sm-4 col-sm-offset-2">
-											<button type="submit" class="btn btn-default">Cancelar</button>
+											<button type="button" class="btn btn-default" onclick="window.history.back();">Cancelar</button>
 											<button type="submit" class="btn btn-primary">Guardar</button>
 										</div>
 									</div>
@@ -133,6 +133,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
 
 		<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
+		<script src="<?php echo $URL;?>admin/plugins/moment/min/moment-with-langs.min.js"></script>
 		<script src="<?php echo $URL;?>admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 
 
