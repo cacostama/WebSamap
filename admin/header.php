@@ -1,3 +1,12 @@
+<?php
+// ---- Flash messages (toast no-bloqueante) ----
+// Si hay un flash pendiente en sesion (seteado por samap_flash_set() antes de un
+// header('Location: ...')), se renderiza aca. Aparece en el top-right de la
+// pagina destino y se auto-dismiss a los 5s.
+if (function_exists('samap_flash_render')) {
+	echo samap_flash_render();
+}
+?>
 <nav role="navigation" class="navbar navbar-default navbar-top navbar-fixed-top">
 
 <div class="navbar-header">
