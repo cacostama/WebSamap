@@ -1,0 +1,8 @@
+
+    "C: $(($listadoTable | ConvertTo-Csv -NoTypeInformation) -join "`n")"
+    "D: $(($deleteResults | ConvertTo-Csv -NoTypeInformation) -join "`n")"
+    "E: $(($cancelarResults | ConvertTo-Csv -NoTypeInformation) -join "`n")"
+    "F: home=$($home2.StatusCode) links=$cardCount"
+    "G: q1=$q1 hits1=$q1hits; q2=$q2 hits2=$q2hits; q3=$q3 noresults=$q3nores"
+    "H: perfil=$perfil MiPerfil=$hasMiPerfil MisDatos=$hasMisDatos CambiarPass=$hasCambiarPass"
+
