@@ -36,6 +36,11 @@ if (isset($_SESSION['ADM_Username'])){
 	}
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
+	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
+	    echo"<script>alert('No se pudo eliminar la fecha. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/fechas/\"</script>";
+	    exit;
+	  }
+
 	  $deleteSQL = sprintf("DELETE FROM tbl_agenda WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
@@ -117,7 +122,7 @@ if (isset($_SESSION['ADM_Username'])){
 							
 																					
 																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarfecha/cod/<?php echo $row_agenda['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/fechas.php?id=<?php echo $row_agenda['id']; ?>&borrar=si"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/fechas.php?id=<?php echo $row_agenda['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar esta fecha? No se puede deshacer.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 																					
 																				</tr>
                                                                               <?php

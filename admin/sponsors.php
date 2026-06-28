@@ -36,6 +36,11 @@ if (isset($_SESSION['ADM_Username'])){
 	}
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
+	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
+	    echo"<script>alert('No se pudo eliminar el sponsor. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/sponsors/\"</script>";
+	    exit;
+	  }
+
 	  $deleteSQL = sprintf("DELETE FROM tbl_sponsor WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
 
@@ -120,7 +125,7 @@ if (isset($_SESSION['ADM_Username'])){
 																					<td><img  height="30px" src="<?php echo $URL?>documentos/sponsor/<?php echo $row_sponsor['imagen']; ?>" alt=""/></td>
 																					
 																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/editarsponsor/cod/<?php echo $row_sponsor['id']; ?>/"><img width="20px" src="<?php echo $URL?>admin/app/img/editar.png"alt=""/></a></div></td>
-																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sponsors.php?id=<?php echo $row_sponsor['id']; ?>&borrar=si"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
+																					<td width="20px"><div align="center"><a href="<?php echo $URL?>admin/sponsors.php?id=<?php echo $row_sponsor['id']; ?>&borrar=si&csrf_token=<?php echo urlencode(samap_csrf_valor()); ?>" onclick="return confirm('¿Querés eliminar este sponsor? No se puede deshacer.');"><img width="20px" src="<?php echo $URL?>admin/app/img/borrar.png"alt=""/></a></div></td>
 																					
 																				</tr>
                                                                               <?php
