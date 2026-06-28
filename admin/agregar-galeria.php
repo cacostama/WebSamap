@@ -15,7 +15,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_galeria (nombre) VALUES ('$nombre')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('GALERIA INSETADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/galeria/\"</script>";
+			samap_flash_set('success', 'Galería guardada correctamente.');
+			header('Location: ' . $URL . 'admin/galeria/');
 
 	}
 

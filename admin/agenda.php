@@ -74,7 +74,8 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar la agenda. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/agenda/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar la agenda. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/agenda/');
 	    exit;
 	  }
 
@@ -84,7 +85,9 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('AGENDA ELIMINADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/agenda/\"</script>";
+	  samap_flash_set('success', 'AGENDA ELIMINADA CORRECTAMENTE!');
+	  header('Location: ' . $URL . 'admin/agenda/');
+	  exit;
 	}
 
 	// ---- Inputs para partials/tabla-searchable.php ----

@@ -59,10 +59,12 @@ if (isset($_GET['borrar'], $_GET['path']) && samap_puede_escribir() && samap_csr
 	}
 
 	if ($permitido && @unlink($abs_real)) {
-		echo "<script>alert('Imagen eliminada.'); window.location.href='" . $URL . "admin/medios/';</script>";
+		samap_flash_set('success', 'Imagen eliminada.');
+		header('Location: ' . $URL . 'admin/medios/');
 		exit;
 	}
-	echo "<script>alert('No se pudo eliminar la imagen. Verifica los permisos del archivo o que la URL corresponda a una imagen valida.'); window.location.href='" . $URL . "admin/medios/';</script>";
+	samap_flash_set('error', 'No se pudo eliminar la imagen. Verifica los permisos del archivo o que la URL corresponda a una imagen valida.');
+	header('Location: ' . $URL . 'admin/medios/');
 	exit;
 }
 

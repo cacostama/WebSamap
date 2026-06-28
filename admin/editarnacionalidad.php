@@ -41,8 +41,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
-			echo"<script>alert('NACIONADILDAD MODIFICADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/nacionalidad/\"</script>";
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
+			samap_flash_set('success', 'Nacionalidad guardada correctamente.');
+			header('Location: ' . $URL . 'admin/nacionalidad/');
 
 	}
 

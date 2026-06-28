@@ -30,7 +30,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_ciudad (nombre, estado) VALUES ('$nombre','$estado')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('CIUDAD INSETADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/ciudad/\"</script>";
+			samap_flash_set('success', 'Ciudad guardada correctamente.');
+			header('Location: ' . $URL . 'admin/ciudad/');
 
 	}
 

@@ -57,7 +57,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_agenda_detalle (idAgenda, titulo, horario, lugar, texto, idSpeaker1, idSpeaker2, idSpeaker3, idSpeaker4, idSpeaker5, idSpeaker6, idSpeaker7, idSpeaker8, idSpeaker9, idSpeaker10) VALUES ('$fecha','$titulo','$horario','$lugar','$texto','$idSpeaker1','$idSpeaker2','$idSpeaker3','$idSpeaker4','$idSpeaker5','$idSpeaker6','$idSpeaker7','$idSpeaker8','$idSpeaker9','$idSpeaker10')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('AGENDA INSETADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/agenda/\"</script>";
+			samap_flash_set('success', 'Agenda guardada correctamente.');
+			header('Location: ' . $URL . 'admin/agenda/');
 
 	}
 

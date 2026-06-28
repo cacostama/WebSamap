@@ -10,7 +10,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaBandera);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/nacionalidad/');
 			exit;
 		}
 
@@ -20,7 +21,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_nacionalidad (nacionalidad, bandera) VALUES ('$nacionalidad','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('NACIONALIDAD INSETADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/nacionalidad/\"</script>";
+			samap_flash_set('success', 'Nacionalidad guardada correctamente.');
+			header('Location: ' . $URL . 'admin/nacionalidad/');
 
 	}
 

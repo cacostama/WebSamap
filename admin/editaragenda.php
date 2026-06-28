@@ -47,7 +47,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
-			echo"<script>alert('AGENDA MODIFICADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/agenda/\"</script>";
+			samap_flash_set('success', 'Agenda guardada correctamente.');
+			header('Location: ' . $URL . 'admin/agenda/');
 
 	}
 

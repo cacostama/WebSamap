@@ -55,7 +55,8 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el médico. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/guia/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el médico. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/guia/');
 	    exit;
 	  }
 
@@ -65,7 +66,9 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el médico se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/guia/\"</script>";
+	  samap_flash_set('success', 'Listo, el médico se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/guia/');
+	  exit;
 	}
 
 	// ---- Inputs para partials/tabla-searchable.php ----

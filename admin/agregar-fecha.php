@@ -15,7 +15,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_agenda (nombre) VALUES ('$nombre')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('FECHA INSETADA CORRECTAMENTE!'); window.location.href=\"".$URL."admin/fechas/\"</script>";
+			samap_flash_set('success', 'Fecha guardada correctamente.');
+			header('Location: ' . $URL . 'admin/fechas/');
 
 	}
 

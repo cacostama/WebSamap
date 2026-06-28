@@ -35,7 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar la ciudad. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/ciudad/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar la ciudad. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/ciudad/');
 	    exit;
 	  }
 
@@ -45,7 +46,9 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, la ciudad se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/ciudad/\"</script>";
+	  samap_flash_set('success', 'Listo, la ciudad se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/ciudad/');
+	  exit;
 	}
 
 	// ---- Inputs para partials/tabla-searchable.php ----

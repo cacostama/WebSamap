@@ -51,9 +51,11 @@ if (isset($_SESSION['ADM_Username'])){
 			if ($inserts === 0) {
 				throw new RuntimeException('No se recibio ninguna foto valida.');
 			}
-			echo"<script>alert('FOTOS INSERTADAS CORRECTAMENTE!'); window.location.href=\"".$URL."admin/fotos/\"</script>";
+			samap_flash_set('success', 'Fotos guardadas correctamente.');
+			header('Location: ' . $URL . 'admin/fotos/');
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/fotos/');
 			exit;
 		}
 

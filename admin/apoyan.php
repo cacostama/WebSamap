@@ -35,7 +35,8 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el apoyo. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/apoyan/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el apoyo. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/apoyan/');
 	    exit;
 	  }
 
@@ -45,7 +46,9 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('SPONSOR ELIMINADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/apoyan/\"</script>";
+	  samap_flash_set('success', 'SPONSOR ELIMINADO CORRECTAMENTE!');
+	  header('Location: ' . $URL . 'admin/apoyan/');
+	  exit;
 	}
 
 	// ---- Inputs para partials/tabla-searchable.php ----

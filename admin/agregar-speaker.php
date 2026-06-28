@@ -56,7 +56,8 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_speaker (nombre, titulo, intro, texto, linkedin, ig, fb, tw, web, idNacionalidad, imagen) VALUES ('$nombre','$titulo','$intro','$texto','$linkedin','$ig','$fb','$tw','$web','$nacionalidad','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('SPEAKER INSETADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/speakers/\"</script>";
+			samap_flash_set('success', 'Speaker guardado correctamente.');
+			header('Location: ' . $URL . 'admin/speakers/');
 
 	}
 
