@@ -661,3 +661,45 @@ LOCK TABLES `tbl_user_token` WRITE;
 /*!40000 ALTER TABLE `tbl_user_token` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tbl_user_token` ENABLE KEYS */;
 UNLOCK TABLES;
+
+-- ============================================================================
+-- Migracion 011 - ABM de usuarios del panel: activo / ultimo_acceso /
+-- deleted_at / email en tbl_user.
+-- (ver docker/mysql/init/migrations/005-add-user-cols.sql - mismo SQL,
+-- idempotente via INFORMATION_SCHEMA + PREPARE/EXECUTE).
+-- Acá en backup_samap.sql se aplica como ALTER simple, asumiendo DB fresca
+-- (las columnas todavia no existen porque el CREATE de tbl_user de mas arriba
+-- solo tiene id / nombre / userName / userPass / rol).
+-- ============================================================================
+SET NAMES utf8mb4;
+ALTER TABLE `tbl_user`
+  ADD COLUMN `activo`         TINYINT(1)   NOT NULL DEFAULT 1              AFTER `rol`,
+  ADD COLUMN `ultimo_acceso`  TIMESTAMP    NULL     DEFAULT NULL          AFTER `activo`,
+  ADD COLUMN `deleted_at`     DATETIME     NULL     DEFAULT NULL          AFTER `ultimo_acceso`,
+  ADD COLUMN `email`          VARCHAR(200) NULL     DEFAULT NULL          AFTER `deleted_at`;
+
+-- ============================================================================
+-- Migracion 010 - Auditoria del panel admin (tbl_audit_log).
+-- (ver docker/mysql/init/migrations/004-create-tbl-audit-log.sql - mismo SQL,
+-- idempotente via CREATE TABLE IF NOT EXISTS). Se aplica como CREATE directo
+-- en backup_samap.sql porque la tabla no existe en dumps legacy.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS `tbl_audit_log` (
+  `id`               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `usuario`          VARCHAR(60)  NOT NULL,
+  `rol`              VARCHAR(20)  NOT NULL DEFAULT '',
+  `accion`           VARCHAR(20)  NOT NULL,
+  `entidad`          VARCHAR(60)  NOT NULL DEFAULT '',
+  `entidad_id`       INT          NOT NULL DEFAULT 0,
+  `descripcion`      VARCHAR(500) NOT NULL DEFAULT '',
+  `datos_anteriores` JSON         NULL,
+  `datos_nuevos`     JSON         NULL,
+  `ip`               VARCHAR(45)  NOT NULL DEFAULT '',
+  `user_agent`       VARCHAR(255) NOT NULL DEFAULT '',
+  `created_at`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_usuario` (`usuario`),
+  KEY `idx_accion`  (`accion`),
+  KEY `idx_entidad` (`entidad`, `entidad_id`),
+  KEY `idx_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;

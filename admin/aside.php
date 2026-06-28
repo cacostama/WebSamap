@@ -162,6 +162,36 @@ if (isset($_SESSION['ADM_Username']) && isset($connect) && $connect instanceof m
 </li>
 
 
+<?php
+// Auditoria: solo admins ven el link en el sidebar.
+if (samap_rol_es('admin')): ?>
+<li class="<?php echo ($currentScript === 'auditoria.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/auditoria/" title="Auditoría" class="has-submenu">
+		<em class="fa fa-history"></em>
+		<span class="item-text">Auditoría</span>
+	</a>
+</li>
+<?php endif; ?>
+
+<?php if (samap_rol_es('admin')): ?>
+<li class="<?php echo ($currentScript === 'backup.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/backup/" title="Backup de la base de datos" class="has-submenu">
+		<em class="fa fa-database"></em>
+		<span class="item-text">Backup</span>
+	</a>
+</li>
+<?php endif; ?>
+
+<?php if (samap_rol_es('admin')): ?>
+<li class="<?php echo ($currentScript === 'usuarios.php' || $currentScript === 'agregar-usuario.php' || $currentScript === 'editarusuario.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/usuarios/" title="Usuarios del panel" class="has-submenu">
+		<em class="fa fa-users"></em>
+		<span class="item-text">Usuarios</span>
+	</a>
+</li>
+<?php endif; ?>
+
+
 
 
 
