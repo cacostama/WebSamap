@@ -136,16 +136,17 @@ if (isset($_SESSION['ADM_Username'])){
 								</fieldset>
 
 								<fieldset>
-									<div class="form-group">
-										<label name="imagen" class="col-sm-2 control-label">Imagen</label>
-										<div class="col-sm-4">
-											<input name="imagen" type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-											
-											
-										</div>
-										
-									</div>
-								</fieldset>	
+									<?php
+									$upload_campo      = 'imagen';
+									$upload_label      = 'Imagen';
+									$upload_subcarpeta = 'aliados';
+									$upload_ruta       = $rutaAliados;
+									$upload_medida     = 'Mantener proporcion. JPG/PNG/WEBP, max 5 MB.';
+									$upload_label_col  = 'col-sm-2';
+									$upload_input_col  = 'col-sm-4';
+									include 'partials/upload-imagen.php';
+									?>
+								</fieldset>
 
 								<input type="hidden" name="id" value="<?php echo $row_noticia['id']; ?>" />
 								<input type="hidden" name="MM_insert" value="form2" />

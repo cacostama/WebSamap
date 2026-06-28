@@ -7,24 +7,15 @@ if (isset($_SESSION['ADM_Username'])){
 	$query_categorias = "SELECT id, nombre FROM tbl_categorias_aliado WHERE deleted_at IS NULL AND activo = 1 ORDER BY orden ASC, nombre ASC";
 	$categorias = mysqli_query($connect, $query_categorias) or die(mysqli_error($connect));
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir()) {
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
-		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
-	    //--------INICIO IMAGEN1---------//
-		$imagen_real=$_FILES['imagen']['name'];
+		try {
+			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaServicios);
+		} catch (RuntimeException $e) {
+			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			exit;
+		}
 
-		if ($_FILES['imagen']['name'] != "") { 
-
-			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
-			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaServicios.$imagen_real);
-			$img_original = "$rutaServicios/".$imagen_real;
-			$type = @getimagesize($img_original);
-
-		}   
-		
-	    //--------FIN IMAGEN1---------//
-			
 			$intro = $_POST['intro'];
 			$nombre = $_POST['nombre'];
 			$detalle= htmlentities( $_POST['detalle']);
@@ -94,6 +85,7 @@ if (isset($_SESSION['ADM_Username'])){
 					<div class="panel-heading">Formulario de Carga</div>
 					<div class="panel-body">
 						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+							<?php echo samap_csrf_field(); ?>
 
 
 								<fieldset>
@@ -129,15 +121,16 @@ if (isset($_SESSION['ADM_Username'])){
 								</fieldset>
 
 								<fieldset>
-									<div class="form-group">
-										<label name="imagen" class="col-sm-2 control-label">Imagen</label>
-										<div class="col-sm-4">
-											<input name="imagen" type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-
-
-										</div>
-
-									</div>
+									<?php
+									$upload_campo      = 'imagen';
+									$upload_label      = 'Imagen';
+									$upload_subcarpeta = 'servicios';
+									$upload_ruta       = $rutaServicios;
+									$upload_medida     = 'Mantener proporcion. JPG/PNG/WEBP, max 5 MB.';
+									$upload_label_col  = 'col-sm-2';
+									$upload_input_col  = 'col-sm-4';
+									include 'partials/upload-imagen.php';
+									?>
 								</fieldset>
 
 								<fieldset>

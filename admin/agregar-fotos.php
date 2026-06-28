@@ -9,29 +9,53 @@ if (isset($_SESSION['ADM_Username'])){
 	$row_galeria = mysqli_fetch_assoc($galeria);
 	$totalRows_galeria = mysqli_num_rows($galeria);
 
-	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2")) {
+	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
-		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
-	    
-		$fotos = $_FILES['fotos'];
-		$galeria_id=$_POST['galeria'];
+		try {
+			$fotos = $_FILES['fotos'];
+			$galeria_id = (int) ($_POST['galeria'] ?? 0);
+			if ($galeria_id <= 0) {
+				throw new RuntimeException('Debe seleccionar una galeria.');
+			}
+			if (empty($fotos) || empty($fotos['name']) || !is_array($fotos['name'])) {
+				throw new RuntimeException('Debe seleccionar al menos una foto.');
+			}
 
-		  // Recorremos todas las fotos subidas
-		  for ($i = 0; $i < count($fotos['name']); $i++) {
+			$inserts = 0;
+			$total = count($fotos['name']);
+			for ($i = 0; $i < $total; $i++) {
+				if (($fotos['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+					continue;
+				}
+				// Reempaquetamos el archivo i-esimo como un $_FILES['single']
+				// para reusar samap_guardar_imagen_upload (que espera un solo
+				// archivo, no el array indexado de un multi-upload).
+				$_FILES['__foto_single'] = [
+					'name'     => $fotos['name'][$i],
+					'type'     => $fotos['type'][$i] ?? '',
+					'tmp_name' => $fotos['tmp_name'][$i],
+					'error'    => $fotos['error'][$i] ?? UPLOAD_ERR_OK,
+					'size'     => $fotos['size'][$i] ?? 0,
+				];
+				$nombre = samap_guardar_imagen_upload('__foto_single', $rutaGaleria);
+				if ($nombre === '') {
+					continue;
+				}
+				$insertSQL = "INSERT INTO tbl_fotos (nombre, descripcion, ruta, galeria_id) VALUES ('$nombre', '', '$rutaGaleria', $galeria_id)";
+				mysqli_select_db($connect, $database);
+				$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+				$inserts++;
+			}
+			unset($_FILES['__foto_single']);
 
-
-		    $nombre = $fotos['name'][$i];
-		
-		    move_uploaded_file($fotos['tmp_name'][$i], $rutaGaleria.$nombre);
-		  
-		    $insertSQL = "INSERT INTO tbl_fotos (nombre, descripcion, ruta, galeria_id) VALUES ('$nombre', '$descripcion', '$ruta', $galeria_id)";
-		    mysqli_select_db($connect, $database);
-		   	$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
- 		}
-
-  			echo"<script>alert('FOTOS INSERTADAS CORRECTAMENTE!'); window.location.href=\"".$URL."admin/fotos/\"</script>";
-
+			if ($inserts === 0) {
+				throw new RuntimeException('No se recibio ninguna foto valida.');
+			}
+			echo"<script>alert('FOTOS INSERTADAS CORRECTAMENTE!'); window.location.href=\"".$URL."admin/fotos/\"</script>";
+		} catch (RuntimeException $e) {
+			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			exit;
+		}
 
 	}
 
@@ -90,6 +114,7 @@ if (isset($_SESSION['ADM_Username'])){
 					<div class="panel-heading">Formulario de Carga</div>
 					<div class="panel-body">
 						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+							<?php echo samap_csrf_field(); ?>
 
 								<fieldset>
 									<div class="form-group">
@@ -116,16 +141,18 @@ if (isset($_SESSION['ADM_Username'])){
 							
 								
 								<fieldset>
-									<div class="form-group">
-										<label name="imagen" class="col-sm-2 control-label">Foto</label>
-										<div class="col-sm-4">
-											<input type="file" name="fotos[]" multiple data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-											
-											
-										</div>
-										
-									</div>
-								</fieldset>	
+									<?php
+									$upload_campo      = 'fotos';
+									$upload_label      = 'Foto';
+									$upload_subcarpeta = 'galeria';
+									$upload_ruta       = $rutaGaleria;
+									$upload_medida     = 'Mantener proporcion. JPG/PNG/WEBP, max 5 MB.';
+									$upload_multiple   = true;
+									$upload_label_col  = 'col-sm-2';
+									$upload_input_col  = 'col-sm-4';
+									include 'partials/upload-imagen.php';
+									?>
+								</fieldset>
 
 							
 
