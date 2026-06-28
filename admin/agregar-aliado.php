@@ -10,7 +10,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaAliados);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/aliados/');
 			exit;
 		}
 
@@ -26,7 +27,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_aliados (titulo, categoria_id, descuento, orden, detalle, imagen) VALUES ('$nombre',$categoria_sql,'$descuento',$orden,'$detalle','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('Listo, el aliado se agregó correctamente.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_aliados', $new_id, "Creó el aliado: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'categoria_id' => $categoria_id, 'descuento' => $descuento, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Listo, el aliado se agregó correctamente.');
+			header('Location: ' . $URL . 'admin/aliados/');
 
 	}
 

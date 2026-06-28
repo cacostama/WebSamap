@@ -57,16 +57,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
 		$up->bind_param('si', $nuevoHash, $u['id']);
 		$up->execute();
 		$up->close();
+		@samap_audit_log('update', 'tbl_user', (int)$u['id'], "Cambió su propia contraseña");
 		session_regenerate_id(true);
 		$_SESSION['ADM_Username'] = $u['userName'];
 		$_SESSION['ADM_Nombre']   = $u['nombre'];
 		$_SESSION['ADM_Rol']      = $u['rol'] ?? 'admin';
 		$_SESSION['ADM_last_activity'] = time();
-		echo "<script>alert('Contraseña actualizada correctamente.'); window.location.href='" . $URL . "admin/perfil/';</script>";
+		samap_flash_set('success', 'Contraseña actualizada correctamente.');
+		header('Location: ' . $URL . 'admin/perfil/');
 		exit;
 	} else {
-		$error_msg = implode("\\n", $errors);
-		echo "<script>alert('" . $error_msg . "'); window.history.back();</script>";
+		$error_msg = implode("\n", $errors);
+		samap_flash_set('error', $error_msg);
+		header('Location: ' . $URL . 'admin/perfil/');
 		exit;
 	}
 }

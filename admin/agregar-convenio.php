@@ -10,7 +10,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaPlan);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/convenios/');
 			exit;
 		}
 
@@ -22,7 +23,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_convenios (ciudad, titulo, detalle, imagen, url) VALUES ('$ciudad','$nombre','$detalle','$IMAGEN','https://')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('CONVENIO INSETADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/convenios/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_convenios', $new_id, "Creó el convenio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'ciudad' => $ciudad, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Convenio guardado correctamente.');
+			header('Location: ' . $URL . 'admin/convenios/');
 
 	}
 

@@ -35,9 +35,17 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el plan. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/planes/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el plan. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/planes/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  // Snapshot del registro antes de soft-delete, para que el audit log
+	  // muestre que plan era (asi no queda "alguien borro el plan #N" sin contexto).
+	  $audit_row_planes = null;
+	  $audQ = mysqli_query($connect, "SELECT id, titulo, imagen FROM tbl_planes WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_planes = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_planes SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -45,7 +53,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el plan se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/planes/\"</script>";
+	  @samap_audit_log('delete', 'tbl_planes', $id_borrar, "Borró (soft) el plan #$id_borrar: " . substr((string)($audit_row_planes['titulo'] ?? ''), 0, 100), $audit_row_planes, null);
+
+	  samap_flash_set('success', 'Listo, el plan se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/planes/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -54,7 +66,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_planes SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El plan fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/planes/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_planes', $id, "Restauró el plan #$id");
+		samap_flash_set('success', 'El plan fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/planes/?papelera=1');
 		exit;
 	}
 
@@ -64,7 +78,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_planes WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El plan fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/planes/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_planes', $id, "Eliminó definitivamente el plan #$id");
+		samap_flash_set('warning', 'El plan fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/planes/?papelera=1');
 		exit;
 	}
 

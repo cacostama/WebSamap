@@ -68,6 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						$up->close();
 					}
 
+					@samap_audit_log('update', 'tbl_user', (int)$tok['user_id'], "Restableció su contraseña vía token");
+
 					$used = date('Y-m-d H:i:s');
 					$mk = $conexion->prepare('UPDATE tbl_user_token SET used_at = ? WHERE id = ?');
 					if ($mk) {

@@ -35,9 +35,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if (isset($_GET['borrar']) && $_GET['id'] != "") {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el sanatorio. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/sanatorios/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el sanatorio. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/sanatorios/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_sanat = null;
+	  $audQ = mysqli_query($connect, "SELECT id, nombre, direccion FROM tbl_sanatorio WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_sanat = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_sanatorio SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -45,7 +51,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el sanatorio se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/sanatorios/\"</script>";
+	  @samap_audit_log('delete', 'tbl_sanatorio', $id_borrar, "Borró (soft) el sanatorio #$id_borrar: " . substr((string)($audit_row_sanat['nombre'] ?? ''), 0, 100), $audit_row_sanat, null);
+
+	  samap_flash_set('success', 'Listo, el sanatorio se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/sanatorios/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -54,7 +64,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_sanatorio SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El sanatorio fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/sanatorios/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_sanatorio', $id, "Restauró el sanatorio #$id");
+		samap_flash_set('success', 'El sanatorio fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/sanatorios/?papelera=1');
 		exit;
 	}
 
@@ -64,7 +76,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_sanatorio WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El sanatorio fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/sanatorios/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_sanatorio', $id, "Eliminó definitivamente el sanatorio #$id");
+		samap_flash_set('warning', 'El sanatorio fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/sanatorios/?papelera=1');
 		exit;
 	}
 

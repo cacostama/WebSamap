@@ -35,9 +35,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el artículo. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/blogs/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el artículo. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/blogs/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_blog = null;
+	  $audQ = mysqli_query($connect, "SELECT id, titulo, imagen FROM tbl_blog WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_blog = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_blog SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -45,7 +51,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el artículo se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/blogs/\"</script>";
+	  @samap_audit_log('delete', 'tbl_blog', $id_borrar, "Borró (soft) el artículo #$id_borrar: " . substr((string)($audit_row_blog['titulo'] ?? ''), 0, 100), $audit_row_blog, null);
+
+	  samap_flash_set('success', 'Listo, el artículo se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/blogs/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -54,7 +64,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_blog SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El artículo fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/blogs/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_blog', $id, "Restauró el artículo #$id");
+		samap_flash_set('success', 'El artículo fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/blogs/?papelera=1');
 		exit;
 	}
 
@@ -64,7 +76,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_blog WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El artículo fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/blogs/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_blog', $id, "Eliminó definitivamente el artículo #$id");
+		samap_flash_set('warning', 'El artículo fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/blogs/?papelera=1');
 		exit;
 	}
 

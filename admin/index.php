@@ -61,9 +61,30 @@ header( 'X-Frame-Options: SAMEORIGIN' );
                 $_SESSION['ADM_Username'] = $usuario;
                 $_SESSION['ADM_Nombre']   = $resultado['nombre'];
                 $_SESSION['ADM_Rol']      = $resultado['rol'] ?? 'admin'; // #9 roles
+
+                // Bloquear login si el usuario esta inactivo o en papelera.
+                if ((int)($resultado['activo'] ?? 1) === 0
+                    || !empty($resultado['deleted_at'])) {
+                    $_SESSION = [];
+                    session_destroy();
+                    echo "<script>window.location.href=\"" . $URL . "admin/index/log/bloqueado/\"</script>";
+                    exit;
+                }
+
+                // Actualizar ultimo_acceso para mostrar en admin/usuarios.php.
+                if ($up = $conexion->prepare('UPDATE tbl_user SET ultimo_acceso = NOW() WHERE id = ?')) {
+                    $uid = (int)$resultado['id'];
+                    $up->bind_param('i', $uid);
+                    $up->execute();
+                    $up->close();
+                }
+
+                @samap_audit_log('login', 'tbl_user', (int)$resultado['id'], "Inicio de sesión: " . $usuario);
+                samap_flash_set('success', 'Bienvenido, ' . (string)$resultado['nombre'] . '.');
                 echo"<script>window.location.href=\"".$URL."admin/home/\"</script>";
             } else {
                 samap_login_registrar_fallo();  // suma intento fallido para la IP
+                @samap_audit_log('login_fail', 'tbl_user', 0, "Intento fallido: " . $usuario);
                 echo"<script>window.location.href=\"".$URL."admin/index/log/error/\"</script>";
             }
         }
@@ -142,6 +163,13 @@ header( 'X-Frame-Options: SAMEORIGIN' );
                                           </div>
                                           ";
                                 } else {
+                                } ?>
+                                <?php if ($login == "bloqueado" ) {
+                                    echo "<div class='alert alert-danger alert-dismissable'>
+                                            <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                                            <strong>Usuario deshabilitado.</strong> Contactá a un administrador del panel.
+                                          </div>
+                                          ";
                                 } ?>
 
                         <div class="g-recaptcha" data-sitekey="6LejN1QpAAAAAKQ528NxxqvZc7qkC_vj_MB3jHK6"></div><br>

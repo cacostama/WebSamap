@@ -10,7 +10,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaPlan);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/planes/');
 			exit;
 		}
 
@@ -21,7 +22,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_planes (titulo, detalle, imagen, url) VALUES ('$nombre','$detalle','$IMAGEN','https://')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('PLAN INSETADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/planes/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_planes', $new_id, "Creó el plan: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Plan guardado correctamente.');
+			header('Location: ' . $URL . 'admin/planes/');
 
 	}
 

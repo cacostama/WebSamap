@@ -35,9 +35,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar la imagen del slider. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/slider/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar la imagen del slider. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/slider/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_slider = null;
+	  $audQ = mysqli_query($connect, "SELECT id, nombre, imagen FROM tbl_slider WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_slider = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_slider SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -45,7 +51,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, la imagen del slider se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/slider/\"</script>";
+	  @samap_audit_log('delete', 'tbl_slider', $id_borrar, "Borró (soft) el slider #$id_borrar: " . substr((string)($audit_row_slider['nombre'] ?? ''), 0, 100), $audit_row_slider, null);
+
+	  samap_flash_set('success', 'Listo, la imagen del slider se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/slider/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -54,7 +64,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_slider SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('La imagen del slider fue restaurada. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/slider/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_slider', $id, "Restauró el slider #$id");
+		samap_flash_set('success', 'La imagen del slider fue restaurada. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/slider/?papelera=1');
 		exit;
 	}
 
@@ -64,7 +76,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_slider WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('La imagen del slider fue eliminada definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/slider/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_slider', $id, "Eliminó definitivamente el slider #$id");
+		samap_flash_set('warning', 'La imagen del slider fue eliminada definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/slider/?papelera=1');
 		exit;
 	}
 

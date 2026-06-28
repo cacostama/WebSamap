@@ -38,12 +38,22 @@ if (isset($_GET['cambiar_estado']) && isset($_GET['id']) && isset($_GET['estado'
 		$estados_validos = ['nuevo', 'contactado', 'cerrado', 'spam'];
 		$estado = (string) $_GET['estado'];
 		if ($id > 0 && in_array($estado, $estados_validos, true)) {
+			// Snapshot del estado anterior para el audit log.
+			$estado_anterior = null;
+			if ($s = $conexion->prepare("SELECT estado FROM tbl_leads WHERE id = ?")) {
+				$s->bind_param('i', $id);
+				$s->execute();
+				$r = $s->get_result();
+				if ($r && ($row = $r->fetch_assoc())) { $estado_anterior = (string)$row['estado']; }
+				$s->close();
+			}
 			$stmt = $conexion->prepare("UPDATE tbl_leads SET estado = ? WHERE id = ?");
 			if ($stmt) {
 				$stmt->bind_param('si', $estado, $id);
 				$stmt->execute();
 				$stmt->close();
 				$mensaje_accion = 'Estado actualizado.';
+				@samap_audit_log('update', 'tbl_leads', $id, "Cambió estado del lead #$id: " . ($estado_anterior ?? '?') . " -> $estado", ['estado' => $estado_anterior], ['estado' => $estado]);
 			}
 		} else {
 			$mensaje_accion = 'Estado o id invalido.';

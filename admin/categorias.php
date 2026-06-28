@@ -13,14 +13,21 @@ if (isset($_SESSION['ADM_Username'])){
 
 	if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar la categoría. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar la categoría. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/categorias/');
 	    exit;
 	  }
 	  $id = (int) $_GET['id'];
+	  $audit_row_cat = null;
+	  $audQ = mysqli_query($connect, "SELECT id, nombre, icono FROM tbl_categorias_aliado WHERE id = " . $id);
+	  if ($audQ) { $audit_row_cat = mysqli_fetch_assoc($audQ); }
 	  $deleteSQL = "UPDATE tbl_categorias_aliado SET deleted_at=NOW() WHERE id=".$id;
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
-	  echo"<script>alert('Listo, la categoría se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
+	  @samap_audit_log('delete', 'tbl_categorias_aliado', $id, "Borró (soft) la categoría #$id: " . substr((string)($audit_row_cat['nombre'] ?? ''), 0, 100), $audit_row_cat, null);
+	  samap_flash_set('success', 'Listo, la categoría se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/categorias/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -29,7 +36,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_categorias_aliado SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('La categoría fue restaurada. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/categorias/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_categorias_aliado', $id, "Restauró la categoría #$id");
+		samap_flash_set('success', 'La categoría fue restaurada. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/categorias/?papelera=1');
 		exit;
 	}
 
@@ -39,7 +48,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_categorias_aliado WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('La categoría fue eliminada definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/categorias/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_categorias_aliado', $id, "Eliminó definitivamente la categoría #$id");
+		samap_flash_set('warning', 'La categoría fue eliminada definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/categorias/?papelera=1');
 		exit;
 	}
 

@@ -3,6 +3,16 @@
 // Si está usando session_name("algo"), ¡no lo olvide ahora!
 session_start();
 $URL = '//'.$_SERVER['HTTP_HOST'].'/';
+
+// Logout auditable: dejamos constancia del usuario que cerro sesion ANTES de
+// vaciar $_SESSION. Cargamos db.php (que es seguro - logout.php esta en la
+// whitelist de paginas publicas de session.php) para tener la conexion
+// $connect que usa samap_audit_log.
+require_once(__DIR__ . '/funciones/db.php');
+
+$logout_user = isset($_SESSION['ADM_Username']) ? (string)$_SESSION['ADM_Username'] : 'anonymous';
+@samap_audit_log('logout', '', 0, "Cierre de sesión: " . $logout_user);
+
 // Destruir todas las variables de sesión.
 $_SESSION = array();
 

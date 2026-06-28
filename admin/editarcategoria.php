@@ -32,9 +32,19 @@ if (isset($_SESSION['ADM_Username'])){
 			               WHERE id=".$COD;
 			mysqli_select_db($connect, $database);
 			mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('Listo, la categoría se actualizó correctamente.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
+			$snap = is_array($row_cat) ? $row_cat : [];
+			$snap['nombre'] = $nombre;
+			$snap['icono']  = $icono;
+			$snap['color']  = $color;
+			$snap['orden']  = $orden;
+			$snap['activo'] = $activo;
+			$snap['id']     = $COD;
+			@samap_audit_log('update', 'tbl_categorias_aliado', $COD, "Editó la categoría #$COD: " . substr((string)$nombre, 0, 100), is_array($row_cat) ? $row_cat : null, $snap);
+			samap_flash_set('success', 'Listo, la categoría se actualizó correctamente.');
+			header('Location: ' . $URL . 'admin/categorias/');
+			exit;
 		} else {
-			echo"<script>alert('Necesitás escribir un nombre para la categoría.');</script>";
+			samap_flash_set('error', 'Necesitás escribir un nombre para la categoría.');
 		}
 	}
 

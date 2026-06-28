@@ -10,7 +10,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaMedico);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/medicos/');
 			exit;
 		}
 
@@ -22,7 +23,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_medicos (titulo, nombre, especialidad, imagen) VALUES ('$titulo', '$nombre','$especialidad','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('MEDICO INSERTADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/medicos/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_medicos', $new_id, "Creó el médico: " . substr(trim($titulo . ' ' . $nombre), 0, 100), null, ['id' => $new_id, 'titulo' => $titulo, 'nombre' => $nombre, 'especialidad' => $especialidad, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Médico guardado correctamente.');
+			header('Location: ' . $URL . 'admin/medicos/');
 
 	}
 

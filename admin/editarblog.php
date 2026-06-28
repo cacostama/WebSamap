@@ -19,20 +19,29 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaBlog);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/blogs/');
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_blog SET titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', texto='".$_POST['texto']."'"; 
+			$sql_update = "UPDATE tbl_blog SET titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', texto='".$_POST['texto']."'";
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('BLOG MODIFICADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/blogs/\"</script>";
+			$snap = is_array($row_blog) ? $row_blog : [];
+			$snap['titulo'] = $_POST['titulo']  ?? ($row_blog['titulo']  ?? '');
+			$snap['intro']  = $_POST['intro']   ?? ($row_blog['intro']   ?? '');
+			$snap['texto']  = $_POST['texto']   ?? ($row_blog['texto']   ?? '');
+			$snap['imagen'] = $imagen_real !== '' ? $imagen_real : ($row_blog['imagen'] ?? '');
+			$snap['id']     = $_POST['id']      ?? ($row_blog['id'] ?? 0);
+			@samap_audit_log('update', 'tbl_blog', (int)$_POST['id'], "Editó el artículo #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_blog) ? $row_blog : null, $snap);
+			samap_flash_set('success', 'Blog guardado correctamente.');
+			header('Location: ' . $URL . 'admin/blogs/');
 
 	}
 

@@ -19,9 +19,13 @@ if (isset($_SESSION['ADM_Username'])){
 			              VALUES ('".$nombre."','".$icono."',".$color_sql.",".$orden.",".$activo.")";
 			mysqli_select_db($connect, $database);
 			mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('Listo, la categoría se agregó correctamente.'); window.location.href=\"".$URL."admin/categorias/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_categorias_aliado', $new_id, "Creó la categoría: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'icono' => $icono, 'orden' => $orden, 'activo' => $activo]);
+			samap_flash_set('success', 'Listo, la categoría se agregó correctamente.');
+			header('Location: ' . $URL . 'admin/categorias/');
+			exit;
 		} else {
-			echo"<script>alert('Necesitás escribir un nombre para la categoría.');</script>";
+			samap_flash_set('error', 'Necesitás escribir un nombre para la categoría.');
 		}
 	}
 

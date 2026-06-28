@@ -36,9 +36,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el médico. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/medicos/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el médico. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/medicos/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_medico = null;
+	  $audQ = mysqli_query($connect, "SELECT id, titulo, nombre, especialidad, imagen FROM tbl_medicos WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_medico = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_medicos SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -46,7 +52,12 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el médico se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/medicos/\"</script>";
+	  $aud_label = trim(((string)($audit_row_medico['titulo'] ?? '')) . ' ' . ((string)($audit_row_medico['nombre'] ?? '')));
+	  @samap_audit_log('delete', 'tbl_medicos', $id_borrar, "Borró (soft) el médico #$id_borrar: " . substr($aud_label, 0, 100), $audit_row_medico, null);
+
+	  samap_flash_set('success', 'Listo, el médico se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/medicos/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -55,7 +66,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_medicos SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El médico fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/medicos/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_medicos', $id, "Restauró el médico #$id");
+		samap_flash_set('success', 'El médico fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/medicos/?papelera=1');
 		exit;
 	}
 
@@ -65,7 +78,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_medicos WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El médico fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/medicos/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_medicos', $id, "Eliminó definitivamente el médico #$id");
+		samap_flash_set('warning', 'El médico fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/medicos/?papelera=1');
 		exit;
 	}
 

@@ -35,9 +35,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el convenio. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/convenios/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el convenio. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/convenios/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_conv = null;
+	  $audQ = mysqli_query($connect, "SELECT id, titulo, ciudad, imagen FROM tbl_convenios WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_conv = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_convenios SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -45,7 +51,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el convenio se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/convenios/\"</script>";
+	  @samap_audit_log('delete', 'tbl_convenios', $id_borrar, "Borró (soft) el convenio #$id_borrar: " . substr((string)($audit_row_conv['titulo'] ?? ''), 0, 100), $audit_row_conv, null);
+
+	  samap_flash_set('success', 'Listo, el convenio se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/convenios/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -54,7 +64,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_convenios SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El convenio fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/convenios/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_convenios', $id, "Restauró el convenio #$id");
+		samap_flash_set('success', 'El convenio fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/convenios/?papelera=1');
 		exit;
 	}
 
@@ -64,7 +76,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_convenios WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El convenio fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/convenios/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_convenios', $id, "Eliminó definitivamente el convenio #$id");
+		samap_flash_set('warning', 'El convenio fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/convenios/?papelera=1');
 		exit;
 	}
 

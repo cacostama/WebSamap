@@ -40,9 +40,15 @@ if (isset($_SESSION['ADM_Username'])){
 
     if ((isset($_GET['borrar'])) && ($_GET['id'] != "")) {
 	  if (!samap_puede_escribir() || !samap_csrf_validar()) {
-	    echo"<script>alert('No se pudo eliminar el aliado. Volvé a intentarlo.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+	    samap_flash_set('error', 'No se pudo eliminar el aliado. Volvé a intentarlo.');
+	    header('Location: ' . $URL . 'admin/aliados/');
 	    exit;
 	  }
+
+	  $id_borrar = (int) $_GET['id'];
+	  $audit_row_aliado = null;
+	  $audQ = mysqli_query($connect, "SELECT id, titulo, imagen, descuento FROM tbl_aliados WHERE id = " . $id_borrar);
+	  if ($audQ) { $audit_row_aliado = mysqli_fetch_assoc($audQ); }
 
 	  $deleteSQL = sprintf("UPDATE tbl_aliados SET deleted_at=NOW() WHERE id=%s",
 	                       GetSQLValueString($_GET['id'], "int"));
@@ -50,7 +56,11 @@ if (isset($_SESSION['ADM_Username'])){
 	  mysqli_select_db($connect, $database);
 	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
 
-	  echo"<script>alert('Listo, el aliado se eliminó. Ya no se muestra en el sitio web.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+	  @samap_audit_log('delete', 'tbl_aliados', $id_borrar, "Borró (soft) el aliado #$id_borrar: " . substr((string)($audit_row_aliado['titulo'] ?? ''), 0, 100), $audit_row_aliado, null);
+
+	  samap_flash_set('success', 'Listo, el aliado se eliminó. Ya no se muestra en el sitio web.');
+	  header('Location: ' . $URL . 'admin/aliados/');
+	  exit;
 	}
 
 	// ---- Papelera: restaurar un registro soft-deleted ----
@@ -59,7 +69,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$restSQL = sprintf("UPDATE tbl_aliados SET deleted_at = NULL WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $restSQL);
-		echo "<script>alert('El aliado fue restaurado. Ya se muestra nuevamente en el sitio web.'); window.location.href=\"".$URL."admin/aliados/?papelera=1\"</script>";
+		@samap_audit_log('restore', 'tbl_aliados', $id, "Restauró el aliado #$id");
+		samap_flash_set('success', 'El aliado fue restaurado. Ya se muestra nuevamente en el sitio web.');
+		header('Location: ' . $URL . 'admin/aliados/?papelera=1');
 		exit;
 	}
 
@@ -69,7 +81,9 @@ if (isset($_SESSION['ADM_Username'])){
 		$defSQL = sprintf("DELETE FROM tbl_aliados WHERE id = %d", $id);
 		mysqli_select_db($connect, $database);
 		@mysqli_query($connect, $defSQL);
-		echo "<script>alert('El aliado fue eliminado definitivamente. Ya no se puede recuperar.'); window.location.href=\"".$URL."admin/aliados/?papelera=1\"</script>";
+		@samap_audit_log('hard_delete', 'tbl_aliados', $id, "Eliminó definitivamente el aliado #$id");
+		samap_flash_set('warning', 'El aliado fue eliminado definitivamente. Ya no se puede recuperar.');
+		header('Location: ' . $URL . 'admin/aliados/?papelera=1');
 		exit;
 	}
 

@@ -12,7 +12,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaServicios);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/servicios/');
 			exit;
 		}
 
@@ -26,7 +27,10 @@ if (isset($_SESSION['ADM_Username'])){
 			$insertSQL = "INSERT INTO tbl_servicios (titulo, intro, detalle, url, imagen, categoria_id) VALUES ('$nombre', '$intro','$detalle','','$IMAGEN',$categoria_sql)";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			echo"<script>alert('SERVICIO INSERTADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/servicios/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_servicios', $new_id, "Creó el servicio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'categoria_id' => $categoria_id, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Servicio guardado correctamente.');
+			header('Location: ' . $URL . 'admin/servicios/');
 
 	}
 

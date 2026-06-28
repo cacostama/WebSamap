@@ -10,18 +10,22 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaSlider);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/slider/');
 			exit;
 		}
 
 			$nombre = $_POST['nombre'];
 			$IMAGEN = $imagen_real;
-			
+
 
 			$insertSQL = "INSERT INTO tbl_slider (nombre, imagen) VALUES ('$nombre','$IMAGEN')";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
-			echo"<script>alert('SLIDER INSETADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/slider/\"</script>";
+			$new_id = mysqli_insert_id($connect);
+			@samap_audit_log('insert', 'tbl_slider', $new_id, "Creó el slider: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'imagen' => $IMAGEN]);
+			samap_flash_set('success', 'Slider guardado correctamente.');
+			header('Location: ' . $URL . 'admin/slider/');
 
 	}
 

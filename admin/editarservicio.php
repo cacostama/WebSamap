@@ -49,7 +49,16 @@ if (isset($_SESSION['ADM_Username'])){
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('SERVICIO MODIFICADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/servicios/\"</script>";
+			$snap = is_array($row_plan) ? $row_plan : [];
+			$snap['titulo']       = $_POST['titulo']   ?? ($row_plan['titulo']       ?? '');
+			$snap['intro']        = $_POST['intro']    ?? ($row_plan['intro']        ?? '');
+			$snap['detalle']      = $_POST['detalle']  ?? ($row_plan['detalle']      ?? '');
+			$snap['categoria_id'] = $categoria_id;
+			$snap['imagen']       = $imagen_real !== '' ? $imagen_real : ($row_plan['imagen'] ?? '');
+			$snap['id']           = $_POST['id']      ?? ($row_plan['id']           ?? 0);
+			@samap_audit_log('update', 'tbl_servicios', (int)$_POST['id'], "Editó el servicio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
+			samap_flash_set('success', 'Servicio guardado correctamente.');
+			header('Location: ' . $URL . 'admin/servicios/');
 
 	}
 

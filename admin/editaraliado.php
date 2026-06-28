@@ -19,7 +19,8 @@ if (isset($_SESSION['ADM_Username'])){
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaAliados);
 		} catch (RuntimeException $e) {
-			echo"<script>alert(".json_encode($e->getMessage())."); window.history.back();</script>";
+			samap_flash_set('error', $e->getMessage());
+			header('Location: ' . $URL . 'admin/aliados/');
 			exit;
 		}
 
@@ -37,7 +38,17 @@ if (isset($_SESSION['ADM_Username'])){
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('Listo, el aliado se actualizó correctamente.'); window.location.href=\"".$URL."admin/aliados/\"</script>";
+			$snap = is_array($row_plan) ? $row_plan : [];
+			$snap['titulo']       = $_POST['titulo']   ?? ($row_plan['titulo']       ?? '');
+			$snap['categoria_id'] = $categoria_id;
+			$snap['descuento']    = $descuento;
+			$snap['orden']        = $orden;
+			$snap['detalle']      = $_POST['detalle'] ?? ($row_plan['detalle']      ?? '');
+			$snap['imagen']       = $imagen_real !== '' ? $imagen_real : ($row_plan['imagen'] ?? '');
+			$snap['id']           = $_POST['id']      ?? ($row_plan['id']           ?? 0);
+			@samap_audit_log('update', 'tbl_aliados', (int)$_POST['id'], "Editó el aliado #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
+			samap_flash_set('success', 'Listo, el aliado se actualizó correctamente.');
+			header('Location: ' . $URL . 'admin/aliados/');
 
 	}
 

@@ -38,16 +38,26 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_sanatorio SET nombre='".$_POST['nombre']."', direccion='".$_POST['direccion']."', telefono='".$_POST['telefono']."', idCiudad='".$_POST['ciudad']."', estado='".$_POST['estado']."'"; 
+			$sql_update = "UPDATE tbl_sanatorio SET nombre='".$_POST['nombre']."', direccion='".$_POST['direccion']."', telefono='".$_POST['telefono']."', idCiudad='".$_POST['ciudad']."', estado='".$_POST['estado']."'";
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
-			echo"<script>alert('SANATORIO MODIFICADO CORRECTAMENTE!'); window.location.href=\"".$URL."admin/sanatorios/\"</script>";
+			$snap = is_array($row_sanatorio) ? $row_sanatorio : [];
+			$snap['nombre']    = $_POST['nombre']    ?? ($row_sanatorio['nombre']    ?? '');
+			$snap['direccion'] = $_POST['direccion'] ?? ($row_sanatorio['direccion'] ?? '');
+			$snap['telefono']  = $_POST['telefono']  ?? ($row_sanatorio['telefono']  ?? '');
+			$snap['idCiudad']  = $_POST['ciudad']    ?? ($row_sanatorio['idCiudad']  ?? '');
+			$snap['estado']    = $_POST['estado']    ?? ($row_sanatorio['estado']    ?? '');
+			$snap['imagen']    = $imagen_real !== '' ? $imagen_real : ($row_sanatorio['imagen'] ?? '');
+			$snap['id']        = $_POST['id']        ?? ($row_sanatorio['id']        ?? 0);
+			@samap_audit_log('update', 'tbl_sanatorio', (int)$_POST['id'], "Editó el sanatorio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['nombre'], 0, 100), is_array($row_sanatorio) ? $row_sanatorio : null, $snap);
+			samap_flash_set('success', 'Sanatorio guardado correctamente.');
+			header('Location: ' . $URL . 'admin/sanatorios/');
 
 	}
 
