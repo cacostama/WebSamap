@@ -63,6 +63,31 @@ if (mb_strlen($mensaje) > 5000) {
     $mensaje = mb_substr($mensaje, 0, 5000);
 }
 
+// --- Persistir en tbl_leads (best-effort, no bloquea el envio SMTP) ---
+// enviar.php no incluye admin/funciones/db.php a proposito, asi que
+// armamos una conexion ad-hoc al host de la DB. Si las env vars de DB
+// no estan definidas o la conexion falla, seguimos: el SMTP sigue
+// siendo el canal primario de notificacion.
+$dbHost = getenv('DB_HOST') ?: 'db';
+$dbName = getenv('DB_NAME') ?: 'web_samap';
+$dbUser = getenv('DB_USER');
+$dbPass = getenv('DB_PASS');
+if ($dbUser !== false && $dbPass !== false && $dbUser !== '' && $dbPass !== '') {
+    $leadsConn = @new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+    if (!$leadsConn->connect_errno) {
+        $leadsConn->set_charset('utf8');
+        $ip        = limpiar_encabezado($_SERVER['REMOTE_ADDR'] ?? '');
+        $userAgent = limpiar_encabezado(substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 250));
+        $stmt = $leadsConn->prepare("INSERT INTO tbl_leads (origen, nombre, email, telefono, mensaje, ip, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param('sssssss', $origen, $nombre, $email, $tel, $mensaje, $ip, $userAgent);
+            $stmt->execute();
+            $stmt->close();
+        }
+        $leadsConn->close();
+    }
+}
+
 // --- Credenciales SMTP desde entorno ---
 $smtpHost = getenv('SMTP_HOST');
 $smtpPort = getenv('SMTP_PORT') ?: '587';

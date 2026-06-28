@@ -586,3 +586,78 @@ CREATE TABLE `tbl_agenda` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+--
+-- Table structure for table `tbl_leads`
+--
+-- Migracion 008: persistencia de leads del formulario de contacto / trabaje
+-- con nosotros. enviar.php hace INSERT despues de validar; admin/leads.php
+-- los lista con filtros, cambio de estado, notas y borrado.
+
+DROP TABLE IF EXISTS `tbl_leads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_leads` (
+  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `origen`     VARCHAR(20)  NOT NULL DEFAULT 'contacto',
+  `nombre`     VARCHAR(200) NOT NULL,
+  `email`      VARCHAR(200) NOT NULL,
+  `telefono`   VARCHAR(50)  DEFAULT NULL,
+  `mensaje`    TEXT         NOT NULL,
+  `ip`         VARCHAR(45)  DEFAULT NULL,
+  `user_agent` VARCHAR(255) DEFAULT NULL,
+  `estado`     ENUM('nuevo','contactado','cerrado','spam') NOT NULL DEFAULT 'nuevo',
+  `notas`      TEXT         DEFAULT NULL,
+  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP    NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_leads_estado`  (`estado`),
+  KEY `idx_leads_origen`  (`origen`),
+  KEY `idx_leads_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tbl_leads`
+--
+
+LOCK TABLES `tbl_leads` WRITE;
+/*!40000 ALTER TABLE `tbl_leads` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tbl_leads` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tbl_user_token`
+--
+-- Migracion 009: tokens de un solo uso para recuperacion de contrasena y
+-- (futuro) verificacion de email. admin/recuperar.php genera el token al
+-- pedir el restablecimiento; admin/restablecer.php lo canjea y marca used_at.
+-- El tipo = ENUM limita los casos de uso para que no entren tokens basura.
+
+DROP TABLE IF EXISTS `tbl_user_token`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_user_token` (
+  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`    INT UNSIGNED NOT NULL,
+  `token`      VARCHAR(128) NOT NULL,
+  `tipo`       ENUM('reset_password', 'verify_email') NOT NULL DEFAULT 'reset_password',
+  `expires_at` TIMESTAMP    NOT NULL,
+  `used_at`    TIMESTAMP    NULL DEFAULT NULL,
+  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip`         VARCHAR(45)  DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_token`    (`token`),
+  KEY        `idx_user_tipo` (`user_id`, `tipo`),
+  KEY        `idx_expires`   (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tbl_user_token`
+--
+
+LOCK TABLES `tbl_user_token` WRITE;
+/*!40000 ALTER TABLE `tbl_user_token` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tbl_user_token` ENABLE KEYS */;
+UNLOCK TABLES;
