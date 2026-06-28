@@ -51,7 +51,7 @@ if (isset($_SESSION['ADM_Username'])){
     
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 	{
-	  $theValue = (!get_magic_quotes_gpc()) ? addslashes($theValue) : $theValue;
+	  $theValue = addslashes($theValue);
 
 	  switch ($theType) {
 	    case "text":
