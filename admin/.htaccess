@@ -20,3 +20,25 @@ RewriteRule ^(.*)$ $1.html
 #RewriteRule ^([a-z]+)/?$ $1.html [NC]
 
 </IfModule>
+
+# Limites para backup: subir archivos .sql/.sql.gz de hasta 200 MB.
+# upload_max_filesize y post_max_size son PHP_INI_PERDIR, por eso van aca
+# y no se pueden cambiar con ini_set() desde el script.
+<IfModule mod_php8.c>
+	php_value upload_max_filesize 200M
+	php_value post_max_size 220M
+	php_value memory_limit 512M
+	php_value max_execution_time 600
+</IfModule>
+<IfModule mod_php7.c>
+	php_value upload_max_filesize 200M
+	php_value post_max_size 220M
+	php_value memory_limit 512M
+	php_value max_execution_time 600
+</IfModule>
+<IfModule mod_php.c>
+	php_value upload_max_filesize 200M
+	php_value post_max_size 220M
+	php_value memory_limit 512M
+	php_value max_execution_time 600
+</IfModule>
