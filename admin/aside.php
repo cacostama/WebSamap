@@ -125,10 +125,39 @@
 </li>
 
 
+<li class="<?php echo ($currentScript === 'medios.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/medios/" title="Biblioteca de medios" class="has-submenu">
+		<em class="fa fa-picture-o"></em>
+		<span class="item-text">Biblioteca de medios</span>
+	</a>
+</li>
+
 <li class="">
 	<a href="<?php echo $URL?>admin/blogs/" title="Blog" class="has-submenu">
 		<em class="fa fa-book"></em>
 		<span class="item-text">Blog</span>
+	</a>
+</li>
+
+<?php
+// Conteo de leads nuevos (solo para el badge del menu).
+// Solo consultamos si hay sesion admin y la conexion $connect esta disponible
+// (la pone en alcance admin/funciones/db.php via admin/header.php).
+$leads_nuevos = 0;
+if (isset($_SESSION['ADM_Username']) && isset($connect) && $connect instanceof mysqli) {
+	@mysqli_select_db($connect, $database);
+	$r = @mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_leads WHERE estado = 'nuevo'");
+	if ($r) {
+		$row = mysqli_fetch_assoc($r);
+		$leads_nuevos = (int)($row['c'] ?? 0);
+		mysqli_free_result($r);
+	}
+}
+?>
+<li class="<?php echo ($currentScript === 'leads.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/leads/" title="Leads" class="has-submenu">
+		<em class="fa fa-inbox"></em>
+		<span class="item-text">Leads <?php echo $leads_nuevos > 0 ? '<span class="badge" style="background:#f6504d;color:#fff;margin-left:6px;">' . $leads_nuevos . '</span>' : ''; ?></span>
 	</a>
 </li>
 
