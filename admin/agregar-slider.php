@@ -98,7 +98,7 @@ if (isset($_SESSION['ADM_Username'])){
 										<label name="imagen" class="col-sm-2 control-label">Slider</label>
 										<div class="col-sm-4">
 											<input name="imagen" type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-											<span><br>Tamaño del Slider: 4168 x 2345 px</span>
+											<span><br>Medida recomendada: 838 × 960 px</span>
 											
 										</div>
 										

@@ -123,7 +123,7 @@ if (isset($_SESSION['ADM_Username'])){
 										<label name="imagen" class="col-sm-2 control-label">Logo</label>
 										<div class="col-sm-4">
 											<input name="imagen" type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="filestyle form-control">
-											
+											<!-- ATENCIÓN: imágenes de apoyo comparten carpeta (documentos/sponsor/) con sponsors. Riesgo de colisión de nombres de archivo. -->
 											
 										</div>
 										
