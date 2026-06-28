@@ -43,15 +43,9 @@
 </div>
 </li>
 <li class="divider"></li>
-<li><a href="#">Profile</a>
+<li><a href="<?php echo $URL; ?>admin/perfil/">Profile</a>
 </li>
-<li><a href="#">Settings</a>
-</li>
-<li><a href="#">Notifications<div class="label label-info pull-right">5</div></a>
-</li>
-<li><a href="#">Messages<div class="label label-danger pull-right">10</div></a>
-</li>
-<li><a href="#">Logout</a>
+<li><a href="<?php echo $URL; ?>admin/logout/">Logout</a>
 </li>
 </ul>
 
@@ -65,9 +59,9 @@
 </div>
 
 
-<form role="search" class="navbar-form">
+<form role="search" class="navbar-form" action="<?php echo $URL;?>admin/buscar/" method="get">
 <div class="form-group has-feedback">
-<input type="text" placeholder="Type and hit Enter.." class="form-control">
+<input type="text" name="q" placeholder="Buscar en todo el sitio..." class="form-control" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES) : ''; ?>">
 <div data-toggle="navbar-search-dismiss" class="fa fa-times form-control-feedback"></div>
 </div>
 <button type="submit" class="hidden btn btn-default">Submit</button>
