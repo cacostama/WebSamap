@@ -36,7 +36,7 @@
 	// Todas las paginas del admin incluyen db.php -> session.php. Aca bloqueamos
 	// del lado del SERVIDOR (header + exit) cualquier pagina que requiera sesion.
 	// Las paginas publicas (login / logout) van en la whitelist.
-	$ADM_paginas_publicas = ['index.php', 'logout.php', 'conexion.php'];
+	$ADM_paginas_publicas = ['index.php', 'logout.php', 'conexion.php', 'recuperar.php', 'restablecer.php'];
 	$ADM_script_actual = basename($_SERVER['SCRIPT_NAME'] ?? '');
 
 	if (!in_array($ADM_script_actual, $ADM_paginas_publicas, true) &&

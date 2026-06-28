@@ -133,21 +133,24 @@ header( 'X-Frame-Options: SAMEORIGIN' );
                                             <strong>¡Cuidado!</strong> Usuario y/o Contraseña Incorrecto/s
                                           </div>
                                           ";
-                                } else { 
+                                } else {
                                 } ?>
-                                 <?php if ($captcha == "incorrecto" ) { 
+                                 <?php if ($captcha == "incorrecto" ) {
                                     echo "<div class='alert alert-warning alert-dismissable'>
                                             <button type='button' class='close' data-dismiss='alert'>&times;</button>
                                             <strong>ReCaptcha</strong>  Incorrecto
                                           </div>
                                           ";
-                                } else { 
+                                } else {
                                 } ?>
-                          
+
                         <div class="g-recaptcha" data-sitekey="6LejN1QpAAAAAKQ528NxxqvZc7qkC_vj_MB3jHK6"></div><br>
 
 							<button type="submit" class="btn btn-block btn-primary">Iniciar sesión</button>
 						</form>
+					</div>
+					<div class="text-center" style="margin-top:10px;">
+						<a href="<?php echo $URL;?>admin/recuperar/" style="color:#888;font-size:12px;">¿Olvidaste tu contraseña?</a>
 					</div>
 				</div>
 
