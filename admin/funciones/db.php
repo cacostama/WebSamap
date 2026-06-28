@@ -3,6 +3,12 @@
 //error_reporting(0);
 date_default_timezone_set('America/Asuncion');
 
+if (!headers_sent()) {
+	header('X-Frame-Options: SAMEORIGIN');
+	header('X-Content-Type-Options: nosniff');
+	header_remove('X-Powered-By');
+}
+
 $hostname = getenv('DB_HOST') ?: 'db';
 $database = getenv('DB_NAME') ?: 'web_samap';
 $username = getenv('DB_USER');

@@ -1,5 +1,10 @@
 <?php
 
+	// Reject malformed session IDs early to avoid PHP warnings leaking file paths
+	if (isset($_COOKIE['PHPSESSID']) && !preg_match('/^[a-zA-Z0-9,-]{1,128}$/', (string)$_COOKIE['PHPSESSID'])) {
+		unset($_COOKIE['PHPSESSID']);
+	}
+
 	// ---- Endurecimiento de la cookie de sesion ----
 	// Solo aplica si la sesion aun no arranco (evita warnings).
 	if (session_status() === PHP_SESSION_NONE) {
