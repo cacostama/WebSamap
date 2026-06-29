@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	mysqli_select_db($connect, $database);
 	$query_ciudad = "SELECT * FROM tbl_ciudad";
-	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
+	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($connect));
 	$row_ciudad = mysqli_fetch_assoc($ciudad);
 	$totalRows_ciudad = mysqli_num_rows($ciudad);
 
@@ -36,7 +36,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$insertSQL = "INSERT INTO tbl_sanatorio (idCiudad, nombre, direccion, telefono, estado) VALUES ('$ciudad','$nombre','$direccion','$telefono','$estado')";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			$new_id = mysqli_insert_id($connect);
 			@samap_audit_log('insert', 'tbl_sanatorio', $new_id, "Creó el sanatorio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'direccion' => $direccion, 'telefono' => $telefono, 'estado' => $estado]);
 			samap_flash_set('success', 'Sanatorio guardado correctamente.');

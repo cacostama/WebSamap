@@ -7,7 +7,7 @@ if (isset($_SESSION['ADM_Username'])){
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_blog= "SELECT * FROM tbl_blog WHERE " . ($papelera ? "deleted_at IS NOT NULL" : "deleted_at IS NULL") . " ORDER BY id DESC";
-	$blog = mysqli_query($connect, $query_blog) or die(mysqli_error($link));
+	$blog = mysqli_query($connect, $query_blog) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -49,7 +49,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  @samap_audit_log('delete', 'tbl_blog', $id_borrar, "Borró (soft) el artículo #$id_borrar: " . substr((string)($audit_row_blog['titulo'] ?? ''), 0, 100), $audit_row_blog, null);
 

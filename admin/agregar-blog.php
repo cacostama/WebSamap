@@ -22,7 +22,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$insertSQL = "INSERT INTO tbl_blog (fecha, titulo, intro, texto,  imagen) VALUES ('$fechaActual','$titulo','$intro', '$texto','$IMAGEN')";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			$new_id = mysqli_insert_id($connect);
 			@samap_audit_log('insert', 'tbl_blog', $new_id, "Creó el artículo: " . substr((string)$titulo, 0, 100), null, ['id' => $new_id, 'fecha' => $fechaActual, 'titulo' => $titulo, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Blog guardado correctamente.');

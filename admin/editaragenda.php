@@ -46,7 +46,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Agenda guardada correctamente.');
 			header('Location: ' . $URL . 'admin/agenda/');
 
@@ -54,73 +54,73 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_agenda = sprintf("SELECT * FROM tbl_agenda_detalle WHERE id = '%d'",$COD);
-	$agenda = mysqli_query($connect, $query_agenda) or die(mysqli_error($link));
+	$agenda = mysqli_query($connect, $query_agenda) or die(mysqli_error($connect));
 	$row_agenda = mysqli_fetch_assoc($agenda);
 	$totalRows_agenda = mysqli_num_rows($agenda);
 
 	mysqli_select_db($connect, $database);
 	$query_fecha = "SELECT * FROM tbl_agenda ";
-	$fecha = mysqli_query($connect, $query_fecha) or die(mysqli_error($link));
+	$fecha = mysqli_query($connect, $query_fecha) or die(mysqli_error($connect));
 	$row_fecha = mysqli_fetch_assoc($fecha);
 	$totalRows_fecha = mysqli_num_rows($fecha);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker1= "SELECT * FROM tbl_speaker";
-	$speaker1 = mysqli_query($connect, $query_speaker1) or die(mysqli_error($link));
+	$speaker1 = mysqli_query($connect, $query_speaker1) or die(mysqli_error($connect));
 	$row_speaker1 = mysqli_fetch_assoc($speaker1);
 	$totalRows_speaker1 = mysqli_num_rows($speaker1);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker2= "SELECT * FROM tbl_speaker";
-	$speaker2 = mysqli_query($connect, $query_speaker2) or die(mysqli_error($link));
+	$speaker2 = mysqli_query($connect, $query_speaker2) or die(mysqli_error($connect));
 	$row_speaker2 = mysqli_fetch_assoc($speaker2);
 	$totalRows_speaker2 = mysqli_num_rows($speaker2);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker3= "SELECT * FROM tbl_speaker";
-	$speaker3 = mysqli_query($connect, $query_speaker3) or die(mysqli_error($link));
+	$speaker3 = mysqli_query($connect, $query_speaker3) or die(mysqli_error($connect));
 	$row_speaker3 = mysqli_fetch_assoc($speaker3);
 	$totalRows_speaker3 = mysqli_num_rows($speaker3);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker4= "SELECT * FROM tbl_speaker";
-	$speaker4 = mysqli_query($connect, $query_speaker4) or die(mysqli_error($link));
+	$speaker4 = mysqli_query($connect, $query_speaker4) or die(mysqli_error($connect));
 	$row_speaker4 = mysqli_fetch_assoc($speaker4);
 	$totalRows_speaker4 = mysqli_num_rows($speaker4);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker5= "SELECT * FROM tbl_speaker";
-	$speaker5= mysqli_query($connect, $query_speaker5) or die(mysqli_error($link));
+	$speaker5= mysqli_query($connect, $query_speaker5) or die(mysqli_error($connect));
 	$row_speaker5 = mysqli_fetch_assoc($speaker5);
 	$totalRows_speaker5 = mysqli_num_rows($speaker5);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker6= "SELECT * FROM tbl_speaker";
-	$speaker6= mysqli_query($connect, $query_speaker6) or die(mysqli_error($link));
+	$speaker6= mysqli_query($connect, $query_speaker6) or die(mysqli_error($connect));
 	$row_speaker6= mysqli_fetch_assoc($speaker6);
 	$totalRows_speaker6 = mysqli_num_rows($speaker6);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker7= "SELECT * FROM tbl_speaker";
-	$speaker7 = mysqli_query($connect, $query_speaker7) or die(mysqli_error($link));
+	$speaker7 = mysqli_query($connect, $query_speaker7) or die(mysqli_error($connect));
 	$row_speaker7 = mysqli_fetch_assoc($speaker7);
 	$totalRows_speaker7 = mysqli_num_rows($speaker7);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker8= "SELECT * FROM tbl_speaker";
-	$speaker8 = mysqli_query($connect, $query_speaker8) or die(mysqli_error($link));
+	$speaker8 = mysqli_query($connect, $query_speaker8) or die(mysqli_error($connect));
 	$row_speaker8 = mysqli_fetch_assoc($speaker8);
 	$totalRows_speaker8 = mysqli_num_rows($speaker8);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker9= "SELECT * FROM tbl_speaker";
-	$speaker9 = mysqli_query($connect, $query_speaker9) or die(mysqli_error($link));
+	$speaker9 = mysqli_query($connect, $query_speaker9) or die(mysqli_error($connect));
 	$row_speaker9 = mysqli_fetch_assoc($speaker9);
 	$totalRows_speaker9 = mysqli_num_rows($speaker9);
 
 	mysqli_select_db($connect, $database);
 	$query_speaker10= "SELECT * FROM tbl_speaker";
-	$speaker10 = mysqli_query($connect, $query_speaker10) or die(mysqli_error($link));
+	$speaker10 = mysqli_query($connect, $query_speaker10) or die(mysqli_error($connect));
 	$row_speaker10 = mysqli_fetch_assoc($speaker10);
 	$totalRows_speaker10 = mysqli_num_rows($speaker10);
 

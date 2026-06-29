@@ -6,7 +6,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_ciudad= "SELECT * FROM tbl_ciudad WHERE deleted_at IS NULL ORDER BY nombre ASC";
-	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
+	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
@@ -44,7 +44,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  samap_flash_set('success', 'Listo, la ciudad se eliminó. Ya no se muestra en el sitio web.');
 	  header('Location: ' . $URL . 'admin/ciudad/');

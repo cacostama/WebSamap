@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_plan = sprintf("SELECT * FROM tbl_convenios WHERE id = '%d'",$COD);
-	$plan = mysqli_query($connect, $query_plan) or die(mysqli_error($link));
+	$plan = mysqli_query($connect, $query_plan) or die(mysqli_error($connect));
 	$row_plan = mysqli_fetch_assoc($plan);
 	$totalRows_plan = mysqli_num_rows($plan);
 

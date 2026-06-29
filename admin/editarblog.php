@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_blog = sprintf("SELECT * FROM tbl_blog WHERE id = '%d'",$COD);
-	$blog = mysqli_query($connect, $query_blog) or die(mysqli_error($link));
+	$blog = mysqli_query($connect, $query_blog) or die(mysqli_error($connect));
 	$row_blog = mysqli_fetch_assoc($blog);
 	$totalRows_blog = mysqli_num_rows($blog);
 

@@ -9,7 +9,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_galeria = sprintf("SELECT * FROM tbl_galeria WHERE id = '%d'",$COD);
-	$galeria = mysqli_query($connect, $query_galeria) or die(mysqli_error($link));
+	$galeria = mysqli_query($connect, $query_galeria) or die(mysqli_error($connect));
 	$row_galeria = mysqli_fetch_assoc($galeria);
 	$totalRows_galeria = mysqli_num_rows($galeria);
 
@@ -35,7 +35,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Galería guardada correctamente.');
 			header('Location: ' . $URL . 'admin/galeria/');
 

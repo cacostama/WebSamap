@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_fecha = sprintf("SELECT * FROM tbl_agenda WHERE id = '%d'",$COD);
-	$fecha = mysqli_query($connect, $query_fecha) or die(mysqli_error($link));
+	$fecha = mysqli_query($connect, $query_fecha) or die(mysqli_error($connect));
 	$row_fecha = mysqli_fetch_assoc($fecha);
 	$totalRows_fecha = mysqli_num_rows($fecha);
 
@@ -20,7 +20,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$sql_update = "UPDATE tbl_agenda SET nombre='".$_POST['nombre']."'"; 		
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Fecha guardada correctamente.');
 			header('Location: ' . $URL . 'admin/fechas/');
 

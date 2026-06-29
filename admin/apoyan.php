@@ -6,7 +6,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_sponsor = "SELECT * FROM tbl_apoyan";
-	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($link));
+	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
@@ -44,7 +44,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  samap_flash_set('success', 'SPONSOR ELIMINADO CORRECTAMENTE!');
 	  header('Location: ' . $URL . 'admin/apoyan/');

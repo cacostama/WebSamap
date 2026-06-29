@@ -11,7 +11,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                   LEFT JOIN tbl_categorias_aliado c ON a.categoria_id = c.id
 	                   WHERE " . ($papelera ? "a.deleted_at IS NOT NULL" : "a.deleted_at IS NULL") . "
 	                   ORDER BY c.orden ASC, a.orden ASC, a.id ASC";
-	$convenios = mysqli_query($connect, $query_convenios) or die(mysqli_error($link));
+	$convenios = mysqli_query($connect, $query_convenios) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -54,7 +54,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  @samap_audit_log('delete', 'tbl_aliados', $id_borrar, "Borró (soft) el aliado #$id_borrar: " . substr((string)($audit_row_aliado['titulo'] ?? ''), 0, 100), $audit_row_aliado, null);
 

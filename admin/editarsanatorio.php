@@ -8,13 +8,13 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_sanatorio = sprintf("SELECT * FROM tbl_sanatorio WHERE id = '%d'",$COD);
-	$sanatorio = mysqli_query($connect, $query_sanatorio) or die(mysqli_error($link));
+	$sanatorio = mysqli_query($connect, $query_sanatorio) or die(mysqli_error($connect));
 	$row_sanatorio = mysqli_fetch_assoc($sanatorio);
 	$totalRows_sanatorio = mysqli_num_rows($sanatorio);
 
 	mysqli_select_db($connect, $database);
 	$query_ciudad = "SELECT * FROM tbl_ciudad";
-	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
+	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($connect));
 	$row_ciudad = mysqli_fetch_assoc($ciudad);
 	$totalRows_ciudad = mysqli_num_rows($ciudad);
 

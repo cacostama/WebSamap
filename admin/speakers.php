@@ -6,7 +6,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_speakers = "SELECT a.id, a.nombre, a.titulo, a.intro, b.nacionalidad FROM tbl_speaker a LEFT JOIN tbl_nacionalidad b ON a.idNacionalidad= b.id";
-	$speakers = mysqli_query($connect, $query_speakers) or die(mysqli_error($link));
+	$speakers = mysqli_query($connect, $query_speakers) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
@@ -44,7 +44,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  samap_flash_set('success', 'SPEAKER ELIMINADO CORRECTAMENTE!');
 	  header('Location: ' . $URL . 'admin/speakers/');

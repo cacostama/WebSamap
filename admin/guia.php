@@ -26,7 +26,7 @@ if (isset($_SESSION['ADM_Username'])){
 					LEFT JOIN tbl_ciudad d ON
 					    c.idCiudad = d.id
 					WHERE a.deleted_at IS NULL";
-	$guia = mysqli_query($connect, $query_guia) or die(mysqli_error($link));
+	$guia = mysqli_query($connect, $query_guia) or die(mysqli_error($connect));
 
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
@@ -64,7 +64,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  samap_flash_set('success', 'Listo, el médico se eliminó. Ya no se muestra en el sitio web.');
 	  header('Location: ' . $URL . 'admin/guia/');

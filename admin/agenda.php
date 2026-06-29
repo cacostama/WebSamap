@@ -45,7 +45,7 @@ if (isset($_SESSION['ADM_Username'])){
 						    a.idSpeaker9 = k.id
 						LEFT JOIN tbl_speaker l ON
 						    a.idSpeaker10 = l.id";
-	$agenda = mysqli_query($connect, $query_agenda) or die(mysqli_error($link));
+	$agenda = mysqli_query($connect, $query_agenda) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 	{
@@ -83,7 +83,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  samap_flash_set('success', 'AGENDA ELIMINADA CORRECTAMENTE!');
 	  header('Location: ' . $URL . 'admin/agenda/');

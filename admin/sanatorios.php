@@ -7,7 +7,7 @@ if (isset($_SESSION['ADM_Username'])){
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_sanatorios= "SELECT a.id, a.nombre,b.nombre AS ciudad, a.direccion, a. estado FROM tbl_sanatorio a LEFT JOIN tbl_ciudad b ON a.idCiudad=b.id WHERE " . ($papelera ? "a.deleted_at IS NOT NULL" : "a.deleted_at IS NULL");
-	$sanatorios = mysqli_query($connect, $query_sanatorios) or die(mysqli_error($link));
+	$sanatorios = mysqli_query($connect, $query_sanatorios) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -49,7 +49,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  @samap_audit_log('delete', 'tbl_sanatorio', $id_borrar, "Borró (soft) el sanatorio #$id_borrar: " . substr((string)($audit_row_sanat['nombre'] ?? ''), 0, 100), $audit_row_sanat, null);
 

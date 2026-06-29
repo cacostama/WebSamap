@@ -22,7 +22,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$insertSQL = "INSERT INTO tbl_medicos (titulo, nombre, especialidad, imagen) VALUES ('$titulo', '$nombre','$especialidad','$IMAGEN')";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			$new_id = mysqli_insert_id($connect);
 			@samap_audit_log('insert', 'tbl_medicos', $new_id, "Creó el médico: " . substr(trim($titulo . ' ' . $nombre), 0, 100), null, ['id' => $new_id, 'titulo' => $titulo, 'nombre' => $nombre, 'especialidad' => $especialidad, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Médico guardado correctamente.');

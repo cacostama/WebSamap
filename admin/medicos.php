@@ -7,7 +7,7 @@ if (isset($_SESSION['ADM_Username'])){
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_medicos= "SELECT * FROM tbl_medicos WHERE " . ($papelera ? "deleted_at IS NOT NULL" : "deleted_at IS NULL");
-	$medicos = mysqli_query($connect, $query_medicos) or die(mysqli_error($link));
+	$medicos = mysqli_query($connect, $query_medicos) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -50,7 +50,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  $aud_label = trim(((string)($audit_row_medico['titulo'] ?? '')) . ' ' . ((string)($audit_row_medico['nombre'] ?? '')));
 	  @samap_audit_log('delete', 'tbl_medicos', $id_borrar, "Borró (soft) el médico #$id_borrar: " . substr($aud_label, 0, 100), $audit_row_medico, null);

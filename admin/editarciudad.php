@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_ciudad = sprintf("SELECT * FROM tbl_ciudad WHERE id = '%d'",$COD);
-	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($link));
+	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($connect));
 	$row_ciudad = mysqli_fetch_assoc($ciudad);
 	$totalRows_ciudad = mysqli_num_rows($ciudad);
 

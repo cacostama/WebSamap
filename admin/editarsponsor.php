@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_sponsor = sprintf("SELECT * FROM tbl_sponsor WHERE id = '%d'",$COD);
-	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($link));
+	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($connect));
 	$row_sponsor = mysqli_fetch_assoc($sponsor);
 	$totalRows_sponsor = mysqli_num_rows($sponsor);
 
@@ -38,7 +38,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Sponsor guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sponsors/');
 

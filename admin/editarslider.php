@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_sponsor = sprintf("SELECT * FROM tbl_slider WHERE id = '%d'",$COD);
-	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($link));
+	$sponsor = mysqli_query($connect, $query_sponsor) or die(mysqli_error($connect));
 	$row_sponsor = mysqli_fetch_assoc($sponsor);
 	$totalRows_sponsor = mysqli_num_rows($sponsor);
 
@@ -30,7 +30,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$sql_update .= " WHERE id='".$_POST['id']."'";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_sponsor) ? $row_sponsor : [];
 			$snap['nombre'] = $_POST['titulo']  ?? ($row_sponsor['nombre'] ?? '');
 			$snap['imagen'] = $imagen_real !== '' ? $imagen_real : ($row_sponsor['imagen'] ?? '');

@@ -40,7 +40,7 @@ $edit_url_pattern   = isset($edit_url_pattern)   ? (string)$edit_url_pattern   :
 $delete_url_pattern = isset($delete_url_pattern) ? (string)$delete_url_pattern : '';
 $delete_confirm     = isset($delete_confirm)     ? (string)$delete_confirm     : '¿Eliminar este registro?';
 $empty_message      = isset($empty_message)      ? (string)$empty_message      : 'Todavia no hay registros cargados.';
-$table_id           = isset($table_id)           ? (string)$table_id           : 'datatable1';
+$table_id           = isset($table_id)           ? (string)$table_id           : 'samap-tabla';
 $datatables_options = (isset($datatables_options) && is_array($datatables_options))
                         ? $datatables_options
                         : ['pageLength' => 25];
@@ -164,10 +164,10 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
                                     <td width="20px"><div align="center"><a href="<?= $e_url . $e_edit_url ?>"><img width="20px" src="<?= $e_url ?>admin/app/img/editar.png" alt="Editar"/></a></div></td>
                                 <?php endif; ?>
                                 <?php if ($show_delete): ?>
-                                    <td width="20px"><div align="center"><a href="<?= $e_url . $e_delete_url ?>" onclick="return confirm(<?= json_encode($delete_confirm, JSON_UNESCAPED_UNICODE) ?>);"><img width="20px" src="<?= $e_url ?>admin/app/img/borrar.png" alt="Borrar"/></a></div></td>
+                                    <td width="20px"><div align="center"><a href="<?= $e_url . $e_delete_url ?>" class="samap-confirm" data-samap-confirm-msg="<?= htmlspecialchars($delete_confirm, ENT_QUOTES, 'UTF-8') ?>" data-samap-confirm-ok="Sí, eliminar" data-samap-confirm-variant="danger" onclick="return confirm(<?= json_encode($delete_confirm, JSON_UNESCAPED_UNICODE) ?>);"><img width="20px" src="<?= $e_url ?>admin/app/img/borrar.png" alt="Borrar"/></a></div></td>
                                 <?php elseif ($papelera_activa): ?>
-                                    <td width="20px"><div align="center"><a href="<?= $restaurar_url ?>" title="Restaurar" onclick="return confirm(<?= json_encode('¿Restaurar este registro? Volverá a mostrarse en el sitio web.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-undo" style="font-size:18px;color:#01b6ad;"></em></a></div></td>
-                                    <td width="20px"><div align="center"><a href="<?= $borrar_def_url ?>" title="Borrar definitivamente" onclick="return confirm(<?= json_encode('¿Borrar DEFINITIVAMENTE? Esta acción no se puede deshacer.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-times-circle" style="font-size:18px;color:#f6504d;"></em></a></div></td>
+                                    <td width="20px"><div align="center"><a href="<?= $restaurar_url ?>" title="Restaurar" class="samap-confirm" data-samap-confirm-msg="¿Restaurar este registro? Volverá a mostrarse en el sitio web." data-samap-confirm-ok="Sí, restaurar" data-samap-confirm-variant="primary" onclick="return confirm(<?= json_encode('¿Restaurar este registro? Volverá a mostrarse en el sitio web.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-undo" style="font-size:18px;color:#01b6ad;"></em></a></div></td>
+                                    <td width="20px"><div align="center"><a href="<?= $borrar_def_url ?>" title="Borrar definitivamente" class="samap-confirm" data-samap-confirm-msg="¿Borrar DEFINITIVAMENTE? Esta acción no se puede deshacer." data-samap-confirm-ok="Sí, borrar definitivamente" data-samap-confirm-variant="danger" onclick="return confirm(<?= json_encode('¿Borrar DEFINITIVAMENTE? Esta acción no se puede deshacer.', JSON_UNESCAPED_UNICODE) ?>);"><em class="fa fa-times-circle" style="font-size:18px;color:#f6504d;"></em></a></div></td>
                                 <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
@@ -274,3 +274,74 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
         </script>
     </div>
 </div>
+
+<?php
+// ----------------------------------------------------------------------------
+// Modal de confirmacion (reemplaza al confirm() nativo del navegador).
+// Se renderiza UNA sola vez por pagina (defendido con SAMAP_CONFIRM_MODAL_OK).
+// Cualquier <a class="samap-confirm" data-samap-confirm-msg="..." data-samap-confirm-ok="..." data-samap-confirm-variant="danger|primary">
+// abre este modal con el mensaje correspondiente y al confirmar navega al href.
+// El onclick="return confirm()" sigue como fallback si por algun motivo el JS
+// del modal no se carga (capture-phase + stopImmediatePropagation lo silencia
+// cuando todo funciona normalmente).
+// ----------------------------------------------------------------------------
+if (!defined('SAMAP_CONFIRM_MODAL_RENDERED')) {
+    define('SAMAP_CONFIRM_MODAL_RENDERED', true);
+?>
+<div id="samap-confirm-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:99998;align-items:center;justify-content:center;">
+    <div role="dialog" aria-modal="true" aria-labelledby="samap-confirm-title" style="background:#fff;border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,0.35);max-width:480px;width:92%;font-family:Helvetica,Arial,sans-serif;overflow:hidden;">
+        <div id="samap-confirm-title" style="background:#274767;color:#fff;padding:14px 20px;font-size:16px;font-weight:bold;display:flex;align-items:center;gap:10px;">
+            <em class="fa fa-question-circle" style="font-size:22px;"></em>
+            <span>Confirmar acción</span>
+        </div>
+        <div id="samap-confirm-body" style="padding:22px 20px;color:#2F2E2D;font-size:15px;line-height:1.45;">
+            ¿Estás seguro?
+        </div>
+        <div style="padding:14px 20px;background:#f4f6f8;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #d8dee5;">
+            <button type="button" id="samap-confirm-cancel" style="background:#fff;color:#2F2E2D;border:1px solid #c0c7d0;padding:8px 18px;border-radius:4px;font-size:14px;cursor:pointer;">Cancelar</button>
+            <a href="#" id="samap-confirm-ok" style="background:#f6504d;color:#fff;border:none;padding:8px 18px;border-radius:4px;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block;font-weight:bold;">Aceptar</a>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    var overlay = document.getElementById('samap-confirm-overlay');
+    var body    = document.getElementById('samap-confirm-body');
+    var okBtn   = document.getElementById('samap-confirm-ok');
+    var cancel  = document.getElementById('samap-confirm-cancel');
+    if (!overlay || !okBtn || !cancel) { return; }
+
+    function open(msg, okLabel, variant, href) {
+        body.textContent = msg || '¿Estás seguro?';
+        okBtn.textContent = okLabel || 'Aceptar';
+        okBtn.href = href;
+        okBtn.style.background = (variant === 'primary') ? '#274767' : '#f6504d';
+        overlay.style.display = 'flex';
+        setTimeout(function(){ okBtn.focus(); }, 50);
+    }
+    function close() { overlay.style.display = 'none'; okBtn.href = '#'; }
+
+    cancel.addEventListener('click', function(e){ e.preventDefault(); close(); });
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && overlay.style.display === 'flex') { close(); }
+    });
+
+    // Intercepta los clicks en CAPTURE phase para correr ANTES que el onclick
+    // inline (que es el fallback). stopImmediatePropagation evita que el
+    // onclick="return confirm()" se evalue cuando el modal esta disponible.
+    document.addEventListener('click', function(e) {
+        var a = e.target.closest && e.target.closest('a.samap-confirm');
+        if (!a) { return; }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        open(
+            a.getAttribute('data-samap-confirm-msg') || a.getAttribute('title') || '¿Estás seguro?',
+            a.getAttribute('data-samap-confirm-ok')  || 'Aceptar',
+            a.getAttribute('data-samap-confirm-variant') || 'danger',
+            a.getAttribute('href')
+        );
+    }, true);
+})();
+</script>
+<?php } ?>

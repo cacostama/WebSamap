@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	mysqli_select_db($connect, $database);
 	$query_galeria = "SELECT * FROM tbl_galeria";
-	$galeria = mysqli_query($connect, $query_galeria) or die(mysqli_error($link));
+	$galeria = mysqli_query($connect, $query_galeria) or die(mysqli_error($connect));
 	$row_galeria = mysqli_fetch_assoc($galeria);
 	$totalRows_galeria = mysqli_num_rows($galeria);
 
@@ -43,7 +43,7 @@ if (isset($_SESSION['ADM_Username'])){
 				}
 				$insertSQL = "INSERT INTO tbl_fotos (nombre, descripcion, ruta, galeria_id) VALUES ('$nombre', '', '$rutaGaleria', $galeria_id)";
 				mysqli_select_db($connect, $database);
-				$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+				$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 				$inserts++;
 			}
 			unset($_FILES['__foto_single']);

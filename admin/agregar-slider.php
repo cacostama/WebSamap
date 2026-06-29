@@ -21,7 +21,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$insertSQL = "INSERT INTO tbl_slider (nombre, imagen) VALUES ('$nombre','$IMAGEN')";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			$new_id = mysqli_insert_id($connect);
 			@samap_audit_log('insert', 'tbl_slider', $new_id, "Creó el slider: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Slider guardado correctamente.');

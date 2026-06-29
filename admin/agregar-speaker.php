@@ -5,7 +5,7 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	mysqli_select_db($connect, $database);
 	$query_nacionalidad = "SELECT * FROM tbl_nacionalidad";
-	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($link));
+	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($connect));
 	$row_nacionalidad = mysqli_fetch_assoc($nacionalidad);
 	$totalRows_nacionalidad = mysqli_num_rows($nacionalidad);
 
@@ -55,7 +55,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$insertSQL = "INSERT INTO tbl_speaker (nombre, titulo, intro, texto, linkedin, ig, fb, tw, web, idNacionalidad, imagen) VALUES ('$nombre','$titulo','$intro','$texto','$linkedin','$ig','$fb','$tw','$web','$nacionalidad','$IMAGEN')";
 			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($link));
+			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Speaker guardado correctamente.');
 			header('Location: ' . $URL . 'admin/speakers/');
 

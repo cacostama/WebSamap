@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_nacionalidad = sprintf("SELECT * FROM tbl_nacionalidad WHERE id = '%d'",$COD);
-	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($link));
+	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($connect));
 	$row_nacionalidad = mysqli_fetch_assoc($nacionalidad);
 	$totalRows_nacionalidad = mysqli_num_rows($nacionalidad);
 

@@ -5,13 +5,13 @@ if (isset($_SESSION['ADM_Username'])){
 	
 	mysqli_select_db($connect, $database);
 	$query_especialidad = "SELECT * FROM tbl_especialidad ORDER BY nombre  ASC";
-	$especialidad = mysqli_query($connect, $query_especialidad) or die(mysqli_error($link));
+	$especialidad = mysqli_query($connect, $query_especialidad) or die(mysqli_error($connect));
 	$row_especialidad = mysqli_fetch_assoc($especialidad);
 	$totalRows_especialidad= mysqli_num_rows($especialidad);
 
 	mysqli_select_db($connect, $database);
 	$query_sanatorio = "SELECT * FROM tbl_sanatorio";
-	$sanatorio = mysqli_query($connect, $query_sanatorio) or die(mysqli_error($link));
+	$sanatorio = mysqli_query($connect, $query_sanatorio) or die(mysqli_error($connect));
 	$row_sanatorio = mysqli_fetch_assoc($sanatorio);
 	$totalRows_sanatorio= mysqli_num_rows($sanatorio);
 

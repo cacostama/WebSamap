@@ -7,7 +7,7 @@ if (isset($_SESSION['ADM_Username'])){
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_servicios= "SELECT * FROM tbl_servicios WHERE " . ($papelera ? "deleted_at IS NOT NULL" : "deleted_at IS NULL");
-	$servicios = mysqli_query($connect, $query_servicios) or die(mysqli_error($link));
+	$servicios = mysqli_query($connect, $query_servicios) or die(mysqli_error($connect));
 
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")

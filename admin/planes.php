@@ -6,7 +6,7 @@ if (isset($_SESSION['ADM_Username'])){
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
 	$query_planes= "SELECT * FROM tbl_planes WHERE " . ($papelera ? "deleted_at IS NOT NULL" : "deleted_at IS NULL");
-	$planes = mysqli_query($connect, $query_planes) or die(mysqli_error($link));
+	$planes = mysqli_query($connect, $query_planes) or die(mysqli_error($connect));
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -51,7 +51,7 @@ if (isset($_SESSION['ADM_Username'])){
 	                       GetSQLValueString($_GET['id'], "int"));
 
 	  mysqli_select_db($connect, $database);
-	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error());
+	  $Result1 = mysqli_query($connect, $deleteSQL) or die(mysqli_error($connect));
 
 	  @samap_audit_log('delete', 'tbl_planes', $id_borrar, "Borró (soft) el plan #$id_borrar: " . substr((string)($audit_row_planes['titulo'] ?? ''), 0, 100), $audit_row_planes, null);
 

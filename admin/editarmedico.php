@@ -8,7 +8,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$query_medico = sprintf("SELECT * FROM tbl_medicos WHERE id = '%d'",$COD);
-	$medico = mysqli_query($connect, $query_medico) or die(mysqli_error($link));
+	$medico = mysqli_query($connect, $query_medico) or die(mysqli_error($connect));
 	$row_medico = mysqli_fetch_assoc($medico);
 	$totalRows_medico = mysqli_num_rows($medico);
 
