@@ -14,7 +14,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-	    $detalle= htmlentities( $_POST['detalle']);
+	    $detalle= htmlentities( (string)($_POST['detalle'] ?? ''), ENT_QUOTES, 'UTF-8' );
 
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaPlan);

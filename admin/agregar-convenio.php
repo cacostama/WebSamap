@@ -17,7 +17,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 			$ciudad = $_POST['ciudad'];
 			$nombre = $_POST['nombre'];
-			$detalle= htmlentities( $_POST['detalle']);
+			$detalle= htmlentities( (string)($_POST['detalle'] ?? ''), ENT_QUOTES, 'UTF-8' );
 			$IMAGEN = $imagen_real;
 
 			$insertSQL = "INSERT INTO tbl_convenios (ciudad, titulo, detalle, imagen, url) VALUES ('$ciudad','$nombre','$detalle','$IMAGEN','https://')";

@@ -17,7 +17,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$fechaActual = date("Y-m-d");
 			$titulo = $_POST['titulo'];
 			$intro = $_POST['intro'];
-			$texto= htmlentities( $_POST['texto']);
+			$texto= htmlentities( (string)($_POST['texto'] ?? ''), ENT_QUOTES, 'UTF-8' );
 			$IMAGEN = $imagen_real;
 
 			$insertSQL = "INSERT INTO tbl_blog (fecha, titulo, intro, texto,  imagen) VALUES ('$fechaActual','$titulo','$intro', '$texto','$IMAGEN')";

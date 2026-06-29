@@ -22,7 +22,7 @@ if (isset($_SESSION['ADM_Username'])){
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
 	    //--------INICIO IMAGEN1---------//
 
-	    $detalle= htmlentities( $_POST['detalle']);
+	    $detalle= htmlentities( (string)($_POST['detalle'] ?? ''), ENT_QUOTES, 'UTF-8' );
 
 		$imagen_real=$_FILES['imagen']['name'];
 
