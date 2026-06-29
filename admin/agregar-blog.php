@@ -15,8 +15,8 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 			$fechaActual = date("Y-m-d");
-			$titulo = $_POST['titulo'];
-			$intro = $_POST['intro'];
+			$titulo = ($_POST['titulo'] ?? '');
+			$intro = ($_POST['intro'] ?? '');
 			$texto= htmlentities( (string)($_POST['texto'] ?? ''), ENT_QUOTES, 'UTF-8' );
 			$IMAGEN = $imagen_real;
 

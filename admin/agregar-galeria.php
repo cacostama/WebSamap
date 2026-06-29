@@ -10,7 +10,7 @@ if (isset($_SESSION['ADM_Username'])){
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
 	    //--------INICIO IMAGEN1---------//
 
-			$nombre = $_POST['nombre'];
+			$nombre = ($_POST['nombre'] ?? '');
 		
 			$insertSQL = "INSERT INTO tbl_galeria (nombre) VALUES ('$nombre')";
 			mysqli_select_db($connect, $database);

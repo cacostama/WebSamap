@@ -40,13 +40,13 @@ if (isset($_SESSION['ADM_Username'])){
 			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);
 			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
 
-			$sql_update = "UPDATE tbl_servicios SET titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', detalle='".$_POST['detalle']."', categoria_id=".$categoria_sql;
+			$sql_update = "UPDATE tbl_servicios SET titulo='".($_POST['titulo'] ?? '')."', intro='".($_POST['intro'] ?? '')."', detalle='".($_POST['detalle'] ?? '')."', categoria_id=".$categoria_sql;
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_plan) ? $row_plan : [];
@@ -56,7 +56,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$snap['categoria_id'] = $categoria_id;
 			$snap['imagen']       = $imagen_real !== '' ? $imagen_real : ($row_plan['imagen'] ?? '');
 			$snap['id']           = $_POST['id']      ?? ($row_plan['id']           ?? 0);
-			@samap_audit_log('update', 'tbl_servicios', (int)$_POST['id'], "Editó el servicio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
+			@samap_audit_log('update', 'tbl_servicios', (int)($_POST['id'] ?? ''), "Editó el servicio #" . (int)($_POST['id'] ?? '') . ": " . substr((string)($_POST['titulo'] ?? ''), 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
 			samap_flash_set('success', 'Servicio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/servicios/');
 			exit;

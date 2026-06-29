@@ -37,14 +37,14 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-			$sql_update = "UPDATE tbl_agenda_detalle SET idAgenda='".$_POST['fecha']."', titulo='".$_POST['titulo']."', horario='".$_POST['horario']."', lugar='".$_POST['lugar']."', texto='".$_POST['texto']."', idSpeaker1='".$_POST['idSpeaker1']."', idSpeaker2='".$_POST['idSpeaker2']."', idSpeaker3='".$_POST['idSpeaker3']."', idSpeaker4='".$_POST['idSpeaker4']."', idSpeaker5='".$_POST['idSpeaker5']."', idSpeaker6='".$_POST['idSpeaker6']."', idSpeaker7='".$_POST['idSpeaker7']."', idSpeaker8='".$_POST['idSpeaker8']."', idSpeaker9='".$_POST['idSpeaker9']."', idSpeaker10='".$_POST['idSpeaker10']."'"; 
+			$sql_update = "UPDATE tbl_agenda_detalle SET idAgenda='".($_POST['fecha'] ?? '')."', titulo='".($_POST['titulo'] ?? '')."', horario='".($_POST['horario'] ?? '')."', lugar='".($_POST['lugar'] ?? '')."', texto='".($_POST['texto'] ?? '')."', idSpeaker1='".($_POST['idSpeaker1'] ?? '')."', idSpeaker2='".($_POST['idSpeaker2'] ?? '')."', idSpeaker3='".($_POST['idSpeaker3'] ?? '')."', idSpeaker4='".($_POST['idSpeaker4'] ?? '')."', idSpeaker5='".($_POST['idSpeaker5'] ?? '')."', idSpeaker6='".($_POST['idSpeaker6'] ?? '')."', idSpeaker7='".($_POST['idSpeaker7'] ?? '')."', idSpeaker8='".($_POST['idSpeaker8'] ?? '')."', idSpeaker9='".($_POST['idSpeaker9'] ?? '')."', idSpeaker10='".($_POST['idSpeaker10'] ?? '')."'"; 
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'"; 
 			}
 		
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Agenda guardada correctamente.');

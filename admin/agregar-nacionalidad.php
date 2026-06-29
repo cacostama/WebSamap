@@ -15,7 +15,7 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$nacionalidad = $_POST['nacionalidad'];
+			$nacionalidad = ($_POST['nacionalidad'] ?? '');
 			$IMAGEN = $imagen_real;
 
 			$insertSQL = "INSERT INTO tbl_nacionalidad (nacionalidad, bandera) VALUES ('$nacionalidad','$IMAGEN')";

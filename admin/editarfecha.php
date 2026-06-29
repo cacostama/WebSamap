@@ -17,8 +17,8 @@ if (isset($_SESSION['ADM_Username'])){
 		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
 
-			$sql_update = "UPDATE tbl_agenda SET nombre='".$_POST['nombre']."'"; 		
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update = "UPDATE tbl_agenda SET nombre='".($_POST['nombre'] ?? '')."'"; 		
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Fecha guardada correctamente.');

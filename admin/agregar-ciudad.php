@@ -23,8 +23,8 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$nombre = $_POST['nombre'];
-			$estado= $_POST['estado'];
+			$nombre = ($_POST['nombre'] ?? '');
+			$estado= ($_POST['estado'] ?? '');
 			
 
 			$insertSQL = "INSERT INTO tbl_ciudad (nombre, estado) VALUES ('$nombre','$estado')";

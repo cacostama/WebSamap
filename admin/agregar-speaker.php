@@ -39,16 +39,16 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-			$nombre = $_POST['nombre'];
-			$titulo = $_POST['titulo'];
-			$intro = $_POST['intro'];
-			$texto = $_POST['detalle'];
-			$linkedin = $_POST['linkedin'];
-			$ig = $_POST['ig'];
-			$fb = $_POST['fb'];
-			$tw = $_POST['tw'];
-			$web = $_POST['web'];
-			$nacionalidad = $_POST['nacionalidad'];
+			$nombre = ($_POST['nombre'] ?? '');
+			$titulo = ($_POST['titulo'] ?? '');
+			$intro = ($_POST['intro'] ?? '');
+			$texto = ($_POST['detalle'] ?? '');
+			$linkedin = ($_POST['linkedin'] ?? '');
+			$ig = ($_POST['ig'] ?? '');
+			$fb = ($_POST['fb'] ?? '');
+			$tw = ($_POST['tw'] ?? '');
+			$web = ($_POST['web'] ?? '');
+			$nacionalidad = ($_POST['nacionalidad'] ?? '');
 			
 			$IMAGEN = $imagen_real;
 			

@@ -15,8 +15,7 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$ciudad = $_POST['ciudad'];
-			$nombre = $_POST['nombre'];
+			$nombre = $_POST['nombre'] ?? '';
 			$detalle= htmlentities( (string)($_POST['detalle'] ?? ''), ENT_QUOTES, 'UTF-8' );
 			$IMAGEN = $imagen_real;
 			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);

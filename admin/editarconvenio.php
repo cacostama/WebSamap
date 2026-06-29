@@ -33,13 +33,13 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_convenios SET ciudad='".$_POST['ciudad']."', titulo='".$_POST['titulo']."', detalle='".$_POST['detalle']."'";
+			$sql_update = "UPDATE tbl_convenios SET ciudad='".($_POST['ciudad'] ?? '')."', titulo='".($_POST['titulo'] ?? '')."', detalle='".($_POST['detalle'] ?? '')."'";
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_plan) ? $row_plan : [];
@@ -48,7 +48,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$snap['detalle'] = $_POST['detalle'] ?? ($row_plan['detalle'] ?? '');
 			$snap['imagen']  = $imagen_real !== '' ? $imagen_real : ($row_plan['imagen'] ?? '');
 			$snap['id']      = $_POST['id']      ?? ($row_plan['id']      ?? 0);
-			@samap_audit_log('update', 'tbl_convenios', (int)$_POST['id'], "Editó el convenio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
+			@samap_audit_log('update', 'tbl_convenios', (int)($_POST['id'] ?? ''), "Editó el convenio #" . (int)($_POST['id'] ?? '') . ": " . substr((string)($_POST['titulo'] ?? ''), 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
 			samap_flash_set('success', 'Convenio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/convenios/');
 			exit;

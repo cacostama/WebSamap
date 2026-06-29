@@ -27,11 +27,11 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$nombre = $_POST['nombre'];
-			$direccion = $_POST['direccion'];
-			$telefono = $_POST['telefono'];
-			$ciudad = $_POST['ciudad'];
-			$estado= $_POST['estado'];
+			$nombre = ($_POST['nombre'] ?? '');
+			$direccion = ($_POST['direccion'] ?? '');
+			$telefono = ($_POST['telefono'] ?? '');
+			$ciudad = ($_POST['ciudad'] ?? '');
+			$estado= ($_POST['estado'] ?? '');
 			
 
 			$insertSQL = "INSERT INTO tbl_sanatorio (idCiudad, nombre, direccion, telefono, estado) VALUES ('$ciudad','$nombre','$direccion','$telefono','$estado')";

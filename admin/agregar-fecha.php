@@ -10,7 +10,7 @@ if (isset($_SESSION['ADM_Username'])){
 		$especiales = array("á", "Á", "é", "É", "í", "Í", "ó", "Ó", "ú", "Ú", "ñ", "Ñ", " ");
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
 	    
-			$nombre = $_POST['nombre'];
+			$nombre = ($_POST['nombre'] ?? '');
 
 			$insertSQL = "INSERT INTO tbl_agenda (nombre) VALUES ('$nombre')";
 			mysqli_select_db($connect, $database);

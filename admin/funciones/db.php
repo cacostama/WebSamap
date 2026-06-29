@@ -1,6 +1,16 @@
 <?php
 
-//error_reporting(0);
+// Logueamos TODOS los errores al log de Apache/PHP pero NO los enviamos al
+// body de la respuesta. Si un Notice/Warning sale al output (campo POST
+// inexistente, variable indefinida en HTML, etc) y despues el script hace
+// header('Location: ...'), Apache responde con un Warning "Cannot modify
+// header information" y el redirect FALLA -- el usuario se queda en la misma
+// pantalla sin feedback. Con display_errors=0 los Notices se logean pero no
+// salen al stream, asi que el redirect funciona aunque el codigo tenga
+// referencias a $_POST['x'] que no existe.
+error_reporting(E_ALL);
+@ini_set('display_errors', '0');
+@ini_set('log_errors', '1');
 date_default_timezone_set('America/Asuncion');
 
 if (!headers_sent()) {

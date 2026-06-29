@@ -24,13 +24,13 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_medicos SET titulo='".$_POST['titulo']."', nombre='".$_POST['nombre']."', especialidad='".$_POST['especialidad']."'";
+			$sql_update = "UPDATE tbl_medicos SET titulo='".($_POST['titulo'] ?? '')."', nombre='".($_POST['nombre'] ?? '')."', especialidad='".($_POST['especialidad'] ?? '')."'";
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_medico) ? $row_medico : [];
@@ -39,7 +39,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$snap['especialidad']  = $_POST['especialidad']  ?? ($row_medico['especialidad']  ?? '');
 			$snap['imagen']        = $imagen_real !== '' ? $imagen_real : ($row_medico['imagen'] ?? '');
 			$snap['id']            = $_POST['id']            ?? ($row_medico['id'] ?? 0);
-			@samap_audit_log('update', 'tbl_medicos', (int)$_POST['id'], "Editó el médico #" . (int)$_POST['id'] . ": " . substr(trim((string)$_POST['titulo'] . ' ' . (string)$_POST['nombre']), 0, 100), is_array($row_medico) ? $row_medico : null, $snap);
+			@samap_audit_log('update', 'tbl_medicos', (int)($_POST['id'] ?? ''), "Editó el médico #" . (int)($_POST['id'] ?? '') . ": " . substr(trim((string)($_POST['titulo'] ?? '') . ' ' . (string)$_POST['nombre']), 0, 100), is_array($row_medico) ? $row_medico : null, $snap);
 			samap_flash_set('success', 'Médico guardado correctamente.');
 			header('Location: ' . $URL . 'admin/medicos/');
 			exit;

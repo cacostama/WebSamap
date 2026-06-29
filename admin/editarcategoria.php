@@ -101,20 +101,38 @@ if (isset($_SESSION['ADM_Username'])){
 								<div class="form-group">
 									<label class="col-lg-2 control-label">Ícono</label>
 									<div class="col-lg-6">
-										<input type="text" name="icono" list="iconos-fa" value="<?php echo htmlspecialchars($row_cat['icono'], ENT_QUOTES, 'UTF-8'); ?>" class="form-control">
-										<datalist id="iconos-fa">
-											<option value="fa-prescription-bottle-alt">
-											<option value="fa-glasses">
-											<option value="fa-vials">
-											<option value="fa-dumbbell">
-											<option value="fa-handshake">
-											<option value="fa-wheelchair">
-											<option value="fa-tags">
-											<option value="fa-tooth">
-											<option value="fa-stethoscope">
-											<option value="fa-heart">
-										</datalist>
-										<span class="help-block">Código de ícono Font Awesome. Si no sabés cuál, dejá <strong>fa-tags</strong>.</span>
+										<?php $icono_actual = htmlspecialchars($row_cat['icono'] ?? 'fa-tags', ENT_QUOTES, 'UTF-8'); ?>
+										<div style="display:flex;gap:10px;align-items:center;">
+											<em id="icono-preview" class="fa <?php echo $icono_actual; ?>" style="font-size:24px;color:#6CA3AB;width:32px;text-align:center;"></em>
+											<select name="icono" id="icono-select" class="form-control" style="flex:1;" onchange="document.getElementById('icono-preview').className = 'fa ' + this.value;">
+												<?php
+												$opciones = [
+													'fa-prescription-bottle-alt' => 'Farmacias (botella)',
+													'fa-glasses'                 => 'Ópticas (anteojos)',
+													'fa-vials'                   => 'Laboratorios (tubos)',
+													'fa-dumbbell'                => 'Gimnasios (mancuerna)',
+													'fa-handshake'               => 'Cooperativas (apretón)',
+													'fa-wheelchair'              => 'Ortopedia (silla)',
+													'fa-tags'                    => 'Otros (etiqueta)',
+													'fa-tooth'                   => 'Odontología (diente)',
+													'fa-stethoscope'             => 'Médico (estetoscopio)',
+													'fa-heart'                   => 'Salud (corazón)',
+													'fa-utensils'                => 'Gastronomía (cubiertos)',
+													'fa-graduation-cap'          => 'Educación (birrete)',
+													'fa-shopping-bag'            => 'Comercio (bolsa)',
+													'fa-car'                     => 'Automotor (auto)',
+													'fa-home'                    => 'Hogar (casa)',
+												];
+												// Si el icono actual no esta entre las opciones, agregarlo al final.
+												if (!isset($opciones[$icono_actual])) { $opciones[$icono_actual] = $icono_actual . ' (personalizado)'; }
+												foreach ($opciones as $val => $lbl) {
+													$sel = $val === $icono_actual ? ' selected' : '';
+													echo '<option value="' . htmlspecialchars($val, ENT_QUOTES, 'UTF-8') . '"' . $sel . '>' . htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8') . '</option>';
+												}
+												?>
+											</select>
+										</div>
+										<span class="help-block">Elegí el ícono que mejor representa a la categoría. La vista previa de la izquierda muestra cómo se verá en el sitio.</span>
 									</div>
 								</div>
 							</fieldset>

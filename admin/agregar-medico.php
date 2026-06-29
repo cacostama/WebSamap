@@ -15,9 +15,9 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$titulo = $_POST['titulo'];
-			$nombre = $_POST['nombre'];
-			$especialidad= $_POST['especialidad'];
+			$titulo = ($_POST['titulo'] ?? '');
+			$nombre = ($_POST['nombre'] ?? '');
+			$especialidad= ($_POST['especialidad'] ?? '');
 			$IMAGEN = $imagen_real;
 
 			$insertSQL = "INSERT INTO tbl_medicos (titulo, nombre, especialidad, imagen) VALUES ('$titulo', '$nombre','$especialidad','$IMAGEN')";

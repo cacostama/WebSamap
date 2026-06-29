@@ -31,9 +31,9 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_galeria SET nombre='".$_POST['nombre']."'"; 
+			$sql_update = "UPDATE tbl_galeria SET nombre='".($_POST['nombre'] ?? '')."'"; 
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Galería guardada correctamente.');

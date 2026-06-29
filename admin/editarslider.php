@@ -22,20 +22,20 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_slider SET nombre='".$_POST['titulo']."'";
+			$sql_update = "UPDATE tbl_slider SET nombre='".($_POST['titulo'] ?? '')."'";
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'";
 			}
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_sponsor) ? $row_sponsor : [];
 			$snap['nombre'] = $_POST['titulo']  ?? ($row_sponsor['nombre'] ?? '');
 			$snap['imagen'] = $imagen_real !== '' ? $imagen_real : ($row_sponsor['imagen'] ?? '');
 			$snap['id']     = $_POST['id']      ?? ($row_sponsor['id'] ?? 0);
-			@samap_audit_log('update', 'tbl_slider', (int)$_POST['id'], "Editó el slider #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_sponsor) ? $row_sponsor : null, $snap);
+			@samap_audit_log('update', 'tbl_slider', (int)($_POST['id'] ?? ''), "Editó el slider #" . (int)($_POST['id'] ?? '') . ": " . substr((string)($_POST['titulo'] ?? ''), 0, 100), is_array($row_sponsor) ? $row_sponsor : null, $snap);
 			samap_flash_set('success', 'Slider guardado correctamente.');
 			header('Location: ' . $URL . 'admin/slider/');
 			exit;

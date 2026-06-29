@@ -82,20 +82,27 @@ if (isset($_SESSION['ADM_Username'])){
 								<div class="form-group">
 									<label class="col-lg-2 control-label">Ícono</label>
 									<div class="col-lg-6">
-										<input type="text" name="icono" list="iconos-fa" placeholder="fa-tags" value="fa-tags" class="form-control">
-										<datalist id="iconos-fa">
-											<option value="fa-prescription-bottle-alt">
-											<option value="fa-glasses">
-											<option value="fa-vials">
-											<option value="fa-dumbbell">
-											<option value="fa-handshake">
-											<option value="fa-wheelchair">
-											<option value="fa-tags">
-											<option value="fa-tooth">
-											<option value="fa-stethoscope">
-											<option value="fa-heart">
-										</datalist>
-										<span class="help-block">Código de ícono Font Awesome. Si no sabés cuál, dejá <strong>fa-tags</strong>.</span>
+										<div style="display:flex;gap:10px;align-items:center;">
+											<em id="icono-preview" class="fa fa-tags" style="font-size:24px;color:#6CA3AB;width:32px;text-align:center;"></em>
+											<select name="icono" id="icono-select" class="form-control" style="flex:1;" onchange="document.getElementById('icono-preview').className = 'fa ' + this.value;">
+												<option value="fa-prescription-bottle-alt">Farmacias (botella)</option>
+												<option value="fa-glasses">Ópticas (anteojos)</option>
+												<option value="fa-vials">Laboratorios (tubos)</option>
+												<option value="fa-dumbbell">Gimnasios (mancuerna)</option>
+												<option value="fa-handshake">Cooperativas (apretón)</option>
+												<option value="fa-wheelchair">Ortopedia (silla)</option>
+												<option value="fa-tags" selected>Otros (etiqueta)</option>
+												<option value="fa-tooth">Odontología (diente)</option>
+												<option value="fa-stethoscope">Médico (estetoscopio)</option>
+												<option value="fa-heart">Salud (corazón)</option>
+												<option value="fa-utensils">Gastronomía (cubiertos)</option>
+												<option value="fa-graduation-cap">Educación (birrete)</option>
+												<option value="fa-shopping-bag">Comercio (bolsa)</option>
+												<option value="fa-car">Automotor (auto)</option>
+												<option value="fa-home">Hogar (casa)</option>
+											</select>
+										</div>
+										<span class="help-block">Elegí el ícono que mejor representa a la categoría. La vista previa de la izquierda muestra cómo se verá en el sitio.</span>
 									</div>
 								</div>
 							</fieldset>

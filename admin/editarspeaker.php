@@ -42,14 +42,14 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-			$sql_update = "UPDATE tbl_speaker SET nombre='".$_POST['nombre']."', titulo='".$_POST['titulo']."', intro='".$_POST['intro']."', texto='".$_POST['detalle']."', linkedin='".$_POST['linkedin']."', ig='".$_POST['ig']."', fb='".$_POST['fb']."', tw='".$_POST['tw']."', tw='".$_POST['web']."', idNacionalidad='".$_POST['nacionalidad']."'"; 
+			$sql_update = "UPDATE tbl_speaker SET nombre='".($_POST['nombre'] ?? '')."', titulo='".($_POST['titulo'] ?? '')."', intro='".($_POST['intro'] ?? '')."', texto='".($_POST['detalle'] ?? '')."', linkedin='".($_POST['linkedin'] ?? '')."', ig='".($_POST['ig'] ?? '')."', fb='".($_POST['fb'] ?? '')."', tw='".($_POST['tw'] ?? '')."', tw='".($_POST['web'] ?? '')."', idNacionalidad='".($_POST['nacionalidad'] ?? '')."'"; 
 
 			if ($imagen_real != "") {
 				$sql_update .= ", imagen='".$imagen_real."'"; 
 			}
 		
 
-			$sql_update .= " WHERE id='".$_POST['id']."'";
+			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
 			mysqli_select_db($connect, $database);
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Speaker guardado correctamente.');

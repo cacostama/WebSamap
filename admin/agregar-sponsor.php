@@ -15,8 +15,8 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$titulo = $_POST['titulo'];
-			$URL2 = $_POST['URL'];
+			$titulo = ($_POST['titulo'] ?? '');
+			$URL2 = ($_POST['URL'] ?? '');
 			$IMAGEN = $imagen_real;
 
 

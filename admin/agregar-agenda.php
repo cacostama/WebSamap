@@ -35,21 +35,21 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-			$fecha = $_POST['fecha'];
-			$titulo = $_POST['titulo'];
-			$horario = $_POST['horario'];
-			$lugar = $_POST['lugar'];
-			$texto = $_POST['texto'];
-			$idSpeaker1 = $_POST['idSpeaker1'];
-			$idSpeaker2 = $_POST['idSpeaker2'];
-			$idSpeaker3 = $_POST['idSpeaker3'];
-			$idSpeaker4 = $_POST['idSpeaker4'];
-			$idSpeaker5 = $_POST['idSpeaker5'];
-			$idSpeaker6 = $_POST['idSpeaker6'];
-			$idSpeaker7 = $_POST['idSpeaker7'];
-			$idSpeaker8 = $_POST['idSpeaker8'];
-			$idSpeaker9 = $_POST['idSpeaker9'];
-			$idSpeaker10 = $_POST['idSpeaker10'];
+			$fecha = ($_POST['fecha'] ?? '');
+			$titulo = ($_POST['titulo'] ?? '');
+			$horario = ($_POST['horario'] ?? '');
+			$lugar = ($_POST['lugar'] ?? '');
+			$texto = ($_POST['texto'] ?? '');
+			$idSpeaker1 = ($_POST['idSpeaker1'] ?? '');
+			$idSpeaker2 = ($_POST['idSpeaker2'] ?? '');
+			$idSpeaker3 = ($_POST['idSpeaker3'] ?? '');
+			$idSpeaker4 = ($_POST['idSpeaker4'] ?? '');
+			$idSpeaker5 = ($_POST['idSpeaker5'] ?? '');
+			$idSpeaker6 = ($_POST['idSpeaker6'] ?? '');
+			$idSpeaker7 = ($_POST['idSpeaker7'] ?? '');
+			$idSpeaker8 = ($_POST['idSpeaker8'] ?? '');
+			$idSpeaker9 = ($_POST['idSpeaker9'] ?? '');
+			$idSpeaker10 = ($_POST['idSpeaker10'] ?? '');
 			
 			$IMAGEN = $imagen_real;
 			

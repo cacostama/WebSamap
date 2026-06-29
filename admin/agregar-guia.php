@@ -21,10 +21,10 @@ if (isset($_SESSION['ADM_Username'])){
 		$correctos   = array("a", "A", "e", "E", "i", "I", "o", "O", "u", "U", "n", "N", "-");
 	    
 
-			$titulo = $_POST['titulo'];
-			$nombre = $_POST['nombre'];
+			$titulo = ($_POST['titulo'] ?? '');
+			$nombre = ($_POST['nombre'] ?? '');
 			$especialidad2 = intval($_POST['especialidad']);
-			$sanatorio = $_POST['sanatorio'];
+			$sanatorio = ($_POST['sanatorio'] ?? '');
 
 			$insertSQL = "INSERT INTO tbl_guiamedica (idEspecialidad, idSanatorios, titulo, nombre, cv) VALUES ('$especialidad2','$sanatorio','$titulo','$nombre','texto')";
 			mysqli_select_db($connect, $database);
