@@ -451,6 +451,13 @@ html, body {
 
 @media (max-width: 520px) {
   .rd-footer__bottom-inner { justify-content: center; text-align: center; }
-  .rd-wa-float { width: 52px; height: 52px; font-size: 1.6rem; }
+  .rd-wa-float {
+    right: 18px;
+    bottom: 18px;
+    width: 52px;
+    height: 52px;
+    font-size: 1.6rem;
+  }
+  .scrollToTop { display: none !important; }
   .rd-footer-cta__btns .rd-btn { flex: 1 1 100%; }
 }

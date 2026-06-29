@@ -335,8 +335,7 @@
     background:rgba(39,71,103,.25); border-radius:999px;
   }
 
-  /* Carrusel horizontal para la seccion "Beneficios" (cards de tbl_servicios,
-     que usan grid Bootstrap .row > .col). Evita el corrido largo en vertical. */
+  /* Carrusel horizontal para secciones secundarias con cards Bootstrap. */
   .rd-hscroll{
     flex-wrap:nowrap;
     overflow-x:auto;
@@ -368,7 +367,28 @@
   /* en celular se ve ~1 card y se asoma el siguiente, invitando a deslizar */
   .rd-why__grid > *,
   .rd-planes__grid > *{ flex:0 0 80%; }
-  .rd-hscroll > [class*="col-"]{ flex:0 0 78%; max-width:78%; }
+  .blog-articles .rd-hscroll{
+    flex-wrap:wrap;
+    overflow-x:visible;
+    scroll-snap-type:none;
+    padding-bottom:0;
+  }
+  .blog-articles .rd-hscroll > [class*="col-"]{
+    flex:0 0 100%;
+    max-width:100%;
+    scroll-snap-align:none;
+  }
+  .blog-articles .blog-articles__card{
+    max-width:100%;
+  }
+  .blog-articles .blog-articles__card .blog-articles__card-thumb img{
+    height:320px !important;
+    object-fit:cover;
+    object-position:center;
+  }
+  .blog-articles .blog-articles__card .blog-articles__card-content{
+    padding:22px;
+  }
   .rd-band__inner{ flex-direction:column; align-items:stretch; text-align:center; }
   .rd-band__search{ max-width:100%; }
 }
