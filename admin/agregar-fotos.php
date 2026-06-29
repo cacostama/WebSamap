@@ -116,7 +116,7 @@ if (isset($_SESSION['ADM_Username'])){
 				<div class="panel panel-default">
 					<div class="panel-heading">Formulario de Carga</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo $editFormAction; ?>" method="post" enctype="multipart/form-data" name="form2" id="form2">
+						<form class="form-horizontal" action="" method="post" enctype="multipart/form-data" name="form2" id="form2">
 							<?php echo samap_csrf_field(); ?>
 
 								<fieldset>
@@ -163,7 +163,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 								
 
-								<input type="hidden" name="id" value="<?php echo $row_noticia['id']; ?>" />
+								<input type="hidden" name="id" value="" />
 								<input type="hidden" name="MM_insert" value="form2" />
 								<fieldset>
 									<div class="form-group">
@@ -214,9 +214,7 @@ if (isset($_SESSION['ADM_Username'])){
 	  	$('#code_preview1').summernote({height: 300});
 	    });
 	</script>
-	
-	<script src='//static.codepen.io/assets/common/stopExecutionOnTimeout-41c52890748cd7143004e05d3c5f786c66b19939c4500ce446314d1748483e13.js'>
-	</script><script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';
