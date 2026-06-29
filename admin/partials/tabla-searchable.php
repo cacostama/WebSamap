@@ -193,6 +193,16 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             <?php endif; ?>
         </div>
 
+        <?php
+        // Cargamos jQuery PRIMERO porque jquery.dataTables.min.js lo necesita
+        // disponible en window al evaluar su IIFE. El partial se incluye en el
+        // <main>, antes que el <script src="jquery.min.js"> del padre que va
+        // al final del body -- si no precargamos jQuery aca, DataTables se
+        // ejecuta sin jQuery cargado y rompe con "jQuery is not defined".
+        // El browser cachea jquery.min.js, asi que esta segunda referencia no
+        // dispara un fetch real cuando el padre vuelve a pedirlo.
+        ?>
+        <script src="<?= $e_url ?>admin/plugins/jquery/jquery.min.js"></script>
         <script src="<?= $e_url ?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
         <script src="<?= $e_url ?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
         <script>

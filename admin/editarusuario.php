@@ -275,7 +275,7 @@ if (!empty($row['ultimo_acceso']) && $row['ultimo_acceso'] !== '0000-00-00 00:00
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/animo/animate+animo.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
-	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css">
+	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
 
 	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
 

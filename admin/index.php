@@ -109,7 +109,7 @@ header( 'X-Frame-Options: SAMEORIGIN' );
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/animo/animate+animo.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
-	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css">
+	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
 	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
 
 	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>

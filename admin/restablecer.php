@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/bootstrap.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/fontawesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/animo/animate+animo.css">
-	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css">
+	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
 
 	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
 	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
