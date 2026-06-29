@@ -1381,15 +1381,27 @@ function(e, t, o) {
 }(jQuery, window, document),
 function(e, t, o) {
     if ("undefined" == typeof e) throw new Error("This application's JavaScript requires jQuery");
+    // Cada llamada a un plugin esta protegida con un check de existencia. Las
+    // paginas simples (agregar-categoria, perfil, etc.) NO cargan los plugins
+    // de slider/slimscroll/chosen, asi que sin estos guards el .ready()
+    // crashearia con "X is not a function" y los handlers posteriores no
+    // correrian.
     e(t).load(function() {
-        e(".scroll-content").slimScroll({
-            height: "250px"
-        })
+        if (e.fn.slimScroll) {
+            e(".scroll-content").slimScroll({
+                height: "250px"
+            })
+        }
     }), e(function() {
-        FastClick.attach(o.body), e('a[href="#"]').each(function() {
+        if (typeof FastClick !== "undefined") { FastClick.attach(o.body); }
+        e('a[href="#"]').each(function() {
             this.href = "javascript:void(0);"
-        }), e("[data-toggle=popover]").popover(), e(".slider").slider(), e(".chosen-select").chosen(), e(".filestyle").filestyle()
+        });
+        if (e.fn.popover)   { e("[data-toggle=popover]").popover(); }
+        if (e.fn.slider)    { e(".slider").slider(); }
+        if (e.fn.chosen)    { e(".chosen-select").chosen(); }
+        if (e.fn.filestyle) { e(".filestyle").filestyle(); }
     })
-	
+
 }(jQuery, window, document);
 

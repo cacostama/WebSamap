@@ -236,7 +236,7 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 	<script src="<?php echo $URL;?>admin/plugins/inputmask/jquery.inputmask.bundle.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 
 	<script type="text/javascript">
 	  $(document).ready(function() {

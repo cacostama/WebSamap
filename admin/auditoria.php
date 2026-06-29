@@ -385,6 +385,6 @@ $export_url = $URL . 'admin/auditoria/?' . $base_qs . ($base_qs !== '' ? '&' : '
 
 	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 </body>
 </html>

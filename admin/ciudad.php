@@ -150,7 +150,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
 
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 
 </body>
 </html>

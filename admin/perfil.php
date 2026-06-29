@@ -219,7 +219,7 @@ if (!empty($conexion) && !empty($_SESSION['ADM_Username'])) {
 	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
 
 
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 	<script src="<?php echo $URL;?>admin/plugins/parsley/parsley.min.js"></script>
 
 </body>

@@ -153,7 +153,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 
 </body>
 </html>

@@ -449,7 +449,7 @@ if (!empty($row['ultimo_acceso']) && $row['ultimo_acceso'] !== '0000-00-00 00:00
 	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
 	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
 
-	<script src="<?php echo $URL;?>admin/app/js/app.js"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
 
 </body>
 </html>
