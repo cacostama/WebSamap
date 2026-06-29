@@ -58,6 +58,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_sanatorio', (int)$_POST['id'], "Editó el sanatorio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['nombre'], 0, 100), is_array($row_sanatorio) ? $row_sanatorio : null, $snap);
 			samap_flash_set('success', 'Sanatorio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sanatorios/');
+			exit;
 
 	}
 

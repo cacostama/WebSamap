@@ -56,6 +56,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Médico guardado correctamente.');
 			header('Location: ' . $URL . 'admin/guia/');
+			exit;
 
 	}
 

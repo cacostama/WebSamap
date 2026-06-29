@@ -31,6 +31,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_servicios', $new_id, "Creó el servicio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'categoria_id' => $categoria_id, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Servicio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/servicios/');
+			exit;
 
 	}
 

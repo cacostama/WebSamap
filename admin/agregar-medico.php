@@ -27,6 +27,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_medicos', $new_id, "Creó el médico: " . substr(trim($titulo . ' ' . $nombre), 0, 100), null, ['id' => $new_id, 'titulo' => $titulo, 'nombre' => $nombre, 'especialidad' => $especialidad, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Médico guardado correctamente.');
 			header('Location: ' . $URL . 'admin/medicos/');
+			exit;
 
 	}
 

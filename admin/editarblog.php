@@ -14,8 +14,6 @@ if (isset($_SESSION['ADM_Username'])){
 
 	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
 
-	    $detalle= htmlentities( $_POST['detalle']);
-
 		try {
 			$imagen_real = samap_guardar_imagen_upload('imagen', $rutaBlog);
 		} catch (RuntimeException $e) {
@@ -42,6 +40,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_blog', (int)$_POST['id'], "Editó el artículo #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_blog) ? $row_blog : null, $snap);
 			samap_flash_set('success', 'Blog guardado correctamente.');
 			header('Location: ' . $URL . 'admin/blogs/');
+			exit;
 
 	}
 

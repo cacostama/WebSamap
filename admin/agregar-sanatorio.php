@@ -41,6 +41,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_sanatorio', $new_id, "Creó el sanatorio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'direccion' => $direccion, 'telefono' => $telefono, 'estado' => $estado]);
 			samap_flash_set('success', 'Sanatorio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sanatorios/');
+			exit;
 
 	}
 

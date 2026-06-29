@@ -38,6 +38,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_slider', (int)$_POST['id'], "Editó el slider #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_sponsor) ? $row_sponsor : null, $snap);
 			samap_flash_set('success', 'Slider guardado correctamente.');
 			header('Location: ' . $URL . 'admin/slider/');
+			exit;
 
 	}
 

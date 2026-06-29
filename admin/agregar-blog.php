@@ -27,6 +27,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_blog', $new_id, "Creó el artículo: " . substr((string)$titulo, 0, 100), null, ['id' => $new_id, 'fecha' => $fechaActual, 'titulo' => $titulo, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Blog guardado correctamente.');
 			header('Location: ' . $URL . 'admin/blogs/');
+			exit;
 
 	}
 

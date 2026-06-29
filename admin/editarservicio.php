@@ -59,6 +59,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_servicios', (int)$_POST['id'], "Editó el servicio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
 			samap_flash_set('success', 'Servicio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/servicios/');
+			exit;
 
 	}
 

@@ -53,6 +53,7 @@ if (isset($_SESSION['ADM_Username'])){
 			}
 			samap_flash_set('success', 'Fotos guardadas correctamente.');
 			header('Location: ' . $URL . 'admin/fotos/');
+			exit;
 		} catch (RuntimeException $e) {
 			samap_flash_set('error', $e->getMessage());
 			header('Location: ' . $URL . 'admin/fotos/');

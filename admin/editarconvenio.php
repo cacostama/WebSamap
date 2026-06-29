@@ -51,6 +51,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_convenios', (int)$_POST['id'], "Editó el convenio #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
 			samap_flash_set('success', 'Convenio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/convenios/');
+			exit;
 
 	}
 

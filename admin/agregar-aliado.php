@@ -31,6 +31,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_aliados', $new_id, "Creó el aliado: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'categoria_id' => $categoria_id, 'descuento' => $descuento, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Listo, el aliado se agregó correctamente.');
 			header('Location: ' . $URL . 'admin/aliados/');
+			exit;
 
 	}
 

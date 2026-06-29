@@ -26,6 +26,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_planes', $new_id, "Creó el plan: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Plan guardado correctamente.');
 			header('Location: ' . $URL . 'admin/planes/');
+			exit;
 
 	}
 

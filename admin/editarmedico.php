@@ -42,6 +42,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_medicos', (int)$_POST['id'], "Editó el médico #" . (int)$_POST['id'] . ": " . substr(trim((string)$_POST['titulo'] . ' ' . (string)$_POST['nombre']), 0, 100), is_array($row_medico) ? $row_medico : null, $snap);
 			samap_flash_set('success', 'Médico guardado correctamente.');
 			header('Location: ' . $URL . 'admin/medicos/');
+			exit;
 
 	}
 

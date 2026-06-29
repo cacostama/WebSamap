@@ -26,6 +26,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_slider', $new_id, "Creó el slider: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Slider guardado correctamente.');
 			header('Location: ' . $URL . 'admin/slider/');
+			exit;
 
 	}
 

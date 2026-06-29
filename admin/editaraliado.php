@@ -49,6 +49,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_aliados', (int)$_POST['id'], "Editó el aliado #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap);
 			samap_flash_set('success', 'Listo, el aliado se actualizó correctamente.');
 			header('Location: ' . $URL . 'admin/aliados/');
+			exit;
 
 	}
 

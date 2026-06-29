@@ -27,6 +27,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('insert', 'tbl_convenios', $new_id, "Creó el convenio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'titulo' => $nombre, 'ciudad' => $ciudad, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Convenio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/convenios/');
+			exit;
 
 	}
 

@@ -25,6 +25,7 @@ if (isset($_SESSION['ADM_Username'])){
 			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
 			samap_flash_set('success', 'SPONSOR INSETADO CORRECTAMENTE!');
 			header('Location: ' . $URL . 'admin/apoyan/');
+			exit;
 
 	}
 

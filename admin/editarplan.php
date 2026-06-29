@@ -41,6 +41,7 @@ if (isset($_SESSION['ADM_Username'])){
 			@samap_audit_log('update', 'tbl_planes', (int)$_POST['id'], "Editó el plan #" . (int)$_POST['id'] . ": " . substr((string)$_POST['titulo'], 0, 100), is_array($row_plan) ? $row_plan : null, $snap_plan);
 			samap_flash_set('success', 'Plan guardado correctamente.');
 			header('Location: ' . $URL . 'admin/planes/');
+			exit;
 
 	}
 
