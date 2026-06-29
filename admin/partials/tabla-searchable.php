@@ -193,18 +193,6 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             <?php endif; ?>
         </div>
 
-        <?php
-        // Cargamos jQuery PRIMERO porque jquery.dataTables.min.js lo necesita
-        // disponible en window al evaluar su IIFE. El partial se incluye en el
-        // <main>, antes que el <script src="jquery.min.js"> del padre que va
-        // al final del body -- si no precargamos jQuery aca, DataTables se
-        // ejecuta sin jQuery cargado y rompe con "jQuery is not defined".
-        // El browser cachea jquery.min.js, asi que esta segunda referencia no
-        // dispara un fetch real cuando el padre vuelve a pedirlo.
-        ?>
-        <script src="<?= $e_url ?>admin/plugins/jquery/jquery.min.js"></script>
-        <script src="<?= $e_url ?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
-        <script src="<?= $e_url ?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
         <script>
         (function() {
             var tableId   = <?= json_encode($table_id, JSON_UNESCAPED_UNICODE) ?>;
@@ -213,21 +201,38 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             var orderOpt  = <?= json_encode($datatables_options['order'] ?? [], JSON_UNESCAPED_UNICODE) ?>;
             var exportBtnId = 'btn-export-csv-' + tableId;
             var isPapelera = <?= $e_papelera ?>;
+            var baseUrl   = <?= json_encode($e_url, JSON_UNESCAPED_UNICODE) ?>;
 
-            // El partial se incluye ANTES del <script src="jquery.min.js"> del
-            // padre, asi que jQuery todavia no esta cargado cuando este bloque
-            // se ejecuta. Polleamos hasta que aparezca y luego inicializamos.
+            // jQuery lo carga el padre al final del <body>, no aca. NO podemos
+            // emitir <script src="dataTables"> en el partial porque correria
+            // antes de jQuery. Y NO podemos cargar jQuery aca porque eso lo
+            // dispararia DOS veces, reseteando $.fn y rompiendo plugins ya
+            // inicializados (slider, slimScroll, etc).
+            //
+            // Estrategia: polleamos por window.jQuery, y cuando exista, cargamos
+            // dataTables y dataTables.bootstrap *dinamicamente* via <script>
+            // inyectados al head. Una vez cargados, inicializamos la tabla.
+            function loadScript(src, cb) {
+                var s = document.createElement('script');
+                s.src = src;
+                s.async = false;            // mantiene orden de ejecucion
+                s.onload = cb;
+                s.onerror = function() { /* silencioso: si falla, la tabla queda como HTML plano */ };
+                document.head.appendChild(s);
+            }
+            function ensureDataTables(cb) {
+                if (typeof window.jQuery.fn.dataTable !== 'undefined') { cb(); return; }
+                loadScript(baseUrl + 'admin/plugins/datatable/media/js/jquery.dataTables.min.js', function() {
+                    loadScript(baseUrl + 'admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js', cb);
+                });
+            }
             function tryInit(attempts) {
                 attempts = attempts || 0;
                 if (typeof window.jQuery === 'undefined') {
                     if (attempts > 200) { return; }
                     return setTimeout(function(){ tryInit(attempts + 1); }, 50);
                 }
-                if (typeof window.jQuery.fn.dataTable === 'undefined') {
-                    if (attempts > 200) { return; }
-                    return setTimeout(function(){ tryInit(attempts + 1); }, 50);
-                }
-                runInit();
+                ensureDataTables(runInit);
             }
 
             function runInit() {

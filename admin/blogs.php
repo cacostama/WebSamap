@@ -106,7 +106,7 @@ if (isset($_SESSION['ADM_Username'])){
 		['th' => 'Fecha',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['fecha'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
 		['th' => 'Imagen', 'td_html' => function($r) use ($URL_BASE) {
 			$img = htmlspecialchars((string)($r['imagen'] ?? ''), ENT_QUOTES, 'UTF-8');
-			return '<td><img height="30px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/blog/' . $img . '" alt=""/></td>';
+			return $img === '' ? '<td><span style="color:#bbb;">—</span></td>' : '<td><img height="30px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/blog/' . $img . '" alt=""/></td>';
 		}],
 	];
 
