@@ -42,3 +42,53 @@ RewriteRule ^(.*)$ $1.html
 	php_value memory_limit 512M
 	php_value max_execution_time 600
 </IfModule>
+
+# ============================================================================
+# Cache HTTP para assets estaticos
+# ============================================================================
+# El admin carga ~22 JS y 6 CSS por pagina. Sin cache, cada navegacion los
+# vuelve a pedir y eso suma 1-2 segundos perceptibles por click. Con estos
+# headers, el browser los baja UNA vez y los reutiliza por 30 dias.
+#
+# El cache-busting se hace via ?v=YYYYMMDDHHMM en el <link> y <script> de los
+# archivos que cambian (app.css, app.js). Cuando el query string cambia, el
+# browser trae la version nueva.
+# ============================================================================
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault                              "access plus 1 day"
+	ExpiresByType text/css                      "access plus 30 days"
+	ExpiresByType application/javascript        "access plus 30 days"
+	ExpiresByType text/javascript               "access plus 30 days"
+	ExpiresByType image/jpeg                    "access plus 30 days"
+	ExpiresByType image/png                     "access plus 30 days"
+	ExpiresByType image/gif                     "access plus 30 days"
+	ExpiresByType image/webp                    "access plus 30 days"
+	ExpiresByType image/svg+xml                 "access plus 30 days"
+	ExpiresByType image/x-icon                  "access plus 30 days"
+	ExpiresByType font/woff                     "access plus 1 year"
+	ExpiresByType font/woff2                    "access plus 1 year"
+	ExpiresByType application/font-woff         "access plus 1 year"
+	ExpiresByType application/font-woff2        "access plus 1 year"
+	ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+	# Cache fuerte para los plugins (no cambian nunca; son librerias).
+	<FilesMatch "\.(js|css|woff2?|eot|ttf|svg|png|jpg|jpeg|gif|ico|webp)$">
+		Header set Cache-Control "public, max-age=2592000, immutable"
+	</FilesMatch>
+	# Para los .php del admin: nunca cachear (siempre dinamico).
+	<FilesMatch "\.php$">
+		Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+	</FilesMatch>
+</IfModule>
+
+# Compresion gzip de respuestas (HTML, JS, CSS, JSON) -> baja transferencia
+# hasta 70% en archivos de texto. Crucial para usuarios en ngrok/3G.
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/plain text/css
+	AddOutputFilterByType DEFLATE application/javascript text/javascript
+	AddOutputFilterByType DEFLATE application/json
+	AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>

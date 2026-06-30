@@ -70,6 +70,11 @@ if (isset($_GET['borrar'], $_GET['path']) && samap_puede_escribir() && samap_csr
 
 // ---------------------------------------------------------------------------
 //  Escaneo de las carpetas configuradas.
+//  PERFORMANCE: NO llamamos getimagesize() aca -- lee el archivo entero para
+//  sacar dimensiones (~10ms por imagen). Con 237 imagenes eso son 2 segundos
+//  por carga de la pagina. Si el usuario necesita ver dimensiones puede
+//  inspeccionar la imagen individual. Lo que nos importa para el grid es
+//  nombre + tamano en KB + fecha, datos baratos via stat().
 // ---------------------------------------------------------------------------
 $imagenes = [];
 foreach ($carpetas as $carpeta_nombre => $carpeta_path) {
@@ -83,16 +88,16 @@ foreach ($carpetas as $carpeta_nombre => $carpeta_path) {
 		$ext = pathinfo($f, PATHINFO_EXTENSION);
 		if (!in_array($ext, $ext_permitidas, true)) continue;
 
-		$size = @getimagesize($abs . $f);
+		$stat = @stat($abs . $f);
 		$imagenes[] = [
 			'nombre'   => $f,
 			'carpeta'  => $carpeta_nombre,
 			'path_web' => $URL . $carpeta_path . rawurlencode($f),
 			'path_abs' => $abs . $f,
-			'size_kb'  => (int) (@filesize($abs . $f) / 1024),
-			'mtime'    => (int) @filemtime($abs . $f),
-			'width'    => $size ? (int) $size[0] : 0,
-			'height'   => $size ? (int) $size[1] : 0,
+			'size_kb'  => $stat ? (int) ($stat['size'] / 1024) : 0,
+			'mtime'    => $stat ? (int) $stat['mtime'] : 0,
+			'width'    => 0,
+			'height'   => 0,
 		];
 	}
 }
