@@ -598,22 +598,27 @@ DROP TABLE IF EXISTS `tbl_leads`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tbl_leads` (
-  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `origen`     VARCHAR(20)  NOT NULL DEFAULT 'contacto',
-  `nombre`     VARCHAR(200) NOT NULL,
-  `email`      VARCHAR(200) NOT NULL,
-  `telefono`   VARCHAR(50)  DEFAULT NULL,
-  `mensaje`    TEXT         NOT NULL,
-  `ip`         VARCHAR(45)  DEFAULT NULL,
-  `user_agent` VARCHAR(255) DEFAULT NULL,
-  `estado`     ENUM('nuevo','contactado','cerrado','spam') NOT NULL DEFAULT 'nuevo',
-  `notas`      TEXT         DEFAULT NULL,
-  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP    NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `origen`       VARCHAR(20)  NOT NULL DEFAULT 'contacto',
+  `nombre`       VARCHAR(200)      DEFAULT NULL,
+  `nombre_enc`   VARBINARY(255)      DEFAULT NULL,
+  `data_hash`    CHAR(64)            DEFAULT NULL,
+  `email`        VARCHAR(200)      DEFAULT NULL,
+  `email_enc`    VARBINARY(255)      DEFAULT NULL,
+  `telefono`     VARCHAR(50)  DEFAULT NULL,
+  `telefono_enc` VARBINARY(255)      DEFAULT NULL,
+  `mensaje`      TEXT         NOT NULL,
+  `ip`           VARCHAR(45)  DEFAULT NULL,
+  `user_agent`   VARCHAR(255) DEFAULT NULL,
+  `estado`       ENUM('nuevo','contactado','cerrado','spam') NOT NULL DEFAULT 'nuevo',
+  `notas`        TEXT         DEFAULT NULL,
+  `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`   TIMESTAMP    NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_leads_estado`  (`estado`),
-  KEY `idx_leads_origen`  (`origen`),
-  KEY `idx_leads_created` (`created_at`)
+  KEY `idx_leads_estado`     (`estado`),
+  KEY `idx_leads_origen`     (`origen`),
+  KEY `idx_leads_created`    (`created_at`),
+  KEY `idx_leads_data_hash`  (`data_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -703,3 +708,24 @@ CREATE TABLE IF NOT EXISTS `tbl_audit_log` (
   KEY `idx_entidad` (`entidad`, `entidad_id`),
   KEY `idx_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+-- ============================================================================
+-- Migracion 012 - Encriptacion a nivel aplicacion para tbl_leads.
+-- (ver docker/mysql/init/migrations/006-encrypt-tbl-leads.sql - mismo SQL,
+-- idempotente via INFORMATION_SCHEMA + PREPARE/EXECUTE).
+-- Cumplimiento Ley 6534/20 de Proteccion de Datos Personales (Paraguay):
+-- encriptacion AES-256-GCM con clave en variable de entorno LEAD_ENC_KEY
+-- (no en la DB ni en el codigo). Se agregaron email_enc / telefono_enc /
+-- nombre_enc (VARBINARY 255) y data_hash (CHAR 64, SHA-256 deterministico
+-- del email) para busqueda sin desencriptar.
+-- ============================================================================
+SET NAMES utf8mb4;
+ALTER TABLE `tbl_leads`
+  ADD COLUMN `nombre_enc`   VARBINARY(255) NULL DEFAULT NULL AFTER `nombre`,
+  ADD COLUMN `data_hash`    CHAR(64)       NULL DEFAULT NULL AFTER `nombre_enc`,
+  ADD COLUMN `email_enc`    VARBINARY(255) NULL DEFAULT NULL AFTER `email`,
+  ADD COLUMN `telefono_enc` VARBINARY(255) NULL DEFAULT NULL AFTER `telefono`,
+  ADD KEY        `idx_leads_data_hash` (`data_hash`);
+-- email y nombre pasan a ser NULLable: la fuente de verdad del PII es _enc.
+ALTER TABLE `tbl_leads` MODIFY COLUMN `email`  VARCHAR(200) NULL DEFAULT NULL;
+ALTER TABLE `tbl_leads` MODIFY COLUMN `nombre` VARCHAR(200) NULL DEFAULT NULL;

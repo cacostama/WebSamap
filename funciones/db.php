@@ -4,6 +4,17 @@
 
 date_default_timezone_set('America/Asuncion');
 
+// Security headers para el sitio publico. El root .htaccess ya setea
+// HSTS/X-Frame-Options/Referrer-Policy/Permissions-Policy/CSP via mod_headers
+// y 'Header always unset X-Powered-By', pero PHP agrega el header
+// "X-Powered-By" via SAPI en runtime y mod_headers no siempre puede removerlo
+// en todas las versiones de Apache. Por seguridad lo apagamos aca tambien
+// (idempotente: si el header no existe, no falla). Los demas headers se
+// setean en .htaccess para evitar duplicados.
+if (!headers_sent()) {
+	header_remove('X-Powered-By');
+}
+
 $hostname = getenv('DB_HOST') ?: 'db';
 $database = getenv('DB_NAME') ?: 'web_samap';
 $username = getenv('DB_USER');
