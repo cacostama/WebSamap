@@ -82,6 +82,24 @@ if (isset($_SESSION['ADM_Username'])){
 		exit;
 	}
 
+	// ---- Acciones masivas (Feature 12) ----
+	if (isset($_GET['borrar_masivo']) && $_GET['borrar_masivo'] === 'si' && samap_puede_escribir() && samap_csrf_validar()) {
+		$ids = isset($_GET['ids']) && is_array($_GET['ids']) ? $_GET['ids'] : [];
+		$count = 0;
+		foreach ($ids as $id_raw) {
+			$id = (int)$id_raw;
+			if ($id > 0) {
+				$updSQL = sprintf("UPDATE tbl_slider SET deleted_at = NOW() WHERE id = %d", $id);
+				mysqli_select_db($connect, $database);
+				if (@mysqli_query($connect, $updSQL)) { $count += (int)@mysqli_affected_rows($connect); }
+			}
+		}
+		@samap_audit_log('delete_bulk', 'tbl_slider', 0, "Borró masivamente $count registros");
+		samap_flash_set('success', "$count registros eliminados.");
+		header('Location: ' . $URL . 'admin/slider/');
+		exit;
+	}
+
 	// ---- Inputs para partials/tabla-searchable.php ----
 	$tabla_titulo        = 'Sliders';
 	$btn_agregar_label   = 'Agregar Slider';
@@ -92,6 +110,7 @@ if (isset($_SESSION['ADM_Username'])){
 	$empty_message       = 'Todavía no hay sliders cargados.';
 	$slug                = 'slider';
 	$papelera_activa     = $papelera;
+	$enable_bulk         = !$papelera;
 	$trash_count         = 0;
 	if (!$papelera) {
 		@mysqli_select_db($connect, $database);

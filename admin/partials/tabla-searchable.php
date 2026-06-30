@@ -3,6 +3,7 @@
 // Partial: tabla-searchable.php
 // Tabla buscable + exportable a CSV, con DataTables ES, botonera y acciones.
 // Soporta vista de papelera (registros soft-deleted) cuando $papelera_activa=true.
+// Soporta seleccion multiple y acciones masivas cuando $enable_bulk=true.
 //
 // Variables esperadas (definidas en el padre ANTES del include):
 //   $tabla_titulo        string  default 'Listado'
@@ -19,6 +20,9 @@
 //   $URL                 string  REQUERIDO  base protocol-relative (provista por db.php)
 //   $slug                string  default 'listado'  slug del padre (para links papelera)
 //   $papelera_activa     bool    default false  si true, muestra la papelera
+//   $enable_bulk         bool    default false  si true, muestra checkboxes + barra de
+//                                 acciones masivas (Borrar/Exportar seleccionados).
+//   $bulk_delete_msg     string  default '¿Borrar los registros seleccionados?'
 //
 // Salida:
 //   <div class="row"> <div class="panel panel-default"> con
@@ -47,6 +51,8 @@ $datatables_options = (isset($datatables_options) && is_array($datatables_option
 $columns            = (isset($columns) && is_array($columns)) ? $columns : [];
 $slug               = isset($slug)               ? (string)$slug               : 'listado';
 $papelera_activa    = !empty($papelera_activa);
+$enable_bulk        = !empty($enable_bulk) && !$papelera_activa && function_exists('samap_puede_escribir') && samap_puede_escribir();
+$bulk_delete_msg    = isset($bulk_delete_msg)    ? (string)$bulk_delete_msg    : '¿Borrar los registros seleccionados? Dejarán de mostrarse en el sitio web.';
 
 // En papelera el "agregar" y el "borrar" no aplican. El padre debe pasar
 // edit_url_pattern vacio si tampoco quiere editar; nosotros igual lo dejamos
@@ -62,6 +68,7 @@ $e_btn_url  = htmlspecialchars($btn_agregar_url, ENT_QUOTES, 'UTF-8');
 $e_table_id = htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8');
 $e_empty    = htmlspecialchars($empty_message, ENT_QUOTES, 'UTF-8');
 $e_papelera = $papelera_activa ? '1' : '0';
+$e_bulk_msg = htmlspecialchars($bulk_delete_msg, ENT_QUOTES, 'UTF-8');
 
 // Nombre del archivo CSV: solo [a-z0-9_], derivado del titulo.
 $csv_filename = strtolower(preg_replace('/[^a-z0-9]+/i', '_', $tabla_titulo));
@@ -83,10 +90,14 @@ if ($has_rows) {
 // CSRF para los links de restaurar / borrar definitivamente (papelera)
 $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : '';
 $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
+
+// URL del endpoint de borrado masivo. El padre debe manejar ?borrar_masivo=si
+// con validacion de CSRF y permisos; el partial solo dispara la URL.
+$bulk_url = $URL . 'admin/' . $slug . '/?borrar_masivo=si&csrf_token=' . $csrf;
 ?>
 <?php /* Token CSRF accesible para scripts/tests que necesiten construir
-         URLs de borrado/restaurar manualmente (sobre todo en modo
-         serverSide donde los links no estan en el HTML inicial). */ ?>
+          URLs de borrado/restaurar manualmente (sobre todo en modo
+          serverSide donde los links no estan en el HTML inicial). */ ?>
 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_raw, ENT_QUOTES, 'UTF-8') ?>" id="samap-csrf-token">
 <div class="row">
     <div class="panel panel-default">
@@ -95,6 +106,11 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                 <button id="btn-export-csv-<?= $e_table_id ?>" class="btn btn-default" type="button">
                     <em class="fa fa-download"></em> Exportar CSV
                 </button>
+                <?php if ($enable_bulk): ?>
+                <button id="btn-export-selected-<?= $e_table_id ?>" class="btn btn-default" type="button" style="margin-left:4px;">
+                    <em class="fa fa-download"></em> Exportar seleccionados
+                </button>
+                <?php endif; ?>
             </div>
             <?php if ($papelera_activa): ?>
                 <div class="pull-left" style="margin-right:10px;">
@@ -115,6 +131,19 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                 </div>
             <?php endif; ?>
         </div>
+        <?php if ($enable_bulk): ?>
+        <div id="samap-bulk-bar-<?= $e_table_id ?>" class="panel-body" style="display:none;padding:10px 15px;background:#f4f6f8;border-bottom:1px solid #d8dee5;">
+            <span style="margin-right:12px;">
+                <strong id="samap-bulk-count-<?= $e_table_id ?>">0</strong> seleccionados
+            </span>
+            <button id="btn-bulk-delete-<?= $e_table_id ?>" type="button" class="btn btn-danger btn-sm">
+                <em class="fa fa-trash"></em> Borrar seleccionados
+            </button>
+            <button id="btn-bulk-cancel-<?= $e_table_id ?>" type="button" class="btn btn-default btn-sm" style="margin-left:4px;">
+                Cancelar
+            </button>
+        </div>
+        <?php endif; ?>
         <?php if ($papelera_activa): ?>
         <div class="panel-body" style="padding-top:0;padding-bottom:0;">
             <div class="alert alert-warning" style="background:#ffc61d;color:#333;border:none;padding:10px 15px;border-radius:4px;margin:10px 0;">
@@ -127,6 +156,9 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
             <table id="<?= $e_table_id ?>" class="table table-striped table-hover">
                 <thead>
                     <tr>
+                        <?php if ($enable_bulk): ?>
+                            <th width="30px" style="width:30px;"><input type="checkbox" id="dt-select-all-<?= $e_table_id ?>" aria-label="Seleccionar todos"></th>
+                        <?php endif; ?>
                         <?php foreach ($columns as $col): ?>
                             <th><?= htmlspecialchars((string)($col['th'] ?? ''), ENT_QUOTES, 'UTF-8') ?></th>
                         <?php endforeach; ?>
@@ -159,6 +191,9 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                             $borrar_def_url  = $e_url . 'admin/' . $e_slug . '/?borrar_def=si&id=' . $e_rid . '&csrf_token=' . $csrf;
                         ?>
                             <tr>
+                                <?php if ($enable_bulk): ?>
+                                    <td><input type="checkbox" class="dt-row-select dt-row-select-<?= $e_table_id ?>" value="<?= $e_rid ?>" aria-label="Seleccionar fila"></td>
+                                <?php endif; ?>
                                 <?php foreach ($columns as $col):
                                     $cb = isset($col['td_html']) && is_callable($col['td_html'])
                                         ? $col['td_html']($r)
@@ -179,7 +214,7 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                     <?php endif; ?>
 
                     <?php if ($row_count === 0 && empty($ajax_url)): /* en modo serverSide, DataTables muestra "Cargando..." y rellena via AJAX */ ?>
-                        <tr><td colspan="<?= (int)(count($columns) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
+                        <tr><td colspan="<?= (int)(count($columns) + ($enable_bulk ? 1 : 0) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
                             <?php if ($papelera_activa): ?>
                                 La papelera está vacía.
                             <?php else: ?>
@@ -266,7 +301,9 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                         cfg.ajax = { url: ajaxUrl, type: 'GET' };
                     }
                     var t = $('#' + tableId).DataTable(cfg);
-                    $('#' + exportBtnId).on('click', function() {
+
+                    // Helpers para exportar CSV (reusado por "todo" y "seleccionados").
+                    function buildCsv(rowsSubset) {
                         var csv = [];
                         var headers = [];
                         t.columns().every(function(idx) {
@@ -277,27 +314,107 @@ $csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
                             headers.push('"' + h + '"');
                         });
                         csv.push(headers.join(','));
-                        t.rows({ search: 'applied' }).every(function() {
+                        rowsSubset.each(function() {
                             var row = [];
                             var $cells = $(this.node()).find('td');
                             var last = $cells.length - 1;
                             $cells.each(function(idx) {
-                                if (idx === last) return;     // Ultima accion (Borrar / Borrar def.)
-                                if (idx === last - 1) return; // Penultima (Editar / Restaurar)
+                                // Skipeamos la columna de checkbox (primera td en modo bulk)
+                                if (idx === 0 && $(this).find('input.dt-row-select').length) return;
+                                if (idx === last) return;
+                                if (idx === last - 1) return;
                                 var text = $(this).text().trim().replace(/"/g, '""');
                                 row.push('"' + text + '"');
                             });
                             csv.push(row.join(','));
                         });
+                        return csv;
+                    }
+                    function downloadCsv(csv, suffix) {
                         var blob = new Blob(["\uFEFF" + csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
                         var link = document.createElement('a');
                         link.href = URL.createObjectURL(blob);
-                        link.download = csvName + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+                        link.download = csvName + (suffix || '') + '_' + new Date().toISOString().slice(0, 10) + '.csv';
                         link.style.display = 'none';
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
+                    }
+
+                    $('#' + exportBtnId).on('click', function() {
+                        downloadCsv(buildCsv(t.rows({ search: 'applied' })), '');
                     });
+
+                    // ---- Acciones masivas (Feature 12) ----
+                    var bulkEnabled = <?= $enable_bulk ? 'true' : 'false' ?>;
+                    if (bulkEnabled) {
+                        var selectAll = $('#dt-select-all-' + tableId);
+                        var bar       = $('#samap-bulk-bar-' + tableId);
+                        var countEl   = $('#samap-bulk-count-' + tableId);
+                        var delBtn    = $('#btn-bulk-delete-' + tableId);
+                        var cancelBtn = $('#btn-bulk-cancel-' + tableId);
+                        var expSelBtn = $('#btn-export-selected-' + tableId);
+                        var bulkUrl   = <?= json_encode($bulk_url, JSON_UNESCAPED_UNICODE) ?>;
+                        var bulkMsg   = <?= json_encode($bulk_delete_msg, JSON_UNESCAPED_UNICODE) ?>;
+
+                        function updateBulk() {
+                            var checked = $('.dt-row-select-' + tableId + ':checked');
+                            var n = checked.length;
+                            countEl.text(n);
+                            bar.toggle(n > 0);
+                            // Reflejamos el estado del header en la columna bulk
+                            // para todas las filas visibles (las no-visibles quedan
+                            // como el usuario las dejo, comportamiento estandar).
+                            var visible = $('.dt-row-select-' + tableId, $('#' + tableId).DataTable().rows({ search: 'applied' }).nodes());
+                            if (visible.length && visible.filter(':checked').length === visible.length) {
+                                selectAll.prop('checked', true);
+                            } else {
+                                selectAll.prop('checked', false);
+                            }
+                        }
+                        // Click en cualquier row-select.
+                        $(document).on('change', '.dt-row-select-' + tableId, updateBulk);
+                        // Click en el header "select all".
+                        selectAll.on('change', function() {
+                            var checked = this.checked;
+                            $('.dt-row-select-' + tableId).each(function(){
+                                this.checked = checked;
+                            });
+                            updateBulk();
+                        });
+                        // Despues de cada redibujo de DataTables (paginacion, busqueda)
+                        // recalculamos el estado del header.
+                        t.on('draw', updateBulk);
+                        updateBulk();
+
+                        cancelBtn.on('click', function() {
+                            $('.dt-row-select-' + tableId).prop('checked', false);
+                            selectAll.prop('checked', false);
+                            updateBulk();
+                        });
+
+                        delBtn.on('click', function() {
+                            var ids = $('.dt-row-select-' + tableId + ':checked').map(function() { return this.value; }).get();
+                            if (!ids.length) return;
+                            if (!confirm(bulkMsg + ' (' + ids.length + ' registros)')) return;
+                            var url = bulkUrl + '&ids[]=' + ids.map(encodeURIComponent).join('&ids[]=');
+                            window.location.href = url;
+                        });
+
+                        expSelBtn.on('click', function() {
+                            var checked = $('.dt-row-select-' + tableId + ':checked');
+                            if (!checked.length) {
+                                alert('Seleccioná al menos una fila.');
+                                return;
+                            }
+                            // Subset = filas de DataTables cuyo checkbox esta tildado.
+                            var subset = t.rows().filter(function(idx) {
+                                var node = this.node();
+                                return node && $(node).find('.dt-row-select-' + tableId).is(':checked');
+                            });
+                            downloadCsv(buildCsv(subset), '_seleccionados');
+                        });
+                    }
                 });
             }
 

@@ -82,7 +82,26 @@ if (isset($_SESSION['ADM_Username'])){
 		exit;
 	}
 
+	// ---- Acciones masivas (Feature 12) ----
+	if (isset($_GET['borrar_masivo']) && $_GET['borrar_masivo'] === 'si' && samap_puede_escribir() && samap_csrf_validar()) {
+		$ids = isset($_GET['ids']) && is_array($_GET['ids']) ? $_GET['ids'] : [];
+		$count = 0;
+		foreach ($ids as $id_raw) {
+			$id = (int)$id_raw;
+			if ($id > 0) {
+				$updSQL = sprintf('UPDATE tbl_blog SET deleted_at = NOW() WHERE id = %d', $id);
+				mysqli_select_db($connect, $database);
+				if (@mysqli_query($connect, $updSQL)) { $count += (int)@mysqli_affected_rows($connect); }
+			}
+		}
+		samap_audit_log('delete_bulk', 'tbl_blog', 0, 'Borró masivamente ' . $count . ' registros');
+		samap_flash_set('success', "$count registros eliminados.");
+		header('Location: ' . $URL . 'admin/blogs/');
+		exit;
+	}
+
 	// ---- Inputs para partials/tabla-searchable.php ----
+
 	$tabla_titulo        = 'Blogs';
 	$btn_agregar_label   = 'Agregar Blog';
 	$btn_agregar_url     = 'admin/agregar-blog.php';
@@ -93,6 +112,7 @@ if (isset($_SESSION['ADM_Username'])){
 	$slug                = 'blogs';
 	$papelera_activa     = $papelera;
 	$trash_count         = 0;
+	$enable_bulk         = !$papelera;
 	if (!$papelera) {
 		@mysqli_select_db($connect, $database);
 		$rcRes = @mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_blog WHERE deleted_at IS NOT NULL");
