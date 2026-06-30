@@ -7,6 +7,47 @@ if (function_exists('samap_flash_render')) {
 	echo samap_flash_render();
 }
 ?>
+<script>
+// Feature 11 — "Cambios sin guardar" (unsaved changes guard).
+// Detecta input/change en cualquier form.form-horizontal dentro de .main-content
+// y, si el form se "ensucia", muestra un confirm nativo al cerrar/refresh la
+// pestaña. Al submit, se resetea. Expone window.samapFormDirty para que Summernote
+// (u otros editores) puedan marcar el form como sucio desde onChange.
+(function() {
+    var dirty = false;
+    window.samapFormDirty = function() { return dirty; };
+    window.samapFormMarkDirty = function() { dirty = true; };
+    window.samapFormResetDirty = function() { dirty = false; };
+    function bind() {
+        var forms = document.querySelectorAll('.main-content form.form-horizontal');
+        forms.forEach(function(f) {
+            if (f.__samapDirtyBound) return;
+            f.__samapDirtyBound = true;
+            f.addEventListener('input', function() { dirty = true; });
+            f.addEventListener('change', function() { dirty = true; });
+            f.addEventListener('submit', function() { dirty = false; });
+            // Cualquier button click también limpia: cubre "Cancelar" que
+            // navega a otra URL sin hacer submit.
+            f.addEventListener('click', function(e) {
+                var btn = e.target.closest && e.target.closest('button, input[type=button], input[type=submit]');
+                if (btn) { dirty = false; }
+            });
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bind);
+    } else {
+        bind();
+    }
+    window.addEventListener('beforeunload', function(e) {
+        if (dirty) {
+            e.preventDefault();
+            e.returnValue = 'Tenés cambios sin guardar. ¿Salir sin guardar?';
+            return e.returnValue;
+        }
+    });
+})();
+</script>
 <nav role="navigation" class="navbar navbar-default navbar-top navbar-fixed-top">
 
 <div class="navbar-header">

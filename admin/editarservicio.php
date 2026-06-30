@@ -257,7 +257,10 @@ if (isset($_SESSION['ADM_Username'])){
 	<script type="text/javascript">
 	  $(document).ready(function() {
 	    $('#code_preview0').summernote({height: 300});
-	  	$('#code_preview1').summernote({height: 300});
+	  	$('#code_preview1').summernote({
+	  		height: 300,
+	  		onChange: function() { if (window.samapFormMarkDirty) window.samapFormMarkDirty(); }
+	  	});
 	    });
 	</script>
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
