@@ -72,7 +72,29 @@ if (isset($_SESSION['ADM_Username'])){
 		exit;
 	}
 
-	// ---- Inputs para partials/tabla-searchable.php ----
+
+// ---- Reordenar (Feature 13): AJAX POST con ids[] -> UPDATE orden = i ----
+if (isset($_GET['reordenar']) && $_GET['reordenar'] === 'si' && samap_puede_escribir() && samap_csrf_validar()) {
+    $ids_post = $_POST['ids'] ?? $_GET['ids'] ?? [];
+    $ids_post = is_array($ids_post) ? $ids_post : [];
+    header('Content-Type: application/json; charset=utf-8');
+    if (!$ids_post) { echo json_encode(['ok' => false, 'error' => 'no_ids']); exit; }
+    $i = 1;
+    $ok = true;
+    foreach ($ids_post as $id_raw) {
+        $id = (int)$id_raw;
+        if ($id <= 0) continue;
+        $updSQL = sprintf("UPDATE tbl_categorias_aliado SET orden = %d WHERE id = %d", $i, $id);
+        mysqli_select_db($connect, $database);
+        if (!@mysqli_query($connect, $updSQL)) { $ok = false; break; }
+        $i++;
+    }
+    if ($ok) {
+        @samap_audit_log('reorder', 'tbl_categorias_aliado', 0, 'Reordenó ' . ($i - 1) . ' registros');
+    }
+    echo json_encode(['ok' => $ok]);
+    exit;
+}	// ---- Inputs para partials/tabla-searchable.php ----
 
 	$tabla_titulo        = 'Categorías de Aliados';
 	$btn_agregar_label   = 'Agregar Categoría';
@@ -85,6 +107,7 @@ if (isset($_SESSION['ADM_Username'])){
 	$papelera_activa     = $papelera;
 	$trash_count         = 0;
 	$enable_bulk         = !$papelera;
+	$ordenable           = !$papelera;
 	if (!$papelera) {
 		@mysqli_select_db($connect, $database);
 		$rcRes = @mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_categorias_aliado WHERE deleted_at IS NOT NULL");

@@ -23,6 +23,11 @@
 //   $enable_bulk         bool    default false  si true, muestra checkboxes + barra de
 //                                 acciones masivas (Borrar/Exportar seleccionados).
 //   $bulk_delete_msg     string  default '¿Borrar los registros seleccionados?'
+//   $ordenable           bool    default false  si true, las filas del tbody son draggables
+//                                 (Sortable.js). Agrega una primera columna con handle "≡"
+//                                 y guarda el nuevo orden via AJAX a ?reordenar=si.
+//                                 Requiere que la tabla tenga una columna 'orden' (o que
+//                                 el padre pase \$reordenar_column para el UPDATE).
 //
 // Salida:
 //   <div class="row"> <div class="panel panel-default"> con
@@ -53,6 +58,7 @@ $slug               = isset($slug)               ? (string)$slug               :
 $papelera_activa    = !empty($papelera_activa);
 $enable_bulk        = !empty($enable_bulk) && !$papelera_activa && function_exists('samap_puede_escribir') && samap_puede_escribir();
 $bulk_delete_msg    = isset($bulk_delete_msg)    ? (string)$bulk_delete_msg    : '¿Borrar los registros seleccionados? Dejarán de mostrarse en el sitio web.';
+$ordenable          = !empty($ordenable) && !$papelera_activa && function_exists('samap_puede_escribir') && samap_puede_escribir();
 
 // En papelera el "agregar" y el "borrar" no aplican. El padre debe pasar
 // edit_url_pattern vacio si tampoco quiere editar; nosotros igual lo dejamos
@@ -156,6 +162,9 @@ $bulk_url = $URL . 'admin/' . $slug . '/?borrar_masivo=si&csrf_token=' . $csrf;
             <table id="<?= $e_table_id ?>" class="table table-striped table-hover">
                 <thead>
                     <tr>
+                        <?php if ($ordenable): ?>
+                            <th width="30px" style="width:30px;" title="Arrastrar para reordenar"></th>
+                        <?php endif; ?>
                         <?php if ($enable_bulk): ?>
                             <th width="30px" style="width:30px;"><input type="checkbox" id="dt-select-all-<?= $e_table_id ?>" aria-label="Seleccionar todos"></th>
                         <?php endif; ?>
@@ -190,7 +199,10 @@ $bulk_url = $URL . 'admin/' . $slug . '/?borrar_masivo=si&csrf_token=' . $csrf;
                             $restaurar_url   = $e_url . 'admin/' . $e_slug . '/?restaurar=si&id=' . $e_rid . '&csrf_token=' . $csrf;
                             $borrar_def_url  = $e_url . 'admin/' . $e_slug . '/?borrar_def=si&id=' . $e_rid . '&csrf_token=' . $csrf;
                         ?>
-                            <tr>
+                            <tr data-id="<?= $e_rid ?>">
+                                <?php if ($ordenable): ?>
+                                    <td class="drag-handle" style="cursor:move;text-align:center;color:#888;font-size:18px;line-height:1;" title="Arrastrar para reordenar">&#x2261;</td>
+                                <?php endif; ?>
                                 <?php if ($enable_bulk): ?>
                                     <td><input type="checkbox" class="dt-row-select dt-row-select-<?= $e_table_id ?>" value="<?= $e_rid ?>" aria-label="Seleccionar fila"></td>
                                 <?php endif; ?>
@@ -214,7 +226,7 @@ $bulk_url = $URL . 'admin/' . $slug . '/?borrar_masivo=si&csrf_token=' . $csrf;
                     <?php endif; ?>
 
                     <?php if ($row_count === 0 && empty($ajax_url)): /* en modo serverSide, DataTables muestra "Cargando..." y rellena via AJAX */ ?>
-                        <tr><td colspan="<?= (int)(count($columns) + ($enable_bulk ? 1 : 0) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
+                        <tr><td colspan="<?= (int)(count($columns) + ($ordenable ? 1 : 0) + ($enable_bulk ? 1 : 0) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
                             <?php if ($papelera_activa): ?>
                                 La papelera está vacía.
                             <?php else: ?>
@@ -414,6 +426,72 @@ $bulk_url = $URL . 'admin/' . $slug . '/?borrar_masivo=si&csrf_token=' . $csrf;
                             });
                             downloadCsv(buildCsv(subset), '_seleccionados');
                         });
+                    }
+
+                    // ---- Drag & drop reorder (Feature 13) ----
+                    var ordenableEnabled = <?= $ordenable ? 'true' : 'false' ?>;
+                    if (ordenableEnabled) {
+                        // Necesitamos Sortable.js. Lo cargamos en runtime (mismo
+                        // patron que DataTables en este partial) y luego init.
+                        function loadSortable(cb) {
+                            if (typeof window.Sortable !== 'undefined') { cb(); return; }
+                            var s = document.createElement('script');
+                            s.src = baseUrl + 'admin/plugins/sortablejs/Sortable.min.js';
+                            s.async = false;
+                            s.onload = cb;
+                            s.onerror = function() { console.error('No se pudo cargar Sortable.min.js'); };
+                            document.head.appendChild(s);
+                        }
+                        function initSortable() {
+                            // Re-attach despues de cada draw de DataTables (pagina / sort / search)
+                            function attach() {
+                                var tbod = $('#' + tableId + ' tbody');
+                                if (!tbod.length) return;
+                                if (tbod[0].__sortableInstance) { tbod[0].__sortableInstance.destroy(); }
+                                tbod[0].__sortableInstance = window.Sortable.create(tbod[0], {
+                                    animation: 150,
+                                    handle: '.drag-handle',
+                                    ghostClass: 'samap-sortable-ghost',
+                                    chosenClass: 'samap-sortable-chosen',
+                                    dragClass: 'samap-sortable-drag',
+                                    onEnd: function() {
+                                        var ids = tbod[0].querySelectorAll('tr[data-id]');
+                                        var newIds = [];
+                                        for (var i = 0; i < ids.length; i++) {
+                                            var v = ids[i].getAttribute('data-id');
+                                            if (v) { newIds.push(v); }
+                                        }
+                                        if (!newIds.length) return;
+                                        saveOrder(newIds);
+                                    }
+                                });
+                            }
+                            var ordenUrl = <?= json_encode($URL . 'admin/' . $slug . '/?reordenar=si', JSON_UNESCAPED_UNICODE) ?>;
+                            var csrf     = <?= json_encode($csrf_raw, JSON_UNESCAPED_UNICODE) ?>;
+                            function saveOrder(ids) {
+                                var fd = new FormData();
+                                fd.append('csrf_token', csrf);
+                                for (var i = 0; i < ids.length; i++) { fd.append('ids[]', ids[i]); }
+                                fetch(ordenUrl, { method: 'POST', body: fd, credentials: 'same-origin' })
+                                    .then(function(r){ return r.json().catch(function(){ return {ok:false}; }); })
+                                    .then(function(j){
+                                        if (j && j.ok) {
+                                            // Toast feedback (reutilizamos el helper que header.php ya crea)
+                                            if (window.samapFlash) {
+                                                window.samapFlash('success', 'Orden actualizado.');
+                                            }
+                                        } else {
+                                            if (window.samapFlash) { window.samapFlash('error', 'No se pudo guardar el nuevo orden.'); }
+                                        }
+                                    })
+                                    .catch(function(){
+                                        if (window.samapFlash) { window.samapFlash('error', 'Error de red al guardar el orden.'); }
+                                    });
+                            }
+                            attach();
+                            t.on('draw', attach);
+                        }
+                        loadSortable(initSortable);
                     }
                 });
             }

@@ -18,6 +18,27 @@ if (function_exists('samap_flash_render')) {
     window.samapFormDirty = function() { return dirty; };
     window.samapFormMarkDirty = function() { dirty = true; };
     window.samapFormResetDirty = function() { dirty = false; };
+    // Helper de toast usado por Sortable, AJAX endpoints, etc. Replica la
+    // UI de samap_flash_render() sin tener que ir/venir de sesion.
+    window.samapFlash = function(tipo, msg) {
+        var bg = { success: '#4ac18e', error: '#f6504d', warning: '#ffc61d', info: '#00afd1' };
+        var fg = { success: '#fff',    error: '#fff',    warning: '#333',    info: '#fff' };
+        var ic = { success: 'check',   error: 'times',   warning: 'exclamation-triangle', info: 'info-circle' };
+        var cont = document.createElement('div');
+        cont.style.cssText = 'position:fixed;top:70px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;';
+        cont.id = 'samap-toasts';
+        var t = document.createElement('div');
+        t.style.cssText = 'background:' + (bg[tipo] || '#888') + ';color:' + (fg[tipo] || '#fff') + ';padding:12px 18px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.2);min-width:280px;max-width:420px;display:flex;align-items:center;gap:10px;';
+        t.innerHTML = '<em class="fa fa-' + (ic[tipo] || 'info') + '" style="font-size:20px;"></em><span style="flex:1;font-size:14px;">' + msg + '</span><button type="button" style="background:transparent;border:none;color:inherit;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>';
+        cont.appendChild(t);
+        document.body.appendChild(cont);
+        t.querySelector('button').addEventListener('click', function(){ t.remove(); if (!cont.childNodes.length) cont.remove(); });
+        setTimeout(function(){
+            t.style.transition = 'opacity 0.3s,transform 0.3s';
+            t.style.opacity = '0'; t.style.transform = 'translateX(20px)';
+            setTimeout(function(){ t.remove(); if (!cont.childNodes.length) cont.remove(); }, 300);
+        }, 5000);
+    };
     function bind() {
         var forms = document.querySelectorAll('.main-content form.form-horizontal');
         forms.forEach(function(f) {
@@ -48,6 +69,12 @@ if (function_exists('samap_flash_render')) {
     });
 })();
 </script>
+<style>
+/* Sortable.js - estados de drag/drop */
+.samap-sortable-ghost { opacity: 0.4; background: #f0f4f8 !important; }
+.samap-sortable-chosen { background: #e8eef4 !important; }
+.samap-sortable-drag { background: #fff !important; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+</style>
 <nav role="navigation" class="navbar navbar-default navbar-top navbar-fixed-top">
 
 <div class="navbar-header">

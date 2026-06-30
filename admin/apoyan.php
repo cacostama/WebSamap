@@ -51,6 +51,29 @@ if (isset($_SESSION['ADM_Username'])){
 	  exit;
 	}
 
+
+// ---- Reordenar (Feature 13): AJAX POST con ids[] -> UPDATE orden = i ----
+if (isset($_GET['reordenar']) && $_GET['reordenar'] === 'si' && samap_puede_escribir() && samap_csrf_validar()) {
+    $ids_post = $_POST['ids'] ?? $_GET['ids'] ?? [];
+    $ids_post = is_array($ids_post) ? $ids_post : [];
+    header('Content-Type: application/json; charset=utf-8');
+    if (!$ids_post) { echo json_encode(['ok' => false, 'error' => 'no_ids']); exit; }
+    $i = 1;
+    $ok = true;
+    foreach ($ids_post as $id_raw) {
+        $id = (int)$id_raw;
+        if ($id <= 0) continue;
+        $updSQL = sprintf("UPDATE tbl_apoyan SET orden = %d WHERE id = %d", $i, $id);
+        mysqli_select_db($connect, $database);
+        if (!@mysqli_query($connect, $updSQL)) { $ok = false; break; }
+        $i++;
+    }
+    if ($ok) {
+        @samap_audit_log('reorder', 'tbl_apoyan', 0, 'Reordenó ' . ($i - 1) . ' registros');
+    }
+    echo json_encode(['ok' => $ok]);
+    exit;
+}
 	// ---- Inputs para partials/tabla-searchable.php ----
 	$tabla_titulo        = 'Apoyan';
 	$btn_agregar_label   = 'Agregar';
@@ -59,6 +82,7 @@ if (isset($_SESSION['ADM_Username'])){
 	$delete_url_pattern  = 'admin/apoyan.php?id={id}&borrar=si&csrf_token={csrf}';
 	$delete_confirm      = '¿Querés eliminar este apoyo? No se puede deshacer.';
 	$empty_message       = 'Todavía no hay apoyos cargados.';
+	$ordenable           = true;
 
 	$URL_BASE = $URL;
 	$columns = [
