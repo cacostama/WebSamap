@@ -113,9 +113,15 @@ if ($dbUser !== false && $dbPass !== false && $dbUser !== '' && $dbPass !== '') 
             $telEnc    = samap_encrypt($tel);
             $nombreEnc = samap_encrypt($nombre);
             $dataHash  = samap_data_hash($email);
-            $stmt = $leadsConn->prepare("INSERT INTO tbl_leads (origen, nombre, nombre_enc, data_hash, email, email_enc, telefono, telefono_enc, mensaje, ip, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Ley 6534/20: NO guardamos PII en columnas plaintext. La fuente
+            // de verdad de nombre/email/telefono es la columna _enc. Las
+            // columnas en claro quedan NULL en filas nuevas y se preservan
+            // solo para compatibilidad con filas antiguas (migration 007
+            // las limpia tras backfill). El mensaje SI se guarda en claro
+            // porque NO es un dato directamente identificable.
+            $stmt = $leadsConn->prepare("INSERT INTO tbl_leads (origen, nombre, nombre_enc, data_hash, email, email_enc, telefono, telefono_enc, mensaje, ip, user_agent) VALUES (?, NULL, ?, ?, NULL, ?, NULL, ?, ?, ?, ?)");
             if ($stmt) {
-                $stmt->bind_param('sssssssssss', $origen, $nombre, $nombreEnc, $dataHash, $email, $emailEnc, $tel, $telEnc, $mensaje, $ip, $userAgent);
+                $stmt->bind_param('ssssssss', $origen, $nombreEnc, $dataHash, $emailEnc, $telEnc, $mensaje, $ip, $userAgent);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -179,6 +185,14 @@ if (!$mail->Send()) {
     if (function_exists('samap_rl_registrar_fallo')) samap_rl_registrar_fallo($bucket, $ip, 900);
     volver_con('No se pudo enviar el mensaje. Por favor intente nuevamente.', false, $destino);
 }
-// Send exitoso: limpia el contador para no penalizar al usuario legitimo.
-if (function_exists('samap_rl_limpiar')) samap_rl_limpiar($bucket, $ip);
+// Send exitoso: TAMBIEN cuenta para el rate limit. El proposito no es detectar
+// abusos por fallos, es limitar el VOLUMEN de envios desde una IP (5/15min)
+// independientemente de si el mail se entrega o no. Asi cortamos:
+//   - bots que envian 100 forms validos para hacer phishing del SMTP
+//   - usuarios reales que rebotan sobre el boton enviar
+//   - postulaciones masivas con datos reales pero abusivas
+// El comentario viejo "limpia para no penalizar al usuario legitimo" era
+// equivalente a tener cero rate limit -- los 5 envios validos pasaban
+// siempre sin contadores.
+if (function_exists('samap_rl_registrar_fallo')) samap_rl_registrar_fallo($bucket, $ip, 900);
 volver_con('Su mensaje fue enviado correctamente, gracias por completar el formulario.', true, $destino);
