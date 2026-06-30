@@ -86,6 +86,8 @@ if (isset($_SESSION['ADM_Username'])){
 				<div class="panel panel-default">
 					<div class="panel-heading">Formulario de Carga</div>
 					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-7">
 						<form class="form-horizontal" action="" method="post" enctype="multipart/form-data" name="form2" id="form2">
 							<?php echo samap_csrf_field(); ?>
 
@@ -94,7 +96,7 @@ if (isset($_SESSION['ADM_Username'])){
 									<div class="form-group">
 										<label class="col-lg-2 control-label">Titulo</label>
 										<div class="col-lg-10">
-											<input type="text" name="titulo" placeholder="" value=""  class="form-control">
+											<input type="text" name="titulo" id="blog-titulo" placeholder="" value=""  class="form-control">
 
 										</div>
 
@@ -104,10 +106,10 @@ if (isset($_SESSION['ADM_Username'])){
 								<fieldset>
 									<div class="form-group">
 										<label class="col-sm-2 control-label">Intro
-											
+
 										</label>
 										<div class="col-sm-10">
-											<textarea class="form-control"  name="intro" style="height: 300px;"></textarea>
+											<textarea class="form-control" id="blog-intro" name="intro" style="height: 150px;"></textarea>
 										</div>
 									</div>
 								</fieldset>
@@ -115,7 +117,7 @@ if (isset($_SESSION['ADM_Username'])){
 								<fieldset>
 									<div class="form-group">
 										<label class="col-sm-2 control-label">Descripcion
-											
+
 										</label>
 										<div class="col-sm-10">
 											<textarea class="form-control" id="code_preview1" name="texto" style="height: 300px;"></textarea>
@@ -148,6 +150,26 @@ if (isset($_SESSION['ADM_Username'])){
 								</fieldset>
 
 							</form>
+							</div>
+							<div class="col-md-5">
+								<div class="samap-blog-preview" id="blog-preview" style="position:sticky;top:80px;border:1px solid #d8dee5;border-radius:6px;background:#fff;padding:24px 28px;font-family:Georgia,serif;max-height:80vh;overflow:auto;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+									<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Vista previa en vivo</div>
+									<h1 id="blog-preview-titulo" style="font-size:28px;line-height:1.2;color:#2F2E2D;margin:0 0 12px 0;">(Título del artículo)</h1>
+									<div id="blog-preview-intro" style="font-size:15px;font-style:italic;color:#555;margin-bottom:18px;line-height:1.5;">(Acá va la introducción.)</div>
+									<hr style="border:none;border-top:1px solid #eee;margin:0 0 18px;">
+									<div id="blog-preview-texto" style="font-size:15px;line-height:1.7;color:#2F2E2D;">(Cuerpo del artículo.)</div>
+								</div>
+							</div>
+						</div>
+						<style>
+						@media (max-width: 991px) {
+							.samap-blog-preview { position: static !important; max-height: none !important; margin-top: 20px; }
+						}
+						.samap-blog-preview img { max-width: 100%; height: auto; }
+						.samap-blog-preview h1, .samap-blog-preview h2, .samap-blog-preview h3 { font-family: 'Poppins', Helvetica, Arial, sans-serif; }
+						.samap-blog-preview p { margin: 0 0 1em 0; }
+						.samap-blog-preview a { color: #274767; }
+						</style>
 						</div>
 					</div>
 
@@ -164,9 +186,28 @@ if (isset($_SESSION['ADM_Username'])){
 	    $('#code_preview0').summernote({height: 300});
 	  	$('#code_preview1').summernote({
 	  		height: 300,
-	  		onChange: function() { if (window.samapFormMarkDirty) window.samapFormMarkDirty(); }
+	  		onChange: function(contents) {
+	  			if (window.samapFormMarkDirty) window.samapFormMarkDirty();
+	  			var el = document.getElementById('blog-preview-texto');
+	  			if (el) { el.innerHTML = contents; }
+	  		}
 	  	});
 	    });
+
+	    (function(){
+	    	function bind(id, target) {
+	    		var src = document.getElementById(id);
+	    		var dst = document.getElementById(target);
+	    		if (!src || !dst) return;
+	    		var update = function() {
+	    			dst.textContent = src.value;
+	    		};
+	    		src.addEventListener('input', update);
+	    		update();
+	    	}
+	    	bind('blog-titulo', 'blog-preview-titulo');
+	    	bind('blog-intro', 'blog-preview-intro');
+	    })();
 	</script>
 	<script >var content_row = 1;
 		function addContent() {
