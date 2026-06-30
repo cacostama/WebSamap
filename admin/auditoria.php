@@ -250,32 +250,51 @@ $export_url = $URL . 'admin/auditoria/?' . $base_qs . ($base_qs !== '' ? '&' : '
 				<!-- Filtros -->
 				<div class="row" style="margin-bottom:12px;">
 					<div class="col-sm-12">
-						<form class="form-inline" method="get" action="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/auditoria/">
-							<select name="usuario" class="form-control input-sm" style="margin-right:4px;">
+						<form id="samap-filtros-auditoria" class="form-inline" method="get" action="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/auditoria/">
+							<select name="usuario" class="form-control input-sm" style="margin-right:4px;" data-samap-autosubmit>
 								<option value="">Todos los usuarios</option>
 								<?php foreach ($usuarios_opts as $u): ?>
 									<option value="<?= htmlspecialchars($u, ENT_QUOTES, 'UTF-8') ?>" <?= $f_usuario === $u ? 'selected' : '' ?>><?= htmlspecialchars($u, ENT_QUOTES, 'UTF-8') ?></option>
 								<?php endforeach; ?>
 							</select>
-							<select name="accion" class="form-control input-sm" style="margin-right:4px;">
+							<select name="accion" class="form-control input-sm" style="margin-right:4px;" data-samap-autosubmit>
 								<option value="">Todas las acciones</option>
 								<?php foreach ($acciones_opts as $a): ?>
 									<option value="<?= htmlspecialchars($a, ENT_QUOTES, 'UTF-8') ?>" <?= $f_accion === $a ? 'selected' : '' ?>><?= htmlspecialchars($a, ENT_QUOTES, 'UTF-8') ?></option>
 								<?php endforeach; ?>
 							</select>
-							<select name="entidad" class="form-control input-sm" style="margin-right:4px;">
+							<select name="entidad" class="form-control input-sm" style="margin-right:4px;" data-samap-autosubmit>
 								<option value="">Todas las entidades</option>
 								<?php foreach ($entidades_opts as $e): ?>
 									<option value="<?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?>" <?= $f_entidad === $e ? 'selected' : '' ?>><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></option>
 								<?php endforeach; ?>
 							</select>
-							<input type="date" name="desde" value="<?= htmlspecialchars($f_desde, ENT_QUOTES, 'UTF-8') ?>" class="form-control input-sm" placeholder="Desde" style="margin-right:4px;">
-							<input type="date" name="hasta" value="<?= htmlspecialchars($f_hasta, ENT_QUOTES, 'UTF-8') ?>" class="form-control input-sm" placeholder="Hasta" style="margin-right:4px;">
+							<input type="date" name="desde" value="<?= htmlspecialchars($f_desde, ENT_QUOTES, 'UTF-8') ?>" class="form-control input-sm" placeholder="Desde" style="margin-right:4px;" data-samap-autosubmit>
+							<input type="date" name="hasta" value="<?= htmlspecialchars($f_hasta, ENT_QUOTES, 'UTF-8') ?>" class="form-control input-sm" placeholder="Hasta" style="margin-right:4px;" data-samap-autosubmit>
 							<input type="text" name="q" value="<?= htmlspecialchars($f_q, ENT_QUOTES, 'UTF-8') ?>" placeholder="Buscar en descripción..." class="form-control input-sm" style="margin-right:4px;width:220px;">
 							<button type="submit" class="btn btn-primary btn-sm" style="margin-right:4px;">Filtrar</button>
-							<a href="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/auditoria/" class="btn btn-default btn-sm" style="margin-right:4px;">Limpiar</a>
+							<a href="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/auditoria/" class="btn btn-default btn-sm" style="margin-right:4px;" title="Limpiar todos los filtros" data-samap-limpiar-filtros>Limpiar filtros</a>
 							<a href="<?= htmlspecialchars($export_url, ENT_QUOTES, 'UTF-8') ?>" class="btn btn-success btn-sm" style="margin-left:6px;"><em class="fa fa-download"></em> Exportar CSV</a>
 						</form>
+						<script>
+						(function(){
+							// Auto-submit al cambiar selects/fechas. El input de
+							// busqueda libre espera Enter o click en Filtrar.
+							var form = document.getElementById('samap-filtros-auditoria');
+							if (!form) return;
+							form.querySelectorAll('[data-samap-autosubmit]').forEach(function(el){
+								el.addEventListener('change', function(){ form.submit(); });
+							});
+							var limpiar = form.querySelector('[data-samap-limpiar-filtros]');
+							if (limpiar) {
+								limpiar.addEventListener('click', function(){
+									form.querySelectorAll('select').forEach(function(s){ s.value = ''; });
+									form.querySelectorAll('input[type=date]').forEach(function(i){ i.value = ''; });
+									var qi = form.querySelector('input[name="q"]'); if (qi) qi.value = '';
+								});
+							}
+						})();
+						</script>
 					</div>
 				</div>
 

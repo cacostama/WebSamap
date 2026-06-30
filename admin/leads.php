@@ -276,14 +276,14 @@ $estado_color = [
 
 				<div class="row" style="margin-bottom:12px;">
 					<div class="col-sm-12">
-						<form class="form-inline" method="get" action="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/leads/">
-							<select name="filtro_estado" class="form-control input-sm">
+						<form id="samap-filtros-leads" class="form-inline" method="get" action="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/leads/">
+							<select name="filtro_estado" class="form-control input-sm" data-samap-autosubmit>
 								<option value="">Todos los estados</option>
 								<?php foreach ($estados_validos as $e): ?>
 									<option value="<?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?>" <?= $filtro_estado === $e ? 'selected' : '' ?>><?= htmlspecialchars($estado_label[$e], ENT_QUOTES, 'UTF-8') ?></option>
 								<?php endforeach; ?>
 							</select>
-							<select name="filtro_origen" class="form-control input-sm" style="margin-left:8px;">
+							<select name="filtro_origen" class="form-control input-sm" style="margin-left:8px;" data-samap-autosubmit>
 								<option value="">Todos los orígenes</option>
 								<?php foreach ($origenes_validos as $o): ?>
 									<option value="<?= htmlspecialchars($o, ENT_QUOTES, 'UTF-8') ?>" <?= $filtro_origen === $o ? 'selected' : '' ?>><?= htmlspecialchars(ucfirst($o), ENT_QUOTES, 'UTF-8') ?></option>
@@ -291,8 +291,27 @@ $estado_color = [
 							</select>
 							<input type="text" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" placeholder="Buscar por nombre, email o mensaje" class="form-control input-sm" style="margin-left:8px;width:280px;">
 							<button type="submit" class="btn btn-primary btn-sm" style="margin-left:8px;">Filtrar</button>
-							<a href="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/leads/" class="btn btn-default btn-sm" style="margin-left:4px;">Limpiar</a>
+							<a href="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/leads/" class="btn btn-default btn-sm" style="margin-left:4px;" title="Limpiar todos los filtros" data-samap-limpiar-filtros>Limpiar filtros</a>
 						</form>
+						<script>
+						(function(){
+							// Auto-submit del form al cambiar selects con data-samap-autosubmit.
+							// El input de busqueda libre espera Enter o click en Filtrar.
+							var form = document.getElementById('samap-filtros-leads');
+							if (!form) return;
+							form.querySelectorAll('[data-samap-autosubmit]').forEach(function(el){
+								el.addEventListener('change', function(){ form.submit(); });
+							});
+							var limpiar = form.querySelector('[data-samap-limpiar-filtros]');
+							if (limpiar) {
+								limpiar.addEventListener('click', function(e){
+									// Si los filtros estan vacios, igual limpiamos el campo q.
+									form.querySelectorAll('select').forEach(function(s){ s.value = ''; });
+									var qi = form.querySelector('input[name="q"]'); if (qi) qi.value = '';
+								});
+							}
+						})();
+						</script>
 					</div>
 				</div>
 
