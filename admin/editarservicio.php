@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -26,29 +27,41 @@ if (isset($_SESSION['ADM_Username'])){
 
 		$imagen_real=$_FILES['imagen']['name'];
 
-		if ($_FILES['imagen']['name'] != "") { 
+		if ($_FILES['imagen']['name'] != "") {
 
 			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
 			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaServicios.$imagen_real);
 			$img_original = "$rutaServicios/".$imagen_real;
 			$type = @getimagesize($img_original);
 
-		}   
-		
+		}
+
 	    //--------FIN IMAGEN1---------//
 
 			$categoria_id = (int) ($_POST['categoria_id'] ?? 0);
-			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
+			$categoria_bind = $categoria_id > 0 ? $categoria_id : null;
 
-			$sql_update = "UPDATE tbl_servicios SET titulo='".($_POST['titulo'] ?? '')."', intro='".($_POST['intro'] ?? '')."', detalle='".($_POST['detalle'] ?? '')."', categoria_id=".$categoria_sql;
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$intro_post = (string) ($_POST['intro'] ?? '');
+			$detalle_post = (string) ($_POST['detalle'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_servicios SET titulo = ?, intro = ?, detalle = ?, categoria_id = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssisi', $titulo_post, $intro_post, $detalle_post, $categoria_bind, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_servicios SET titulo = ?, intro = ?, detalle = ?, categoria_id = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssii', $titulo_post, $intro_post, $detalle_post, $categoria_bind, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_plan) ? $row_plan : [];
 			$snap['titulo']       = $_POST['titulo']   ?? ($row_plan['titulo']       ?? '');
 			$snap['intro']        = $_POST['intro']    ?? ($row_plan['intro']        ?? '');
@@ -165,9 +178,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_plan['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/servicios/<?php echo $row_plan['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/servicios/<?php echo $row_plan['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

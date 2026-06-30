@@ -82,7 +82,12 @@ if ($has_rows) {
 
 // CSRF para los links de restaurar / borrar definitivamente (papelera)
 $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : '';
+$csrf_raw = function_exists('samap_csrf_valor') ? samap_csrf_valor() : '';
 ?>
+<?php /* Token CSRF accesible para scripts/tests que necesiten construir
+         URLs de borrado/restaurar manualmente (sobre todo en modo
+         serverSide donde los links no estan en el HTML inicial). */ ?>
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_raw, ENT_QUOTES, 'UTF-8') ?>" id="samap-csrf-token">
 <div class="row">
     <div class="panel panel-default">
         <div class="panel-heading clearfix">
@@ -173,7 +178,7 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
                         <?php endwhile; ?>
                     <?php endif; ?>
 
-                    <?php if ($row_count === 0): ?>
+                    <?php if ($row_count === 0 && empty($ajax_url)): /* en modo serverSide, DataTables muestra "Cargando..." y rellena via AJAX */ ?>
                         <tr><td colspan="<?= (int)(count($columns) + ($show_edit ? 1 : 0) + ($show_delete ? 1 : ($papelera_activa ? 2 : 0))) ?>" style="text-align:center;color:#888;padding:18px;">
                             <?php if ($papelera_activa): ?>
                                 La papelera está vacía.
@@ -186,7 +191,9 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             </table>
         </div>
         <div class="panel-footer">
-            <?php if ($papelera_activa): ?>
+            <?php if (!empty($ajax_url)): /* en serverSide DataTables ya muestra "X de Y registros" en su info */ ?>
+                <small style="color:#888;">Listado paginado del lado del servidor (más rápido para tablas grandes).</small>
+            <?php elseif ($papelera_activa): ?>
                 Registros en papelera: <strong><?= (int)$row_count ?></strong>
             <?php else: ?>
                 Total: <?= (int)$row_count ?> registros
@@ -202,6 +209,7 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             var exportBtnId = 'btn-export-csv-' + tableId;
             var isPapelera = <?= $e_papelera ?>;
             var baseUrl   = <?= json_encode($e_url, JSON_UNESCAPED_UNICODE) ?>;
+            var ajaxUrl   = <?= json_encode(isset($ajax_url) ? (string)$ajax_url : '', JSON_UNESCAPED_UNICODE) ?>;
 
             // jQuery lo carga el padre al final del <body>, no aca. NO podemos
             // emitir <script src="dataTables"> en el partial porque correria
@@ -238,17 +246,26 @@ $csrf = function_exists('samap_csrf_valor') ? urlencode(samap_csrf_valor()) : ''
             function runInit() {
                 var $ = window.jQuery;
                 $(function() {
-                    // En papelera: ocultar la barra de busqueda (no tiene sentido
-                    // sobre un set pequeno y casi siempre ordenado por fecha).
-                    var t = $('#' + tableId).DataTable({
+                    var cfg = {
                         pageLength: pageLen,
                         order: orderOpt,
-                        language: { url: '//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json' },
+                        language: { url: baseUrl + 'admin/plugins/datatable/i18n/Spanish.json' },
                         columnDefs: [
                             { orderable: false, targets: -1 },
                             { orderable: false, targets: -2 }
                         ]
-                    });
+                    };
+                    // Si el padre paso $ajax_url, activar modo serverSide.
+                    // El tbody del HTML quedo vacio; DataTables hace AJAX cada
+                    // vez que el usuario pagina/busca/ordena, trayendo solo el
+                    // subset visible. Baja el peso inicial de listados grandes
+                    // (guia=326 filas, sanatorios=210) a ~25 filas por request.
+                    if (ajaxUrl) {
+                        cfg.serverSide = true;
+                        cfg.processing = true;
+                        cfg.ajax = { url: ajaxUrl, type: 'GET' };
+                    }
+                    var t = $('#' + tableId).DataTable(cfg);
                     $('#' + exportBtnId).on('click', function() {
                         var csv = [];
                         var headers = [];

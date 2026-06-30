@@ -82,6 +82,17 @@ RewriteRule ^(.*)$ $1.html
 	<FilesMatch "\.php$">
 		Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
 	</FilesMatch>
+	# Security headers. CSP admin: mas estricto que el publico - no carga
+	# Google Fonts, solo reCAPTCHA en /admin/index.php (login). inline scripts
+	# y styles permitidos por el codigo legacy (Bootstrap 3, Summernote,
+	# DataTables init inline).
+	Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	Header always set X-Frame-Options "SAMEORIGIN"
+	Header always set X-Content-Type-Options "nosniff"
+	Header always set Referrer-Policy "strict-origin-when-cross-origin"
+	Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+	Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.google.com; form-action 'self'; base-uri 'self'; object-src 'none'"
+	Header always unset X-Powered-By
 </IfModule>
 
 # Compresion gzip de respuestas (HTML, JS, CSS, JSON) -> baja transferencia

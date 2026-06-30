@@ -6,18 +6,29 @@
 	}
 
 	// ---- Endurecimiento de la cookie de sesion ----
+	// Flags:
+	// - lifetime=0: cookie de sesion, no persistente
+	// - path=/: cookie valida en toda la app
+	// - httponly: no accesible desde JS (mitiga robo via XSS)
+	// - secure: solo viaja por HTTPS cuando el server lo detecta
+	//   (via HTTPS=on o X-Forwarded-Proto=https detras de un proxy)
+	// - samesite=Strict: la cookie NO se envia en ninguna peticion
+	//   cross-site (ni en navegacion top-level). Elimina toda una
+	//   categoria de CSRF. Tradeoff: el usuario tiene que loguearse
+	//   de nuevo si entra al admin desde un link externo.
 	// Solo aplica si la sesion aun no arranco (evita warnings).
 	if (session_status() === PHP_SESSION_NONE) {
 		$secure = (
 			(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-			(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+			(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+			(isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
 		);
 		session_set_cookie_params([
 			'lifetime' => 0,
 			'path'     => '/',
-			'httponly' => true,      // la cookie no es accesible desde JS (anti-XSS)
-			'secure'   => $secure,   // solo viaja por HTTPS cuando corresponde
-			'samesite' => 'Lax',     // mitiga CSRF en navegacion cross-site
+			'httponly' => true,           // anti-XSS: cookie no accesible desde JS
+			'secure'   => $secure,        // force HTTPS when available
+			'samesite' => 'Strict',        // anti-CSRF maximo: cookie solo misma-origin
 		]);
 		session_start();
 	}

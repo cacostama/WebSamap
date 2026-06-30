@@ -145,10 +145,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -168,36 +164,7 @@ if (isset($_SESSION['ADM_Username'])){
 		</section>
 
 	</section>
-
-
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
 </body>
 </html>

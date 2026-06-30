@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -25,19 +26,30 @@ if (isset($_SESSION['ADM_Username'])){
 		}
 
 			$categoria_id  = (int) ($_POST['categoria_id'] ?? 0);
-			$categoria_sql = $categoria_id > 0 ? $categoria_id : 'NULL';
+			$categoria_bind = $categoria_id > 0 ? $categoria_id : null;
 			$descuento = $_POST['descuento'] ?? '';
 			$orden     = (int) ($_POST['orden'] ?? 0);
 
-			$sql_update = "UPDATE tbl_aliados SET titulo='".($_POST['titulo'] ?? '')."', categoria_id=".$categoria_sql.", descuento='".$descuento."', orden=".$orden.", detalle='".($_POST['detalle'] ?? '')."'";
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$detalle_post = (string) ($_POST['detalle'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_aliados SET titulo = ?, categoria_id = ?, descuento = ?, orden = ?, detalle = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sisissi', $titulo_post, $categoria_bind, $descuento, $orden, $detalle_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_aliados SET titulo = ?, categoria_id = ?, descuento = ?, orden = ?, detalle = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sisisi', $titulo_post, $categoria_bind, $descuento, $orden, $detalle_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_plan) ? $row_plan : [];
 			$snap['titulo']       = $_POST['titulo']   ?? ($row_plan['titulo']       ?? '');
 			$snap['categoria_id'] = $categoria_id;
@@ -173,9 +185,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_plan['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/aliados/<?php echo $row_plan['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/aliados/<?php echo $row_plan['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

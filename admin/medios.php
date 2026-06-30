@@ -146,9 +146,6 @@ $total_imagenes = count($imagenes);
 	<link rel="stylesheet" href="<?php echo $URL; ?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL; ?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL; ?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -202,7 +199,7 @@ $total_imagenes = count($imagenes);
 						?>
 							<div style="background:#fff;border:1px solid #eee;border-radius:4px;overflow:hidden;position:relative;">
 								<a href="<?php echo $e_path_web; ?>" target="_blank" style="display:block;background:#f5f5f5;text-align:center;padding:8px;min-height:140px;line-height:140px;">
-									<img src="<?php echo $e_path_web; ?>" style="max-width:100%;max-height:140px;vertical-align:middle;" alt="<?php echo $e_nombre; ?>">
+									<img src="<?php echo $e_path_web; ?>" loading="lazy" decoding="async" style="max-width:100%;max-height:140px;vertical-align:middle;" alt="<?php echo $e_nombre; ?>">
 								</a>
 								<div style="padding:8px;font-size:11px;color:#656565;">
 									<div style="font-weight:700;margin-bottom:4px;word-break:break-all;"><?php echo $e_nombre; ?></div>
@@ -235,27 +232,7 @@ $total_imagenes = count($imagenes);
 		</section>
 
 	</section>
-
-	<script src="<?php echo $URL; ?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-	<script src="<?php echo $URL; ?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-	<script src="<?php echo $URL; ?>admin/plugins/animo/animo.min.js"></script>
-
-	<script src="<?php echo $URL; ?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-	<script src="<?php echo $URL; ?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-	<script src="<?php echo $URL; ?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
-	<script src="<?php echo $URL; ?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL; ?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
 </body>
 </html>

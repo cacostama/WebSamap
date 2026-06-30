@@ -13,9 +13,12 @@ error_reporting(E_ALL);
 @ini_set('log_errors', '1');
 date_default_timezone_set('America/Asuncion');
 
+// Los security headers los pone admin/.htaccess via mod_headers (canonica).
+// Antes los duplicabamos aca y terminaban saliendo DOS veces en la respuesta
+// (curl -I lo mostraba). Borrar aca evita la duplicacion y mantiene una sola
+// fuente de verdad. Si en el futuro el admin se sirve detras de nginx/PHP-FPM
+// y .htaccess no aplica, restaurar este bloque.
 if (!headers_sent()) {
-	header('X-Frame-Options: SAMEORIGIN');
-	header('X-Content-Type-Options: nosniff');
 	header_remove('X-Powered-By');
 }
 

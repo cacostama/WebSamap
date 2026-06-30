@@ -37,9 +37,14 @@ HTTP=$(curl -s -c "$C" -b "$C" -o /tmp/h.html -w '%{http_code}' "$URL/admin/home
 [ "$HTTP" = "200" ] && ok "login admin" || ko "login admin (HTTP $HTTP)"
 
 # ---- 1. Borrar id=1 (soft) ----
+# Listado de sanatorios ahora usa serverSide -> links vienen via AJAX al
+# endpoint admin/api/datatable.php?tabla=sanatorios. Pedimos el CSRF token
+# desde el HTML del listado y construimos el delete URL manualmente.
 HTTP=$(curl -s -c "$C" -b "$C" -o /tmp/s.html -w '%{http_code}' "$URL/admin/sanatorios/")
-DEL=$(grep -oE 'admin/sanatorios\.php\?id=1&amp;borrar=si&amp;csrf_token=[a-f0-9]+' /tmp/s.html | head -1 | sed 's/&amp;/\&/g')
-[ -n "$DEL" ] && ok "GET listado y delete link encontrado" || ko "delete link NO encontrado"
+[ "$HTTP" = "200" ] && ok "GET /admin/sanatorios/ HTTP 200" || ko "GET sanatorios HTTP $HTTP"
+CSRF=$(grep -oE 'name="csrf_token" value="[a-f0-9]+"' /tmp/s.html | head -1 | sed -E 's/.*value="([a-f0-9]+)".*/\1/')
+DEL="admin/sanatorios.php?id=1&borrar=si&csrf_token=$CSRF"
+[ -n "$CSRF" ] && ok "delete URL construido (CSRF=${CSRF:0:8}...)" || ko "no se pudo obtener CSRF token"
 
 curl -s -c "$C" -b "$C" -L -o /tmp/del1.html "$URL/$DEL"
 DEL_OK=$(echo "SELECT deleted_at IS NOT NULL FROM tbl_sanatorio WHERE id = 1;" | DB | head -1)
@@ -79,10 +84,13 @@ curl -s -c "$C" -b "$C" -L -o /tmp/csrf.html "$URL/admin/sanatorios.php?id=1&bor
 CSRF_OK=$(echo "SELECT deleted_at IS NULL FROM tbl_sanatorio WHERE id = 1;" | DB | head -1)
 [ "$CSRF_OK" = "1" ] && ok "borrado SIN csrf_token fue rechazado" || ko "BORRADO SIN CSRF PASO (vulnerabilidad)"
 
-# ---- 6. Modal de confirmacion en el HTML del listado ----
+# ---- 6. Modal de confirmacion + links marcados ----
+# Listado de sanatorios usa serverSide -> los links vienen via AJAX endpoint.
 HTTP=$(curl -s -c "$C" -b "$C" -o /tmp/s2.html -w '%{http_code}' "$URL/admin/sanatorios/")
 grep -q 'samap-confirm-overlay' /tmp/s2.html && ok "modal de confirmacion inyectado" || ko "modal NO inyectado"
-grep -q 'class="samap-confirm"' /tmp/s2.html && ok "links de borrado marcados con .samap-confirm" || ko "links NO marcados"
+# Verificar que el JSON del endpoint trae los links con class="samap-confirm"
+curl -s -c "$C" -b "$C" "$URL/admin/api/datatable.php?tabla=sanatorios&draw=1&start=0&length=5" -o /tmp/sjson.json
+grep -q 'samap-confirm' /tmp/sjson.json && ok "JSON del endpoint trae links .samap-confirm" || ko "JSON sin links marcados"
 
 # Resumen
 echo ""

@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -22,15 +23,25 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_slider SET nombre='".($_POST['titulo'] ?? '')."'";
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_slider SET nombre = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('ssi', $titulo_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_slider SET nombre = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('si', $titulo_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_sponsor) ? $row_sponsor : [];
 			$snap['nombre'] = $_POST['titulo']  ?? ($row_sponsor['nombre'] ?? '');
 			$snap['imagen'] = $imagen_real !== '' ? $imagen_real : ($row_sponsor['imagen'] ?? '');
@@ -121,9 +132,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_sponsor['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/slider/<?php echo $row_sponsor['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/slider/<?php echo $row_sponsor['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

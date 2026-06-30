@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -42,16 +43,36 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-			$sql_update = "UPDATE tbl_speaker SET nombre='".($_POST['nombre'] ?? '')."', titulo='".($_POST['titulo'] ?? '')."', intro='".($_POST['intro'] ?? '')."', texto='".($_POST['detalle'] ?? '')."', linkedin='".($_POST['linkedin'] ?? '')."', ig='".($_POST['ig'] ?? '')."', fb='".($_POST['fb'] ?? '')."', tw='".($_POST['tw'] ?? '')."', tw='".($_POST['web'] ?? '')."', idNacionalidad='".($_POST['nacionalidad'] ?? '')."'"; 
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$nombre_post = (string) ($_POST['nombre'] ?? '');
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$intro_post = (string) ($_POST['intro'] ?? '');
+			$texto_post = (string) ($_POST['detalle'] ?? '');
+			$linkedin_post = (string) ($_POST['linkedin'] ?? '');
+			$ig_post = (string) ($_POST['ig'] ?? '');
+			$fb_post = (string) ($_POST['fb'] ?? '');
+			$tw_post = (string) ($_POST['tw'] ?? '');
+			$web_post = (string) ($_POST['web'] ?? '');
+			$nacionalidad_post = (int) ($_POST['nacionalidad'] ?? 0);
 
+			// El UPDATE original repite `tw='$web'` por bug, sobreescribiendo `tw`.
+			// El campo `web` queda sin actualizar. Mantenemos exactamente ese
+			// comportamiento: en la segunda pasada tw termina valiendo `web`.
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$stmt = $conexion->prepare('UPDATE tbl_speaker SET nombre = ?, titulo = ?, intro = ?, texto = ?, linkedin = ?, ig = ?, fb = ?, tw = ?, tw = ?, idNacionalidad = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssssssssiisi', $nombre_post, $titulo_post, $intro_post, $texto_post, $linkedin_post, $ig_post, $fb_post, $tw_post, $web_post, $nacionalidad_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_speaker SET nombre = ?, titulo = ?, intro = ?, texto = ?, linkedin = ?, ig = ?, fb = ?, tw = ?, tw = ?, idNacionalidad = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssssssssiii', $nombre_post, $titulo_post, $intro_post, $texto_post, $linkedin_post, $ig_post, $fb_post, $tw_post, $web_post, $nacionalidad_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
-		
-
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Speaker guardado correctamente.');
 			header('Location: ' . $URL . 'admin/speakers/');
 			exit;
@@ -212,9 +233,9 @@ if (isset($_SESSION['ADM_Username'])){
 										</div>
 										<div class="col-sm-4">
 											<?php if ($row_speaker['imagen'] != "") {?>
-												<img width="60px" src="<?php echo $URL?>documentos/speaker/<?php echo $row_speaker['imagen']; ?>" alt=""/>
+												<img width="60px" src="<?php echo $URL?>documentos/speaker/<?php echo $row_speaker['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 									</div>

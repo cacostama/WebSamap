@@ -6,8 +6,15 @@ if (isset($_SESSION['ADM_Username'])){
 
 	mysqli_select_db($connect, $database);
 	$papelera = isset($_GET['papelera']) && $_GET['papelera'] === '1';
-	$query_sanatorios= "SELECT a.id, a.nombre,b.nombre AS ciudad, a.direccion, a. estado FROM tbl_sanatorio a LEFT JOIN tbl_ciudad b ON a.idCiudad=b.id WHERE " . ($papelera ? "a.deleted_at IS NOT NULL" : "a.deleted_at IS NULL");
-	$sanatorios = mysqli_query($connect, $query_sanatorios) or die(mysqli_error($connect));
+	// Sanatorios tiene ~210 filas. En la vista NORMAL pedimos los datos via AJAX
+	// paginado (admin/api/datatable.php) para que el HTML inicial sea liviano.
+	// En la papelera, mantenemos el listado completo (suele tener pocos registros).
+	if (!$papelera) {
+		$ajax_url = $URL . 'admin/api/datatable.php?tabla=sanatorios';
+	} else {
+		$query_sanatorios = "SELECT a.id, a.nombre, b.nombre AS ciudad, a.direccion, a.estado FROM tbl_sanatorio a LEFT JOIN tbl_ciudad b ON a.idCiudad = b.id WHERE a.deleted_at IS NOT NULL";
+		$sanatorios = mysqli_query($connect, $query_sanatorios) or die(mysqli_error($connect));
+	}
 
     function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
@@ -139,10 +146,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -157,42 +160,20 @@ if (isset($_SESSION['ADM_Username'])){
 
 				<h3><?php echo htmlspecialchars($tabla_titulo, ENT_QUOTES, 'UTF-8'); ?></h3>
 				<?php include 'partials/papelera-toggle.php'; ?>
-				<?php $papelera_activa = $papelera; if (isset($sanatorios)) { $rows = $sanatorios; include 'partials/tabla-searchable.php'; } ?>
+				<?php
+					$papelera_activa = $papelera;
+					// En modo serverSide (sin $sanatorios) le pasamos $rows=null y el
+					// partial renderiza solo el esqueleto -- DataTables trae las filas
+					// por AJAX al endpoint en $ajax_url.
+					$rows = $sanatorios ?? null;
+					include 'partials/tabla-searchable.php';
+				?>
 			</section>
 
 		</section>
 
 	</section>
-
-
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
 </body>
 </html>

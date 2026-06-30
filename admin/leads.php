@@ -5,6 +5,13 @@
  * Persistencia: enviar.php hace INSERT en tbl_leads despues de validar; esta
  * pantalla los lista con filtros, permite cambiar estado, editar notas y borrar.
  *
+ * PII: a partir de la migracion 012 los campos sensibles (nombre, email,
+ * telefono) se encriptan en columnas VARBINARY con AES-256-GCM. Esta pagina
+ * los desencripta transparentemente. Filas pre-migration (sin _enc) caen
+ * a los valores en claro via samap_get_lead_field(). El telefono se muestra
+ * enmascarado (***-***-XXXX) y requiere click explicito en "Ver" para
+ * revelar el valor completo, que queda registrado en tbl_audit_log.
+ *
  * Acciones (todas requieren samap_puede_escribir() + samap_csrf_validar()):
  *   ?cambiar_estado=1&id=N&estado=...   -> UPDATE estado
  *   ?borrar=si&id=N                    -> DELETE FROM tbl_leads WHERE id=N
@@ -13,7 +20,8 @@
  * Filtros (GET, no requieren CSRF — son solo lectura):
  *   ?filtro_estado=  (nuevo|contactado|cerrado|spam)
  *   ?filtro_origen=  (contacto|trabajo)
- *   ?q=              (busqueda libre en nombre/email/mensaje)
+ *   ?q=              (busqueda libre en nombre/email/mensaje — la busqueda
+ *                     por email exacto se hace contra data_hash)
  */
 require_once('funciones/db.php');
 require_once('conexion.php');
@@ -97,6 +105,41 @@ if (isset($_GET['borrar']) && $_GET['borrar'] === 'si' && isset($_GET['id'])) {
 }
 
 // ============================================================================
+// Reveal de telefono (PII) — endpoint AJAX para el boton "Ver" en la tabla.
+// Devuelve JSON con el telefono desencriptado. Cada llamada genera una fila
+// en tbl_audit_log con accion='view_pii'.
+// ============================================================================
+if (isset($_GET['ver_tel']) && $_GET['ver_tel'] === '1' && isset($_GET['id'])) {
+	header('Content-Type: application/json; charset=utf-8');
+	if (!samap_csrf_validar()) {
+		http_response_code(403);
+		echo json_encode(['ok' => false, 'error' => 'csrf']);
+		exit;
+	}
+	$id = (int) $_GET['id'];
+	$tel_revealed = '';
+	if ($id > 0) {
+		$stmt = $conexion->prepare('SELECT telefono_enc, telefono FROM tbl_leads WHERE id = ?');
+		if ($stmt) {
+			$stmt->bind_param('i', $id);
+			$stmt->execute();
+			$res = $stmt->get_result();
+			if ($res && ($r = $res->fetch_assoc())) {
+				$tel_revealed = samap_get_lead_field($r, 'telefono_enc', 'telefono');
+			}
+			$stmt->close();
+		}
+		@samap_audit_log('view_pii', 'tbl_leads', $id, "Revelo telefono del lead #$id (Ley 6534/20 audit)");
+	}
+	echo json_encode([
+		'ok'  => true,
+		'id'  => $id,
+		'tel' => $tel_revealed,
+	]);
+	exit;
+}
+
+// ============================================================================
 // Filtros
 // ============================================================================
 $filtro_estado = isset($_GET['filtro_estado']) ? (string) $_GET['filtro_estado'] : '';
@@ -121,15 +164,29 @@ if (in_array($filtro_origen, $origenes_validos, true)) {
 	$types .= 's';
 }
 if ($q !== '') {
-	$where[] = '(nombre LIKE ? OR email LIKE ? OR mensaje LIKE ?)';
-	$like = '%' . $q . '%';
-	$params[] = $like; $params[] = $like; $params[] = $like;
-	$types .= 'sss';
+	// Busqueda libre: si parece un email, match exacto por data_hash
+	// (no requiere desencriptar todas las filas). Si no, fallback a LIKE
+	// sobre los campos en claro (legacy + nombre + mensaje).
+	if (filter_var($q, FILTER_VALIDATE_EMAIL)) {
+		$hash = samap_data_hash($q);
+		$where[] = 'data_hash = ?';
+		$params[] = $hash;
+		$types .= 's';
+	} else {
+		$where[] = '(nombre LIKE ? OR mensaje LIKE ?)';
+		$like = '%' . $q . '%';
+		$params[] = $like; $params[] = $like;
+		$types .= 'ss';
+	}
 }
 
 $where_sql = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
 
-$sql_list = "SELECT * FROM tbl_leads $where_sql ORDER BY created_at DESC, id DESC LIMIT 500";
+// Listamos las columnas necesarias explicitamente. nombre / email /
+// telefono son las legacy en claro (filas pre-migration); nombre_enc /
+// email_enc / telefono_enc son las encriptadas (filas nuevas). La UI las
+// lee con samap_get_lead_field() que prioriza _enc y cae a plain.
+$sql_list = "SELECT id, origen, nombre, nombre_enc, email, email_enc, telefono, telefono_enc, mensaje, ip, user_agent, estado, notas, created_at, updated_at, data_hash FROM tbl_leads $where_sql ORDER BY created_at DESC, id DESC LIMIT 500";
 $stmt = $conexion->prepare($sql_list);
 if ($stmt) {
 	if (!empty($params)) {
@@ -189,10 +246,6 @@ $estado_color = [
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -276,9 +329,24 @@ $estado_color = [
 											$e_csrf = htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8');
 											$e_id = htmlspecialchars((string)$id, ENT_QUOTES, 'UTF-8');
 											$e_origen = htmlspecialchars((string)$row['origen'], ENT_QUOTES, 'UTF-8');
-											$e_nombre = htmlspecialchars((string)$row['nombre'], ENT_QUOTES, 'UTF-8');
-											$e_email  = htmlspecialchars((string)$row['email'], ENT_QUOTES, 'UTF-8');
-											$e_tel    = htmlspecialchars((string)($row['telefono'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+											// PII: desencriptar con fallback a columnas legacy.
+											$nombre_plain = samap_get_lead_field($row, 'nombre_enc', 'nombre');
+											$email_plain  = samap_get_lead_field($row, 'email_enc',  'email');
+											$tel_plain    = samap_get_lead_field($row, 'telefono_enc', 'telefono');
+											$e_nombre = htmlspecialchars($nombre_plain, ENT_QUOTES, 'UTF-8');
+											$e_email  = htmlspecialchars($email_plain,  ENT_QUOTES, 'UTF-8');
+											$e_tel    = htmlspecialchars($tel_plain,    ENT_QUOTES, 'UTF-8');
+											// Mascara del telefono: solo ultimos 4 digitos visibles.
+											$tel_masked = '';
+											if ($tel_plain !== '') {
+												$tel_digits = preg_replace('/\D+/', '', $tel_plain);
+												$tel_masked = strlen($tel_digits) >= 4
+													? '***-***-' . substr($tel_digits, -4)
+													: '***';
+											}
+											$e_tel_masked = htmlspecialchars($tel_masked, ENT_QUOTES, 'UTF-8');
+
 											$mensaje_full  = (string)$row['mensaje'];
 											$mensaje_trunc = mb_strlen($mensaje_full) > 80 ? mb_substr($mensaje_full, 0, 80) . '…' : $mensaje_full;
 											$e_mensaje = htmlspecialchars($mensaje_trunc, ENT_QUOTES, 'UTF-8');
@@ -296,9 +364,18 @@ $estado_color = [
 												<td><?= $e_id ?></td>
 												<td><?= htmlspecialchars($fecha_fmt, ENT_QUOTES, 'UTF-8') ?></td>
 												<td><?= $e_origen ?></td>
-												<td><?= $e_nombre ?></td>
-												<td><a href="mailto:<?= $e_email ?>"><?= $e_email ?></a></td>
-												<td><?= $e_tel !== '' ? $e_tel : '<span class="text-muted">-</span>' ?></td>
+												<td><?= $e_nombre !== '' ? $e_nombre : '<span class="text-muted">-</span>' ?></td>
+												<td>
+													<a href="mailto:<?= $e_email ?>" title="Ver email completo"><?= $e_email !== '' ? $e_email : '<span class="text-muted">-</span>' ?></a>
+												</td>
+												<td>
+													<?php if ($tel_plain !== ''): ?>
+														<span class="samap-tel-masked" data-lead-id="<?= $e_id ?>" data-tel="<?= $e_tel ?>" data-tel-masked="<?= $e_tel_masked ?>"><?= $e_tel_masked ?></span>
+														<a href="#" class="samap-tel-toggle btn btn-xs btn-default" data-lead-id="<?= $e_id ?>" style="margin-left:4px;" title="Ver telefono completo (queda registrado en auditoria)"><em class="fa fa-eye"></em> Ver</a>
+													<?php else: ?>
+														<span class="text-muted">-</span>
+													<?php endif; ?>
+												</td>
 												<td title="<?= htmlspecialchars($mensaje_full, ENT_QUOTES, 'UTF-8') ?>" style="max-width:280px;"><?= $e_mensaje ?></td>
 												<td>
 													<form method="get" action="<?= htmlspecialchars($URL, ENT_QUOTES, 'UTF-8') ?>admin/leads/" style="display:inline;">
@@ -359,36 +436,42 @@ $estado_color = [
 		</section>
 
 	</section>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
-
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-	<script src="<?php echo $URL;?>admin/plugins/datatable/media/js/jquery.dataTables.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrap.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/datatable-bootstrap/js/dataTables.bootstrapPagination.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/datatable/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<script>
+	(function(){
+		// Reveal del telefono: hace GET al endpoint AJAX del mismo archivo
+		// (?ver_tel=1&id=N&csrf_token=...) que registra view_pii en audit log
+		// y devuelve JSON con el telefono desencriptado.
+		var csrf = <?php echo json_encode(samap_csrf_valor()); ?>;
+		document.querySelectorAll('.samap-tel-toggle').forEach(function(btn){
+			btn.addEventListener('click', function(e){
+				e.preventDefault();
+				var id = btn.getAttribute('data-lead-id');
+				var span = document.querySelector('.samap-tel-masked[data-lead-id="' + id + '"]');
+				if (!span) return;
+				var url = <?php echo json_encode($URL); ?> + 'admin/leads/?ver_tel=1&id=' + encodeURIComponent(id) + '&csrf_token=' + encodeURIComponent(csrf);
+				btn.innerHTML = '<em class="fa fa-spinner fa-spin"></em>';
+				fetch(url, { credentials: 'same-origin' })
+					.then(function(r){ return r.json(); })
+					.then(function(j){
+						if (j && j.ok && j.tel) {
+							span.textContent = j.tel;
+							span.setAttribute('data-tel-revealed', '1');
+							btn.outerHTML = '<em class="fa fa-check text-muted" title="Telefono revelado (registrado en auditoria)"></em>';
+						} else {
+							btn.innerHTML = '<em class="fa fa-eye"></em> Ver';
+							alert('No se pudo obtener el telefono.');
+						}
+					})
+					.catch(function(){
+						btn.innerHTML = '<em class="fa fa-eye"></em> Ver';
+						alert('Error de red al revelar el telefono.');
+					});
+			});
+		});
+	})();
+	</script>
 
 </body>
 </html>

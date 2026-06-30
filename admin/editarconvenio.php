@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -22,26 +23,38 @@ if (isset($_SESSION['ADM_Username'])){
 
 		$imagen_real=$_FILES['imagen']['name'];
 
-		if ($_FILES['imagen']['name'] != "") { 
+		if ($_FILES['imagen']['name'] != "") {
 
 			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
 			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaPlan.$imagen_real);
 			$img_original = "$rutaPlan/".$imagen_real;
 			$type = @getimagesize($img_original);
 
-		}   
-		
+		}
+
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_convenios SET ciudad='".($_POST['ciudad'] ?? '')."', titulo='".($_POST['titulo'] ?? '')."', detalle='".($_POST['detalle'] ?? '')."'";
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$ciudad_post = (string) ($_POST['ciudad'] ?? '');
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$detalle_post = (string) ($_POST['detalle'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_convenios SET ciudad = ?, titulo = ?, detalle = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('ssssi', $ciudad_post, $titulo_post, $detalle_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_convenios SET ciudad = ?, titulo = ?, detalle = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssi', $ciudad_post, $titulo_post, $detalle_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_plan) ? $row_plan : [];
 			$snap['ciudad']  = $_POST['ciudad']  ?? ($row_plan['ciudad']  ?? '');
 			$snap['titulo']  = $_POST['titulo']  ?? ($row_plan['titulo']  ?? '');
@@ -155,9 +168,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_plan['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/<?php echo $row_plan['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/<?php echo $row_plan['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

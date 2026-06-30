@@ -276,10 +276,6 @@ if (!empty($row['ultimo_acceso']) && $row['ultimo_acceso'] !== '0000-00-00 00:00
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -444,12 +440,7 @@ if (!empty($row['ultimo_acceso']) && $row['ultimo_acceso'] !== '0000-00-00 00:00
 		</section>
 
 	</section>
-
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
 </body>
 </html>

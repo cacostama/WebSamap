@@ -215,8 +215,6 @@ $export_url = $URL . 'admin/auditoria/?' . $base_qs . ($base_qs !== '' ? '&' : '
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/animo/animate+animo.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 
 	<style>
 		.aud-json { display: none; white-space: pre-wrap; word-break: break-all; background: #f8f8f8; padding: 8px; border: 1px solid #eee; border-radius: 3px; max-height: 240px; overflow: auto; font-family: monospace; font-size: 11px; margin: 4px 0 0; }
@@ -382,9 +380,6 @@ $export_url = $URL . 'admin/auditoria/?' . $base_qs . ($base_qs !== '' ? '&' : '
 		</section>
 
 	</section>
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 </body>
 </html>

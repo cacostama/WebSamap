@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	mysqli_select_db($connect, $database);
 	$query_ciudad = "SELECT * FROM tbl_ciudad";
 	$ciudad = mysqli_query($connect, $query_ciudad) or die(mysqli_error($connect));
@@ -16,15 +17,15 @@ if (isset($_SESSION['ADM_Username'])){
 	    //--------INICIO IMAGEN1---------//
 		$imagen_real=$_FILES['imagen']['name'];
 
-		if ($_FILES['imagen']['name'] != "") { 
+		if ($_FILES['imagen']['name'] != "") {
 
 			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
 			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaPlan.$imagen_real);
 			$img_original = "$rutaPlan/".$imagen_real;
 			$type = @getimagesize($img_original);
 
-		}   
-		
+		}
+
 	    //--------FIN IMAGEN1---------//
 
 			$nombre = ($_POST['nombre'] ?? '');
@@ -32,12 +33,16 @@ if (isset($_SESSION['ADM_Username'])){
 			$telefono = ($_POST['telefono'] ?? '');
 			$ciudad = ($_POST['ciudad'] ?? '');
 			$estado= ($_POST['estado'] ?? '');
-			
 
-			$insertSQL = "INSERT INTO tbl_sanatorio (idCiudad, nombre, direccion, telefono, estado) VALUES ('$ciudad','$nombre','$direccion','$telefono','$estado')";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
-			$new_id = mysqli_insert_id($connect);
+			$new_id = 0;
+			$ciudad_id = (int) $ciudad;
+			$stmt = $conexion->prepare('INSERT INTO tbl_sanatorio (idCiudad, nombre, direccion, telefono, estado) VALUES (?, ?, ?, ?, ?)');
+			if ($stmt) {
+				$stmt->bind_param('issss', $ciudad_id, $nombre, $direccion, $telefono, $estado);
+				$stmt->execute();
+				$new_id = $stmt->insert_id;
+				$stmt->close();
+			}
 			@samap_audit_log('insert', 'tbl_sanatorio', $new_id, "Creó el sanatorio: " . substr((string)$nombre, 0, 100), null, ['id' => $new_id, 'nombre' => $nombre, 'direccion' => $direccion, 'telefono' => $telefono, 'estado' => $estado]);
 			samap_flash_set('success', 'Sanatorio guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sanatorios/');
@@ -72,10 +77,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.css'>
 	<style type="text/css">
 	.note-editor {
@@ -189,44 +190,15 @@ if (isset($_SESSION['ADM_Username'])){
 			</section>
 
 		</section>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
-
-
-		<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-		<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-		<script src="<?php echo $URL;?>admin/plugins/moment/min/moment-with-langs.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
-
-	<script src="<?php echo $URL;?>admin/plugins/inputmask/jquery.inputmask.bundle.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
-
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script type="text/javascript">
 	  $(document).ready(function() {
 	    $('#code_preview0').summernote({height: 300});
 	  	$('#code_preview1').summernote({height: 300});
 	    });
 	</script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';

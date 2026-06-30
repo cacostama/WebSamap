@@ -1,5 +1,6 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
 
@@ -24,14 +25,15 @@ if (isset($_SESSION['ADM_Username'])){
 		$activo = isset($_POST['activo']) ? 1 : 0;
 
 		if ($icono === '') { $icono = 'fa-tags'; }
-		$color_sql = $color !== '' ? "'".$color."'" : 'NULL';
+		$color_bind = $color !== '' ? $color : null;
 
 		if ($nombre !== '') {
-			$sql_update = "UPDATE tbl_categorias_aliado
-			               SET nombre='".$nombre."', icono='".$icono."', color=".$color_sql.", orden=".$orden.", activo=".$activo."
-			               WHERE id=".$COD;
-			mysqli_select_db($connect, $database);
-			mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
+			$stmt = $conexion->prepare('UPDATE tbl_categorias_aliado SET nombre = ?, icono = ?, color = ?, orden = ?, activo = ? WHERE id = ?');
+			if ($stmt) {
+				$stmt->bind_param('sssiii', $nombre, $icono, $color_bind, $orden, $activo, $COD);
+				$stmt->execute();
+				$stmt->close();
+			}
 			$snap = is_array($row_cat) ? $row_cat : [];
 			$snap['nombre'] = $nombre;
 			$snap['icono']  = $icono;
@@ -68,8 +70,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/animo/animate+animo.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -178,10 +178,7 @@ if (isset($_SESSION['ADM_Username'])){
 		</section>
 
 	</section>
-
-	<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
 </body>
 </html>

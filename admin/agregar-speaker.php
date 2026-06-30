@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	mysqli_select_db($connect, $database);
 	$query_nacionalidad = "SELECT * FROM tbl_nacionalidad";
 	$nacionalidad = mysqli_query($connect, $query_nacionalidad) or die(mysqli_error($connect));
@@ -16,46 +17,46 @@ if (isset($_SESSION['ADM_Username'])){
 	    //--------INICIO IMAGEN1---------//
 		$imagen_real=$_FILES['imagen']['name'];
 
-		if ($_FILES['imagen']['name'] != "") { 
+		if ($_FILES['imagen']['name'] != "") {
 
 			$imagen_real=str_replace($especiales, $correctos, $_FILES['imagen']['name']);
 			move_uploaded_file($_FILES['imagen']['tmp_name'],$rutaSpeaker.$imagen_real);
 			$img_original = "$rutaSpeaker/".$imagen_real;
 			$type = @getimagesize($img_original);
 
-		}   
+		}
 		$imagen_real2=$_FILES['imagen2']['name'];
 
-		if ($_FILES['imagen2']['name'] != "") { 
+		if ($_FILES['imagen2']['name'] != "") {
 
 			$imagen_real2=str_replace($especiales, $correctos, $_FILES['imagen2']['name']);
 			move_uploaded_file($_FILES['imagen2']['tmp_name'],$rutaSpeaker.$imagen_real2);
 			$img_original = "$rutaSpeaker/".$imagen_real2;
 			$type = @getimagesize($img_original);
 
-		}   
+		}
 	    //--------FIN IMAGEN1---------//
 
 
+			$nombre = (string) ($_POST['nombre'] ?? '');
+			$titulo = (string) ($_POST['titulo'] ?? '');
+			$intro = (string) ($_POST['intro'] ?? '');
+			$texto = (string) ($_POST['detalle'] ?? '');
+			$linkedin = (string) ($_POST['linkedin'] ?? '');
+			$ig = (string) ($_POST['ig'] ?? '');
+			$fb = (string) ($_POST['fb'] ?? '');
+			$tw = (string) ($_POST['tw'] ?? '');
+			$web = (string) ($_POST['web'] ?? '');
+			$nacionalidad_id = (int) ($_POST['nacionalidad'] ?? 0);
 
-
-			$nombre = ($_POST['nombre'] ?? '');
-			$titulo = ($_POST['titulo'] ?? '');
-			$intro = ($_POST['intro'] ?? '');
-			$texto = ($_POST['detalle'] ?? '');
-			$linkedin = ($_POST['linkedin'] ?? '');
-			$ig = ($_POST['ig'] ?? '');
-			$fb = ($_POST['fb'] ?? '');
-			$tw = ($_POST['tw'] ?? '');
-			$web = ($_POST['web'] ?? '');
-			$nacionalidad = ($_POST['nacionalidad'] ?? '');
-			
 			$IMAGEN = $imagen_real;
-			
 
-			$insertSQL = "INSERT INTO tbl_speaker (nombre, titulo, intro, texto, linkedin, ig, fb, tw, web, idNacionalidad, imagen) VALUES ('$nombre','$titulo','$intro','$texto','$linkedin','$ig','$fb','$tw','$web','$nacionalidad','$IMAGEN')";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
+			$stmt = $conexion->prepare('INSERT INTO tbl_speaker (nombre, titulo, intro, texto, linkedin, ig, fb, tw, web, idNacionalidad, imagen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+			if ($stmt) {
+				$stmt->bind_param('sssssssssis', $nombre, $titulo, $intro, $texto, $linkedin, $ig, $fb, $tw, $web, $nacionalidad_id, $IMAGEN);
+				$stmt->execute();
+				$stmt->close();
+			}
 			samap_flash_set('success', 'Speaker guardado correctamente.');
 			header('Location: ' . $URL . 'admin/speakers/');
 			exit;
@@ -89,10 +90,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.css'>
 	<style type="text/css">
 	.note-editor {
@@ -244,44 +241,15 @@ if (isset($_SESSION['ADM_Username'])){
 			</section>
 
 		</section>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
-
-
-		<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-		<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-		<script src="<?php echo $URL;?>admin/plugins/moment/min/moment-with-langs.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
-
-	<script src="<?php echo $URL;?>admin/plugins/inputmask/jquery.inputmask.bundle.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
-
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script type="text/javascript">
 	  $(document).ready(function() {
 	    $('#code_preview0').summernote({height: 300});
 	  	$('#code_preview1').summernote({height: 300});
 	    });
 	</script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';

@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -30,15 +31,25 @@ if (isset($_SESSION['ADM_Username'])){
 		
 	    //--------FIN IMAGEN1---------//
 
-			$sql_update = "UPDATE tbl_sponsor SET titulo='".($_POST['titulo'] ?? '')."', URL='".($_POST['URL'] ?? '')."'"; 
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$url_post = (string) ($_POST['URL'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'"; 
+				$stmt = $conexion->prepare('UPDATE tbl_sponsor SET titulo = ?, URL = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssi', $titulo_post, $url_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_sponsor SET titulo = ?, URL = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('ssi', $titulo_post, $url_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
-
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			samap_flash_set('success', 'Sponsor guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sponsors/');
 			exit;
@@ -133,9 +144,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_sponsor['imagen'] != "") {?>
-												<img width="60px" src="<?php echo $URL?>documentos/sponsor/<?php echo $row_sponsor['imagen']; ?>" alt=""/>
+												<img width="60px" src="<?php echo $URL?>documentos/sponsor/<?php echo $row_sponsor['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

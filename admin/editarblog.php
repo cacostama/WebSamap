@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -22,15 +23,27 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_blog SET titulo='".($_POST['titulo'] ?? '')."', intro='".($_POST['intro'] ?? '')."', texto='".($_POST['texto'] ?? '')."'";
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$intro_post = (string) ($_POST['intro'] ?? '');
+			$texto_post = (string) ($_POST['texto'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_blog SET titulo = ?, intro = ?, texto = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('ssssi', $titulo_post, $intro_post, $texto_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_blog SET titulo = ?, intro = ?, texto = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssi', $titulo_post, $intro_post, $texto_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_blog) ? $row_blog : [];
 			$snap['titulo'] = $_POST['titulo']  ?? ($row_blog['titulo']  ?? '');
 			$snap['intro']  = $_POST['intro']   ?? ($row_blog['intro']   ?? '');
@@ -145,9 +158,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_blog['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 

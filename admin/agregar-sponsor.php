@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 
 
 	if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form2") && samap_puede_escribir() && samap_csrf_validar()) {
@@ -19,10 +20,12 @@ if (isset($_SESSION['ADM_Username'])){
 			$URL2 = ($_POST['URL'] ?? '');
 			$IMAGEN = $imagen_real;
 
-
-			$insertSQL = "INSERT INTO tbl_sponsor (titulo, URL, imagen) VALUES ('$titulo','$URL2','$IMAGEN')";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $insertSQL) or die(mysqli_error($connect));
+			$stmt = $conexion->prepare('INSERT INTO tbl_sponsor (titulo, URL, imagen) VALUES (?, ?, ?)');
+			if ($stmt) {
+				$stmt->bind_param('sss', $titulo, $URL2, $IMAGEN);
+				$stmt->execute();
+				$stmt->close();
+			}
 			samap_flash_set('success', 'Sponsor guardado correctamente.');
 			header('Location: ' . $URL . 'admin/sponsors/');
 			exit;
@@ -56,10 +59,6 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-
-	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
-
-	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
 	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.css'>
 	<style type="text/css">
 	.note-editor {
@@ -151,38 +150,15 @@ if (isset($_SESSION['ADM_Username'])){
 			</section>
 
 		</section>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
-
-
-		<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-
-		<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-		<script src="<?php echo $URL;?>admin/plugins/moment/min/moment-with-langs.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
-
-	<script src="<?php echo $URL;?>admin/plugins/inputmask/jquery.inputmask.bundle.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
-
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script type="text/javascript">
 	  $(document).ready(function() {
 	    $('#code_preview0').summernote({height: 300});
 	  	$('#code_preview1').summernote({height: 300});
 	    });
 	</script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';

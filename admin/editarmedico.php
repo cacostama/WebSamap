@@ -1,8 +1,9 @@
 <?php
 require_once('funciones/db.php');
+require_once('conexion.php');
 
 if (isset($_SESSION['ADM_Username'])){
-	
+
 	$COD = $_GET['cod'];
 	settype($COD, 'integer');
 
@@ -24,15 +25,27 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$sql_update = "UPDATE tbl_medicos SET titulo='".($_POST['titulo'] ?? '')."', nombre='".($_POST['nombre'] ?? '')."', especialidad='".($_POST['especialidad'] ?? '')."'";
+			$id_post = (int) ($_POST['id'] ?? 0);
+			$titulo_post = (string) ($_POST['titulo'] ?? '');
+			$nombre_post = (string) ($_POST['nombre'] ?? '');
+			$especialidad_post = (string) ($_POST['especialidad'] ?? '');
 
 			if ($imagen_real != "") {
-				$sql_update .= ", imagen='".$imagen_real."'";
+				$stmt = $conexion->prepare('UPDATE tbl_medicos SET titulo = ?, nombre = ?, especialidad = ?, imagen = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('ssssi', $titulo_post, $nombre_post, $especialidad_post, $imagen_real, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
+			} else {
+				$stmt = $conexion->prepare('UPDATE tbl_medicos SET titulo = ?, nombre = ?, especialidad = ? WHERE id = ?');
+				if ($stmt) {
+					$stmt->bind_param('sssi', $titulo_post, $nombre_post, $especialidad_post, $id_post);
+					$stmt->execute();
+					$stmt->close();
+				}
 			}
 
-			$sql_update .= " WHERE id='".($_POST['id'] ?? '')."'";
-			mysqli_select_db($connect, $database);
-			$Result1 = mysqli_query($connect, $sql_update) or die(mysqli_error($connect));
 			$snap = is_array($row_medico) ? $row_medico : [];
 			$snap['titulo']        = $_POST['titulo']        ?? ($row_medico['titulo']        ?? '');
 			$snap['nombre']        = $_POST['nombre']        ?? ($row_medico['nombre']        ?? '');
@@ -147,9 +160,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 										<div class="col-sm-4">
 											<?php if ($row_medico['imagen'] != "") {?>
-												<img width="100px" src="<?php echo $URL?>documentos/medicos/<?php echo $row_medico['imagen']; ?>" alt=""/>
+												<img width="100px" src="<?php echo $URL?>documentos/medicos/<?php echo $row_medico['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt=""/>
+												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 
