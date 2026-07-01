@@ -37,8 +37,8 @@
 // cuando editamos el archivo. El resto son librerias que no cambian -> cache
 // fuerte (30 dias) configurado en .htaccess.
 //
-// USO: en admin/<pantalla>.php, antes de </body>:
-//   <?php include 'partials/scripts-comunes.php'; ?>
+// USO: en admin/<pantalla>.php, antes de cerrar el body, incluir este
+// partial con: include 'partials/scripts-comunes.php';
 //
 // Si la pantalla necesita scripts extra (Summernote para blog, modales propios)
 // se incluyen DESPUES del partial.
