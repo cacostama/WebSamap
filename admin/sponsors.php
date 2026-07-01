@@ -147,7 +147,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
 
 
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606291718"></script>
+	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606301500"></script>
 
 </body>
 </html>

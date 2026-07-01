@@ -52,4 +52,4 @@ $e_url = htmlspecialchars($URL, ENT_QUOTES, 'UTF-8');
 <script src="<?= $e_url ?>admin/plugins/jquery/jquery.min.js"></script>
 <script src="<?= $e_url ?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?= $e_url ?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-<script src="<?= $e_url ?>admin/app/js/app.js?v=202606291718"></script>
+<script src="<?= $e_url ?>admin/app/js/app.js?v=202606301500"></script>

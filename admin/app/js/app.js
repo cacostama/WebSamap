@@ -970,7 +970,7 @@ function(e, t, o) {
             }).remove()
         }
         var a = e(this).closest(".panel");
-        e.support.animation ? a.animo({
+        e.support.animation && e.fn.animo ? a.animo({
             animation: "bounceOut"
         }, o) : o()
     })
@@ -1023,7 +1023,7 @@ function(e, t, o) {
                 !t.hasClass("anim-running") && e.Utils.isInView(t, {
                     topoffset: n
                 }) && (t.addClass("anim-running"), setTimeout(function() {
-                    t.addClass("anim-done").animo({
+                    t.addClass("anim-done"), e.fn.animo && t.animo({
                         animation: i,
                         duration: .7
                     })
@@ -1041,7 +1041,7 @@ function(e, t, o) {
                 a = o.data("target"),
                 n = o.data("play") || "bounce",
                 r = e(a);
-            r && r && r.animo({
+            r && r.length && e.fn.animo && r.animo({
                 animation: n
             })
         })
