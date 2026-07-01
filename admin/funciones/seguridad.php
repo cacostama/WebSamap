@@ -84,6 +84,34 @@ if (!function_exists('samap_login_bloqueado')) {
 	}
 }
 
+// ---- Thumbnail defensivo para listados del admin ----
+// Muchos listados renderizan <img src="documentos/<subdir>/<file>"> a partir
+// de un campo de la fila. Si el archivo falta en disco (migracion incompleta,
+// borrado manual) el browser emite un 404 visible en consola. Esta helper
+// valida existencia en disco y, si falta o esta vacio, devuelve el placeholder
+// "—" en lugar de un <img> roto.
+//   __DIR__ aca = admin/funciones -> documentos vive en __DIR__/../../documentos
+if (!function_exists('samap_thumb_td')) {
+	function samap_thumb_td($url_base, $subdir, $filename, $height = 30, $suffix = '') {
+		$raw = trim((string)$filename);
+		// Algunos campos guardan un sufijo descriptivo (ej " 28x18 px") que no
+		// forma parte del nombre real de archivo: se recorta antes de validar.
+		if ($suffix !== '' && substr($raw, -strlen($suffix)) === $suffix) {
+			$raw = trim(substr($raw, 0, -strlen($suffix)));
+		}
+		$sub = trim((string)$subdir, '/');
+		$disk = __DIR__ . '/../../documentos/' . ($sub !== '' ? $sub . '/' : '') . $raw;
+		if ($raw === '' || !is_file($disk)) {
+			return '<td><span style="color:#bbb;">—</span></td>';
+		}
+		$src = htmlspecialchars($url_base, ENT_QUOTES, 'UTF-8')
+			. 'documentos/' . ($sub !== '' ? $sub . '/' : '')
+			. htmlspecialchars($raw, ENT_QUOTES, 'UTF-8');
+		return '<td><img height="' . (int)$height . 'px" src="' . $src
+			. '" alt="" loading="lazy" decoding="async"></td>';
+	}
+}
+
 // ---- Rate-limit generico (5 intentos / 15 min / IP) ----
 // Version configurable por "bucket" del mismo mecanismo de throttling que
 // usa samap_login_*. Asi el mismo codigo sirve para login, formulario de

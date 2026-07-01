@@ -160,15 +160,7 @@ if (isset($_GET['reordenar']) && $_GET['reordenar'] === 'si' && samap_puede_escr
 		}],
 		['th' => 'Descuento',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)($r['descuento'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>'; }],
 		['th' => 'Imagen',     'td_html' => function($r) use ($URL_BASE) {
-			$img_raw = (string)($r['imagen'] ?? '');
-			// El archivo puede faltar en disco (migración incompleta): validamos
-			// existencia para no emitir un 404 en la consola y mostrar el
-			// placeholder "—" como si no hubiera imagen.
-			if ($img_raw === '' || !is_file(__DIR__ . '/../documentos/aliados/' . $img_raw)) {
-				return '<td><span style="color:#bbb;">—</span></td>';
-			}
-			$img = htmlspecialchars($img_raw, ENT_QUOTES, 'UTF-8');
-			return '<td><img height="30px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/aliados/' . $img . '" alt="" loading="lazy" decoding="async"></td>';
+			return samap_thumb_td($URL_BASE, 'aliados', (string)($r['imagen'] ?? ''));
 		}],
 	];
 

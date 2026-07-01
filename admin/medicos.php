@@ -131,8 +131,7 @@ if (isset($_SESSION['ADM_Username'])){
 			return '<td>' . $t . ' ' . $n . '</td>';
 		}],
 		['th' => 'Imagen',       'td_html' => function($r) use ($URL_BASE) {
-			$img = htmlspecialchars((string)($r['imagen'] ?? ''), ENT_QUOTES, 'UTF-8');
-			return $img === '' ? '<td><span style="color:#bbb;">—</span></td>' : '<td><img height="30px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/medicos/' . $img . '" alt="" loading="lazy" decoding="async"></td>';
+			return samap_thumb_td($URL_BASE, 'medicos', (string)($r['imagen'] ?? ''));
 		}],
 	];
 

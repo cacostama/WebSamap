@@ -65,8 +65,7 @@ if (isset($_SESSION['ADM_Username'])){
 		['th' => 'ID',           'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
 		['th' => 'Nacionalidad', 'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nacionalidad'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
 		['th' => 'Bandera',      'td_html' => function($r) use ($URL_BASE) {
-			$img = htmlspecialchars((string)($r['bandera'] ?? ''), ENT_QUOTES, 'UTF-8');
-			return '<td><img height="18px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/bandera/' . $img . '" alt="" loading="lazy" decoding="async"> 28x18 px</td>';
+			return samap_thumb_td($URL_BASE, 'bandera', (string)($r['bandera'] ?? ''), 18);
 		}],
 	];
 

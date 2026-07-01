@@ -146,8 +146,7 @@ if (isset($_GET['reordenar']) && $_GET['reordenar'] === 'si' && samap_puede_escr
 		['th' => 'ID',      'td_html' => function($r) { return '<td>' . (int)$r['id'] . '</td>'; }],
 		['th' => 'Nombre',  'td_html' => function($r) { return '<td>' . htmlspecialchars((string)$r['nombre'], ENT_QUOTES, 'UTF-8') . '</td>'; }],
 		['th' => 'Banner',  'td_html' => function($r) use ($URL_BASE) {
-			$img = htmlspecialchars((string)($r['imagen'] ?? ''), ENT_QUOTES, 'UTF-8');
-			return $img === '' ? '<td><span style="color:#bbb;">—</span></td>' : '<td><img height="30px" src="' . htmlspecialchars($URL_BASE, ENT_QUOTES, 'UTF-8') . 'documentos/slider/' . $img . '" alt="" loading="lazy" decoding="async"></td>';
+			return samap_thumb_td($URL_BASE, 'slider', (string)($r['imagen'] ?? ''));
 		}],
 		['th' => 'Tamaño',  'td_html' => function($r) { return '<td>Medida recomendada: 838 × 960 px</td>'; }],
 	];
