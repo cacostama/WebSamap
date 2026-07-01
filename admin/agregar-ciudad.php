@@ -67,7 +67,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/plugins/csspinner/csspinner.min.css">
 
 	<link rel="stylesheet" href="<?php echo $URL;?>admin/app/css/app.css?v=202606291705">
-	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.css'>
+	<link rel='stylesheet' href='<?php echo $URL;?>admin/plugins/summernote/summernote.min.css'>
 	<style type="text/css">
 	.note-editor {
 		margin-bottom: 5rem !important;
@@ -139,7 +139,7 @@ if (isset($_SESSION['ADM_Username'])){
 		</section>
 	<?php include 'partials/scripts-comunes.php'; ?>
 
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
+	<script src='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'></script>
 	<script type="text/javascript">
 	  $(document).ready(function() {
 	    $('#code_preview0').summernote({height: 300});

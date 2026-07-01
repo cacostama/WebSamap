@@ -88,7 +88,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
 
 	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
-	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.css'>
+	<link rel='stylesheet' href='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'>
 	<style type="text/css">
 	.note-editor {
 		margin-bottom: 5rem !important;
@@ -217,7 +217,7 @@ if (isset($_SESSION['ADM_Username'])){
 	  	});
 	    });
 	</script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/summernote/0.6.6/summernote.min.js'></script>
+		<script src='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';
@@ -241,3 +241,4 @@ if (isset($_SESSION['ADM_Username'])){
 
 </body>
 </html>
+
