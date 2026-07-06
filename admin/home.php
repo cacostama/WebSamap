@@ -83,7 +83,36 @@ if (isset($_SESSION['ADM_Username'])){
 									array('categorias_aliado', 'Categorías de aliados', 'fa-tags',         '#ffc61d', 'admin/categorias/',     'admin/agregar-categoria/', 'nombre'),
 								);
 
-								$dash_delay = 400;
+								// Resolver todas las tarjetas en una sola ida a MySQL. Antes se
+								// ejecutaban dos consultas por tarjeta (24 consultas secuenciales).
+								$dash_stats = array();
+								$stats_sql = array();
+								foreach ($dash_sections as $sec) {
+									$tbl = $sec[0];
+									$col_mode = $sec[6];
+									if ($col_mode === 'nombre') {
+										$display_col = 'nombre';
+									} elseif ($col_mode === 'concat') {
+										$display_col = "CONCAT(IFNULL(titulo,''), ' ', IFNULL(nombre,''))";
+									} else {
+										$display_col = 'titulo';
+									}
+									$stats_sql[] = "SELECT CONVERT('$tbl' USING utf8mb4) COLLATE utf8mb4_unicode_ci AS section_key,
+										COUNT(*) AS total,
+										COALESCE(MAX(id), 0) AS last_id,
+										CONVERT(COALESCE(SUBSTRING_INDEX(
+											GROUP_CONCAT($display_col ORDER BY id DESC SEPARATOR '\\n'),
+											'\\n', 1
+										), '') USING utf8mb4) COLLATE utf8mb4_unicode_ci AS last_title
+										FROM tbl_$tbl WHERE deleted_at IS NULL";
+								}
+								$qStats = mysqli_query($connect, implode(' UNION ALL ', $stats_sql));
+								if ($qStats) {
+									while ($stat = mysqli_fetch_assoc($qStats)) {
+										$dash_stats[$stat['section_key']] = $stat;
+									}
+								}
+
 								foreach ($dash_sections as $sec):
 									$tbl       = $sec[0];
 									$label     = $sec[1];
@@ -93,20 +122,10 @@ if (isset($_SESSION['ADM_Username'])){
 									$add_url   = $sec[5];
 									$col_mode  = $sec[6];
 
-									// 1) Conteo de registros activos (soft-delete: deleted_at IS NULL).
-									$q1    = mysqli_query($connect, "SELECT COUNT(*) AS c FROM tbl_$tbl WHERE deleted_at IS NULL");
-									$row1  = $q1 ? mysqli_fetch_assoc($q1) : null;
-									$count = $row1 ? (int)$row1['c'] : 0;
-
-									// 2) "Ultima edicion" = registro activo mas reciente (id DESC).
-									if     ($col_mode === 'nombre') { $select_disp = 'nombre'; }
-									elseif ($col_mode === 'concat') { $select_disp = "CONCAT(IFNULL(titulo,''), ' ', IFNULL(nombre,''))"; }
-									else                            { $select_disp = 'titulo'; }
-
-									$q2   = mysqli_query($connect, "SELECT id, $select_disp AS display FROM tbl_$tbl WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 1");
-									$row2 = $q2 ? mysqli_fetch_assoc($q2) : null;
-									$last_id    = $row2 ? (int)$row2['id'] : 0;
-									$last_title = $row2 ? trim((string)$row2['display']) : '';
+									$stat       = $dash_stats[$tbl] ?? null;
+									$count      = $stat ? (int)$stat['total'] : 0;
+									$last_id    = $stat ? (int)$stat['last_id'] : 0;
+									$last_title = $stat ? trim((string)$stat['last_title']) : '';
 									if (function_exists('mb_strlen')) {
 										if (mb_strlen($last_title) > 60) { $last_title = mb_substr($last_title, 0, 60) . '...'; }
 									} elseif (strlen($last_title) > 60) {
@@ -116,7 +135,7 @@ if (isset($_SESSION['ADM_Username'])){
 							?>
 
 							<div class="col-md-4">
-								<div data-toggle="play-animation" data-play="fadeInLeft" data-offset="0" data-delay="<?php echo $dash_delay; ?>" class="panel widget bg-success" style="background: <?php echo $bg; ?>; position:relative;">
+								<div class="panel widget bg-success" style="background: <?php echo $bg; ?>; position:relative;">
 									<div class="panel-body" style="padding-bottom:38px;">
 										<div class="text-right text">
 											<em class="fa <?php echo $icon; ?> fa-2x"></em>
@@ -137,7 +156,6 @@ if (isset($_SESSION['ADM_Username'])){
 							</div>
 
 							<?php
-									$dash_delay += 100;
 								endforeach;
 							?>
 

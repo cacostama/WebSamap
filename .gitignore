@@ -37,3 +37,7 @@ skills-lock.json
 
 # Misc
 tsconfig.tsbuildinfo
+
+# Informes y presupuestos confidenciales (no publicar en repo publico)
+Informe_*.pdf
+Presupuesto_*.pdf
