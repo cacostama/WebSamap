@@ -46,7 +46,7 @@ CREATE TABLE `tbl_blog` (
   `fecha` date DEFAULT NULL,
   `titulo` varchar(250) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `intro` varchar(250) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
-  `texto` text CHARACTER SET latin1 COLLATE latin1_general_ci,
+  `texto` longtext CHARACTER SET latin1 COLLATE latin1_general_ci,
   `imagen` varchar(250) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `orden` int NOT NULL DEFAULT 0,
   `deleted_at` datetime DEFAULT NULL,

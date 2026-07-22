@@ -95,29 +95,35 @@
         });
 
         // CircularProgressBar
+        // Solo se ejecuta si la libreria esta cargada y hay elementos ".pie".
+        // Antes tiraba "CircularProgressBar is not defined" y cortaba el resto
+        // de plugins.js (sliders, wow, etc.).
+        if (typeof CircularProgressBar !== "undefined") {
             const elements = [].slice.call(document.querySelectorAll(".pie"));
-            const circle = new CircularProgressBar("pie");
-    
-            const config = {
-                root: null,
-                rootMargin: "0px",
-                threshold: 0.75,
-                
-            };
-    
-            const ovserver = new IntersectionObserver((entries, observer) => {
-                entries.map((entry) => {
-                    if (entry.isIntersecting && entry.intersectionRatio > 0.75) {
-                        circle.initial(entry.target);
-                        observer.unobserve(entry.target);
-                    }
+            if (elements.length) {
+                const circle = new CircularProgressBar("pie");
+
+                const config = {
+                    root: null,
+                    rootMargin: "0px",
+                    threshold: 0.75,
+                };
+
+                const ovserver = new IntersectionObserver((entries, observer) => {
+                    entries.map((entry) => {
+                        if (entry.isIntersecting && entry.intersectionRatio > 0.75) {
+                            circle.initial(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, config);
+
+                elements.map((item) => {
+                    ovserver.observe(item);
                 });
-            }, config);
-    
-            elements.map((item) => {
-                ovserver.observe(item);
-            });
-    
+            }
+        }
+
 
         // hero slider
         $('.slider-hero').slick({

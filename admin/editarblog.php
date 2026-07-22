@@ -23,26 +23,33 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 
-			$id_post = (int) ($_POST['id'] ?? 0);
-			$titulo_post = (string) ($_POST['titulo'] ?? '');
-			$intro_post = (string) ($_POST['intro'] ?? '');
-			$texto_post = (string) ($_POST['texto'] ?? '');
+			// $POST_RAW: sin el escape global de db.php. La query es preparada
+			// (bind_param) y parametriza sola; leer de $_POST escapado meteria
+			// backslashes literales (\") y romperia el HTML del editor y las
+			// imagenes base64.
+			$id_post = (int) ($POST_RAW['id'] ?? 0);
+			$titulo_post = (string) ($POST_RAW['titulo'] ?? '');
+			$intro_post = (string) ($POST_RAW['intro'] ?? '');
+			$texto_post = (string) ($POST_RAW['texto'] ?? '');
 
+			$conexion->set_charset('utf8mb4');
 			if ($imagen_real != "") {
 				$stmt = $conexion->prepare('UPDATE tbl_blog SET titulo = ?, intro = ?, texto = ?, imagen = ? WHERE id = ?');
 				if ($stmt) {
 					$stmt->bind_param('ssssi', $titulo_post, $intro_post, $texto_post, $imagen_real, $id_post);
-					$stmt->execute();
-					$stmt->close();
 				}
 			} else {
 				$stmt = $conexion->prepare('UPDATE tbl_blog SET titulo = ?, intro = ?, texto = ? WHERE id = ?');
 				if ($stmt) {
 					$stmt->bind_param('sssi', $titulo_post, $intro_post, $texto_post, $id_post);
-					$stmt->execute();
-					$stmt->close();
 				}
 			}
+			if (!$stmt || !$stmt->execute()) {
+				samap_flash_set('error', 'No se pudo guardar el blog: ' . $conexion->error);
+				header('Location: ' . $URL . 'admin/editarblog/cod/' . $id_post . '/');
+				exit;
+			}
+			$stmt->close();
 
 			$snap = is_array($row_blog) ? $row_blog : [];
 			$snap['titulo'] = $_POST['titulo']  ?? ($row_blog['titulo']  ?? '');
@@ -88,7 +95,7 @@ if (isset($_SESSION['ADM_Username'])){
 	<script src="<?php echo $URL;?>admin/plugins/modernizr/modernizr.js" type="application/javascript"></script>
 
 	<script src="<?php echo $URL;?>admin/plugins/fastclick/fastclick.js" type="application/javascript"></script>
-	<link rel='stylesheet' href='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'>
+	<link rel='stylesheet' href='<?php echo $URL;?>admin/plugins/summernote/summernote.min.css'>
 	<style type="text/css">
 	.note-editor {
 		margin-bottom: 5rem !important;
@@ -105,7 +112,7 @@ if (isset($_SESSION['ADM_Username'])){
 		<section>
 
 			<section class="main-content">
-				<h3>Editar Plan
+				<h3>Editar Blog
 				</h3>
 
 				<div class="panel panel-default">
@@ -162,7 +169,7 @@ if (isset($_SESSION['ADM_Username'])){
 											<?php if ($row_blog['imagen'] != "") {?>
 												<img width="100px" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="" loading="lazy" decoding="async"/>
 											<?php } else {?>
-												<img width="60px" src="<?php echo $URL?>img/sin-imagen.jpg" alt="" loading="lazy" decoding="async"/>
+												<img width="120px" src="<?php echo $URL?>assets/images/blog_articles.png" alt="Sin imagen" loading="lazy" decoding="async"/>
 											<?php }?>
 										</div>
 
@@ -186,10 +193,13 @@ if (isset($_SESSION['ADM_Username'])){
 							<div class="col-md-5">
 								<div class="samap-blog-preview" id="blog-preview" style="position:sticky;top:80px;border:1px solid #d8dee5;border-radius:6px;background:#fff;padding:24px 28px;font-family:Georgia,serif;max-height:80vh;overflow:auto;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
 									<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Vista previa en vivo</div>
+									<?php if (trim((string)$row_blog['imagen']) !== '') { ?>
+										<img src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Imagen destacada" style="width:100%;height:auto;border-radius:4px;margin-bottom:16px;" loading="lazy" decoding="async"/>
+									<?php } ?>
 									<h1 id="blog-preview-titulo" style="font-size:28px;line-height:1.2;color:#2F2E2D;margin:0 0 12px 0;"><?php echo htmlspecialchars($row_blog['titulo'], ENT_QUOTES, 'UTF-8'); ?></h1>
 									<div id="blog-preview-intro" style="font-size:15px;font-style:italic;color:#555;margin-bottom:18px;line-height:1.5;"><?php echo $row_blog['intro']; ?></div>
 									<hr style="border:none;border-top:1px solid #eee;margin:0 0 18px;">
-									<div id="blog-preview-texto" style="font-size:15px;line-height:1.7;color:#2F2E2D;"><?php echo $row_blog['texto']; ?></div>
+									<div id="blog-preview-texto" style="font-size:15px;line-height:1.7;color:#2F2E2D;"><?php echo preg_replace('#<img\b[^>]*>#i', '', preg_replace('#<figure\b[^>]*>.*?</figure>#is', '', (string)$row_blog['texto'])); ?></div>
 								</div>
 							</div>
 						</div>
@@ -214,33 +224,9 @@ if (isset($_SESSION['ADM_Username'])){
 
 
 
-		<script src="<?php echo $URL;?>admin/plugins/jquery/jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<?php include 'partials/scripts-comunes.php'; ?>
 
-		<script src="<?php echo $URL;?>admin/plugins/chosen/chosen.jquery.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/slider/js/bootstrap-slider.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/filestyle/bootstrap-filestyle.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/animo/animo.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/sparklines/jquery.sparkline.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-		<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.tooltip.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.resize.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.pie.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.time.min.js"></script>
-	<script src="<?php echo $URL;?>admin/plugins/flot/jquery.flot.categories.min.js"></script>
-
-		<!--[if lt IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-		<script src="<?php echo $URL;?>admin/plugins/moment/min/moment-with-langs.min.js"></script>
-		<script src="<?php echo $URL;?>admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
-
-	<script src="<?php echo $URL;?>admin/plugins/inputmask/jquery.inputmask.bundle.min.js"></script>
-	<script src="<?php echo $URL;?>admin/app/js/app.js?v=202606301500"></script>
+	<script src='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'></script>
 
 	<script type="text/javascript">
 	  $(document).ready(function() {
@@ -250,7 +236,14 @@ if (isset($_SESSION['ADM_Username'])){
 	  		onChange: function(contents) {
 	  			if (window.samapFormMarkDirty) window.samapFormMarkDirty();
 	  			var el = document.getElementById('blog-preview-texto');
-	  			if (el) { el.innerHTML = contents; }
+	  			// La foto del blog es siempre la del campo "Imagen". Las imagenes
+	  			// pegadas dentro del texto no se publican, asi que tampoco se
+	  			// muestran en la previa.
+	  			if (el) {
+	  				el.innerHTML = String(contents)
+	  					.replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, '')
+	  					.replace(/<img\b[^>]*>/gi, '');
+	  			}
 	  		}
 	  	});
 	    });
@@ -271,7 +264,6 @@ if (isset($_SESSION['ADM_Username'])){
 	    	bind('blog-intro', 'blog-preview-intro');
 	    })();
 	</script>
-		<script src='<?php echo $URL;?>admin/plugins/summernote/summernote.min.js'></script>
 	<script >var content_row = 1;
 		function addContent() {
 		  html = '<div id="content-row">';

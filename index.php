@@ -79,7 +79,7 @@
     <!--  / css dependencies end  -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
     <!-- rediseno css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-home.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-home.css'); ?>">
@@ -316,7 +316,7 @@
                 <div class="col-12 col-md-6">
                     <div class="blog-articles__card wow fadeInUp" data-wow-duration="1.2s">
                         <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blog['titulo']); ?>/cod/<?php echo $row_blog['id']; ?>/" class="blog-articles__card-thumb">
-                            <img style="width: 100%; height: 400px; object-fit: cover; object-position: center;" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image" loading="lazy" decoding="async">
+                            <img style="width: 100%; height: 400px; object-fit: cover; object-position: center;" src="<?php echo samap_img_blog($row_blog['imagen']); ?>" alt="Image" loading="lazy" decoding="async">
                         </a>
                         <div class="blog-articles__card-content">
 
@@ -367,7 +367,7 @@
     <!--  js dependencies start  -->
 
     <!-- jquery -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
     <!-- bootstrap five js -->
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
@@ -388,7 +388,7 @@
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 <script>

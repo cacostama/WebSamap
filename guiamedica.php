@@ -29,7 +29,11 @@
         // no hay seleccion para no romper la logica de ramas de abajo (!= "").
         $VARespecialidad = ($_POST["Especialidad"] ?? '') !== '' ? (int) $_POST["Especialidad"] : '';
         $VACiudad        = ($_POST["Ciudad"] ?? '') !== '' ? (int) $_POST["Ciudad"] : '';
-        $VAMedico        = $_POST["medico"] ?? ''; // usado solo en LIKE entre comillas (ya escapado por db.php)
+        // #2 SQLi: db.php en el sitio PUBLICO no escapa globalmente. Escapamos el
+        // valor para usarlo dentro del LIKE. $VAMedico crudo solo se usa para
+        // reflejar en HTML (ver htmlspecialchars mas abajo), nunca en SQL.
+        $VAMedico        = $_POST["medico"] ?? '';
+        $VAMedicoSQL     = mysqli_real_escape_string($connect, $VAMedico);
 
         if ($VARespecialidad!='') {
             mysqli_select_db($connect, $database);
@@ -132,7 +136,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedicoSQL%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -195,7 +199,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.deleted_at IS NULL AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND c.idCiudad= $VACiudad AND a.nombre like '%$VAMedicoSQL%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -226,7 +230,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.deleted_at IS NULL AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.nombre like '%$VAMedicoSQL%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -257,7 +261,7 @@
                                 a.idSanatorios = c.id
                             LEFT JOIN tbl_ciudad d ON
                                 c.idCiudad = d.id
-                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND a.nombre like '%$VAMedico%' ORDER BY
+                            WHERE a.deleted_at IS NULL AND a.idEspecialidad= $VARespecialidad AND a.nombre like '%$VAMedicoSQL%' ORDER BY
     b.nombre ASC,
     CASE WHEN c.nombre LIKE '%Sanatorio Adventista%' THEN 0 ELSE 1 END,
     c.nombre ASC";
@@ -367,7 +371,7 @@
     <!--  / css dependencies end  -->
     
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
 
 </head>
 
@@ -426,7 +430,7 @@
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-5">
                                     <label class="rd-visually-hidden" for="guia-medico">Nombre del médico</label>
-                                    <input type="text" name="medico" value='<?php if ($VAMedico != '') { echo "$VAMedico"; } ?>' class="form-control" style="border: var(--bs-border-width) solid var(--bs-border-color);" id="guia-medico" placeholder="Médico" autocomplete="name">
+                                    <input type="text" name="medico" value="<?php if ($VAMedico != '') { echo htmlspecialchars($VAMedico, ENT_QUOTES, 'UTF-8'); } ?>" class="form-control" style="border: var(--bs-border-width) solid var(--bs-border-color);" id="guia-medico" placeholder="Médico" autocomplete="name">
 
 
                                 </div>
@@ -445,7 +449,7 @@
                     <strong style='color: red'><?php echo $totalRows_guia;?> </strong> Resultado/s encontrado/s para:
                     <strong style='color: red'><?php echo $row_especialidad2['nombre'] ?? '';?>, </strong>
                     <strong style='color: red'><?php echo $row_ciudad2['nombre'] ?? '';?>, </strong>
-                    <strong style='color: red'><?php echo $VAMedico; ?> </strong>
+                    <strong style='color: red'><?php echo htmlspecialchars($VAMedico, ENT_QUOTES, 'UTF-8'); ?> </strong>
                     </p>
                     <a href="<?php echo $URL?>guiamedica-pdf.php?esp=<?php echo urlencode($VARespecialidad);?>&amp;ciu=<?php echo urlencode($VACiudad);?>&amp;med=<?php echo urlencode($VAMedico);?>"
                        target="_blank" rel="noopener"
@@ -507,7 +511,7 @@
     <!--  js dependencies start  -->
 
     <!-- jquery -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
     <!-- bootstrap five js -->
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
@@ -528,7 +532,7 @@
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 

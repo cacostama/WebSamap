@@ -1510,7 +1510,7 @@ label.error {
   width: 100%;
   padding-top: 200px;
   padding-bottom: 90px;
-  background: url(../images/inner_banner.png) no-repeat;
+  background: linear-gradient(120deg, #274767 0%, #6CA3AB 100%) no-repeat;
   background-position: center;
   background-size: cover;
   display: flex;

@@ -23,7 +23,56 @@
     $row_blogOtros = mysqli_fetch_assoc($blogOtros);
     $totalRows_Otros = mysqli_num_rows($blogOtros);
 
-?>  
+    /**
+     * Convierte URLs sueltas (http/https) en enlaces clickeables,
+     * SIN tocar las que ya están dentro de etiquetas HTML (atributos
+     * como src/href, imagenes base64 data-URI, o enlaces <a> existentes).
+     */
+    if (!function_exists('samap_linkificar')) {
+        function samap_linkificar($html) {
+            if ($html === null || $html === '') {
+                return $html;
+            }
+            // Separa el contenido en tokens: etiquetas <...> vs texto plano.
+            $tokens = preg_split('/(<[^>]+>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $dentro_de_anchor = 0;
+            $resultado = '';
+            foreach ($tokens as $token) {
+                if ($token === '') {
+                    continue;
+                }
+                if ($token[0] === '<') {
+                    // Es una etiqueta: se deja intacta.
+                    if (preg_match('/^<\s*a[\s>]/i', $token)) {
+                        $dentro_de_anchor++;
+                    } elseif (preg_match('/^<\s*\/\s*a\s*>/i', $token)) {
+                        if ($dentro_de_anchor > 0) {
+                            $dentro_de_anchor--;
+                        }
+                    }
+                    $resultado .= $token;
+                    continue;
+                }
+                // Es texto plano. Solo linkificar si NO estamos dentro de un <a>.
+                if ($dentro_de_anchor > 0) {
+                    $resultado .= $token;
+                    continue;
+                }
+                $resultado .= preg_replace_callback(
+                    '#\bhttps?://[^\s<>"\']+#i',
+                    function ($m) {
+                        $url = rtrim($m[0], '.,;:!?)');
+                        $safe = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+                        return '<a href="' . $safe . '" target="_blank" rel="noopener noreferrer">' . $safe . '</a>';
+                    },
+                    $token
+                );
+            }
+            return $resultado;
+        }
+    }
+
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -61,7 +110,7 @@
     <!--  / css dependencies end  -->
     
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
 
 </head>
 
@@ -103,7 +152,7 @@
                     <div class="blog-details__wrapper">
                         <div class="blog-details__inner">
                             <div class="blog-details__thumb wow fadeInUp" data-wow-duration="1.2">
-                                <img width="100%" src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image">
+                                <img width="100%" src="<?php echo samap_img_blog($row_blog['imagen']); ?>" alt="Image">
                             </div>
                             <div class="blog-details__content">
                                 <p class="blog-details__content-meta wow fadeInRight" data-wow-duration="1.2">
@@ -121,7 +170,7 @@
                                 </p>
                                 <h2 class="mb_30 wow fadeInUp" data-wow-duration="1.2s"><?php echo $row_blog['titulo']; ?></h2>
                                 <p class="blog-details__content-text">
-                                    <?php echo $row_blog['texto']; ?>
+                                    <?php echo samap_linkificar(samap_sin_imagenes($row_blog['texto'])); ?>
                                 </p>
                             </div>
                         </div>
@@ -140,7 +189,7 @@
                             <div class="sidebar__post-single">
                                 <div class="latest-post__thumb">
                                     <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogUltimos['titulo']); ?>/cod/<?php echo $row_blogUltimos['id']; ?>/" title="Read More">
-                                        <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blogUltimos['imagen']; ?>" alt="Blog">
+                                        <img src="<?php echo samap_img_blog($row_blogUltimos['imagen']); ?>" alt="Blog">
                                     </a>
                                 </div>
                                 <div class="latest-post__content">
@@ -189,8 +238,8 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="blog__wrapper wow fadeInUp" data-wow-duration="1.2s">
                             <div class="blog__single">
-                                <a href="blog-details.html" class="blog__thumb">
-                                    <img style="width: 100%; height: 250px; object-fit: cover; object-position: center;"  src="<?php echo $URL?>documentos/blog/<?php echo $row_blogOtros['imagen']; ?>" alt="Image">
+                                <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogOtros['titulo']); ?>/cod/<?php echo $row_blogOtros['id']; ?>/" class="blog__thumb">
+                                    <img style="width: 100%; height: 250px; object-fit: cover; object-position: center;"  src="<?php echo samap_img_blog($row_blogOtros['imagen']); ?>" alt="Image">
                                 </a>
                                 <div class="blog__content">
                                     <p class="mb_16 fs-6">
@@ -233,7 +282,7 @@
     <!--  js dependencies start  -->
 
     <!-- jquery -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
     <!-- bootstrap five js -->
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
@@ -254,7 +303,7 @@
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 

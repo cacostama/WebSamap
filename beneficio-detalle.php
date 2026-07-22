@@ -72,7 +72,7 @@
     <!--  / css dependencies end  -->
 
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
     <!-- rediseno css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-convenios.css'); ?>">
@@ -207,13 +207,13 @@
     <a href="#" class="scrollToTop"><i class="fas fa-angle-double-up"></i></a>
 
     <!--  js dependencies start  -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $URL?>assets/vendor/wow/wow.min.js"></script>
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 

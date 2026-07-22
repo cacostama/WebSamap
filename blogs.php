@@ -58,7 +58,7 @@
     <!--  / css dependencies end  -->
     
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
 
 </head>
 
@@ -101,7 +101,7 @@
                         <?php do { ?>
                             <div class="blog__single wow fadeInUp" data-wow-duration="1.2s">
                                 <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blog['titulo']); ?>/cod/<?php echo $row_blog['id']; ?>/" class="blog__thumb">
-                                    <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blog['imagen']; ?>" alt="Image" loading="lazy" decoding="async">
+                                    <img src="<?php echo samap_img_blog($row_blog['imagen']); ?>" alt="Image" loading="lazy" decoding="async">
                                 </a>
                                 <div class="blog__content">
                                     <p class="blog__content-meta">
@@ -140,7 +140,7 @@
                             <div class="sidebar__post-single">
                                 <div class="latest-post__thumb">
                                     <a href="<?php echo $URL;?>blog-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_blogUltimos['titulo']); ?>/cod/<?php echo $row_blogUltimos['id']; ?>/" title="Read More">
-                                        <img src="<?php echo $URL?>documentos/blog/<?php echo $row_blogUltimos['imagen']; ?>" alt="Blog" loading="lazy" decoding="async">
+                                        <img src="<?php echo samap_img_blog($row_blogUltimos['imagen']); ?>" alt="Blog" loading="lazy" decoding="async">
                                     </a>
                                 </div>
                                 <div class="latest-post__content">
@@ -210,7 +210,7 @@
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 

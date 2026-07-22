@@ -1,3 +1,23 @@
+# ============================================================================
+# Bloqueo de archivos sensibles (credenciales, dumps, backups, fuentes)
+# Impide que se descarguen por URL: .env, *.sql, *.gz, *.zip, *.bak, .git, etc.
+# ============================================================================
+<FilesMatch "(^\.env|\.(env|sql|gz|tgz|zip|tar|rar|bak|old|swp|ini|log|sh|dist|lock|sqlite|db)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Bloquear acceso al directorio .git si quedo publicado
+RedirectMatch 404 /\.git
+
+# Nunca listar directorios
+Options -Indexes
+
 <IfModule mod_rewrite.c>
   RewriteEngine on
 

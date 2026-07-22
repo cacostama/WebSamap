@@ -58,7 +58,7 @@ ini_set('display_errors', 1);
     <!--  / css dependencies end  -->
     
     <!-- main css -->
-    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/style.css?v=<?php echo @filemtime(__DIR__."/assets/css/style.css"); ?>">
 
 </head>
 
@@ -168,7 +168,7 @@ ini_set('display_errors', 1);
     <!--  js dependencies start  -->
 
     <!-- jquery -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <script src="<?php echo $URL?>assets/vendor/jquery/jquery-3.6.3.min.js"></script>
     <!-- bootstrap five js -->
     <script src="<?php echo $URL?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- magnific popup js -->
@@ -189,7 +189,7 @@ ini_set('display_errors', 1);
     <!--  / js dependencies end  -->
 
     <!-- plugins js -->
-    <script src="<?php echo $URL?>assets/js/plugins.js"></script>
+    <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
 

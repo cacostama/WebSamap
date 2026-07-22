@@ -54,9 +54,43 @@ $correctosComparar   = array('11px', '99%');
 $especialesKEY = array(' ', '"', '/');
 $correctosKEY   = array(', ', ' ', ', '); 
 $especialesMETA = array('<span style="font-weight: 600;">', '</span>', '•', '&nbsp;', '<br>', '<span style="font-weight: bold;">', '<div>', '</div>', '<table class="table table-bordered" style="background-color: rgb(255, 255, 255); width: 804px;">', '<tbody>', '</tbody>', '</table>');
-$correctosMETA   = array(' ', '', '', '', '', '', '', '', '', '', '', '')
+$correctosMETA   = array(' ', '', '', '', '', '', '', '', '', '', '', '');
 
 
+/**
+ * URL de imagen de blog con fallback. Si el articulo no tiene imagen,
+ * devuelve un placeholder existente en vez de apuntar a la carpeta
+ * "documentos/blog/" (que devuelve 403 y muestra la imagen rota).
+ */
+/**
+ * Quita las imagenes incrustadas en el cuerpo del articulo. La foto del
+ * blog es SIEMPRE la del campo "Imagen" (columna imagen), que se muestra
+ * arriba del detalle. Si el editor dejo un <img> pegado en el texto, se
+ * veria una segunda imagen duplicada: aca la sacamos al renderizar, sin
+ * tocar el contenido guardado en la base.
+ */
+if (!function_exists('samap_sin_imagenes')) {
+    function samap_sin_imagenes($html) {
+        if ($html === null || $html === '') {
+            return $html;
+        }
+        // <img ...> y <figure>...</figure> (Summernote envuelve algunas imagenes)
+        $html = preg_replace('#<figure\b[^>]*>.*?</figure>#is', '', $html);
+        $html = preg_replace('#<img\b[^>]*>#i', '', $html);
+        return $html;
+    }
+}
+
+if (!function_exists('samap_img_blog')) {
+    function samap_img_blog($imagen) {
+        global $URL;
+        $imagen = trim((string)$imagen);
+        if ($imagen === '') {
+            return $URL . 'assets/images/blog_articles.png';
+        }
+        return $URL . 'documentos/blog/' . $imagen;
+    }
+}
 
 
 ?>

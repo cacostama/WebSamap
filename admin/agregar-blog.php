@@ -16,19 +16,29 @@ if (isset($_SESSION['ADM_Username'])){
 			exit;
 		}
 			$fechaActual = date("Y-m-d");
-			$titulo = ($_POST['titulo'] ?? '');
-			$intro = ($_POST['intro'] ?? '');
-			$texto= htmlentities( (string)($_POST['texto'] ?? ''), ENT_QUOTES, 'UTF-8' );
+			// Usamos $POST_RAW (sin el escape global de db.php): la query es
+			// preparada (bind_param) y ya parametriza sola. Leer de $_POST
+			// escapado agregaria backslashes literales (\") y romperia el HTML
+			// del editor (Summernote) y las imagenes base64. Sin htmlentities:
+			// el cuerpo es HTML enriquecido y debe guardarse tal cual.
+			$titulo = (string)($POST_RAW['titulo'] ?? '');
+			$intro  = (string)($POST_RAW['intro'] ?? '');
+			$texto  = (string)($POST_RAW['texto'] ?? '');
 			$IMAGEN = $imagen_real;
 
+			$conexion->set_charset('utf8mb4');
 			$new_id = 0;
 			$stmt = $conexion->prepare('INSERT INTO tbl_blog (fecha, titulo, intro, texto, imagen) VALUES (?, ?, ?, ?, ?)');
 			if ($stmt) {
 				$stmt->bind_param('sssss', $fechaActual, $titulo, $intro, $texto, $IMAGEN);
-				$stmt->execute();
-				$new_id = $stmt->insert_id;
-				$stmt->close();
 			}
+			if (!$stmt || !$stmt->execute()) {
+				samap_flash_set('error', 'No se pudo guardar el blog: ' . $conexion->error);
+				header('Location: ' . $URL . 'admin/agregar-blog/');
+				exit;
+			}
+			$new_id = $stmt->insert_id;
+			$stmt->close();
 			@samap_audit_log('insert', 'tbl_blog', $new_id, "Creó el artículo: " . substr((string)$titulo, 0, 100), null, ['id' => $new_id, 'fecha' => $fechaActual, 'titulo' => $titulo, 'imagen' => $IMAGEN]);
 			samap_flash_set('success', 'Blog guardado correctamente.');
 			header('Location: ' . $URL . 'admin/blogs/');
