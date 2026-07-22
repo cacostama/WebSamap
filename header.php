@@ -47,7 +47,7 @@
 
             <li class="rd-nav__actions">
                 <a href="<?php echo $URL?>contactos/" class="rd-btn rd-btn--azul">Solicitar información</a>
-                <a class="rd-nav__wa" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <a class="rd-nav__wa" href="<?php echo samap_whatsapp_url(); ?>" target="_blank" rel="noopener" aria-label="WhatsApp">
                     <i class="fab fa-whatsapp"></i>
                 </a>
             </li>
@@ -55,7 +55,7 @@
 
         <div class="rd-nav__actions">
             <a href="<?php echo $URL?>contactos/" class="rd-btn rd-btn--azul">Solicitar información</a>
-            <a class="rd-nav__wa" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <a class="rd-nav__wa" href="<?php echo samap_whatsapp_url(); ?>" target="_blank" rel="noopener" aria-label="WhatsApp">
                 <i class="fab fa-whatsapp"></i>
             </a>
         </div>

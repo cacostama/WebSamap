@@ -14,7 +14,7 @@
         <h2>¿Querés más información?</h2>
         <p>Contactanos y un asesor te ayuda a encontrar el plan ideal para vos y tu familia.</p>
         <div class="rd-footer-cta__btns">
-            <a class="rd-btn rd-btn--wa" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener">
+            <a class="rd-btn rd-btn--wa" href="<?php echo samap_whatsapp_url(); ?>" target="_blank" rel="noopener">
                 <i class="fab fa-whatsapp"></i> WhatsApp
             </a>
             <a class="rd-btn rd-btn--azul" href="tel:+595212196700">
@@ -63,7 +63,7 @@
             <div class="rd-footer__social">
                 <a href="https://www.facebook.com/samap.py" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
                 <a href="https://www.instagram.com/samap.py" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="<?php echo samap_whatsapp_url(); ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
             <ul class="rd-footer__menu" style="margin-top:1.5rem">
                 <li><a href="http://sanatorioadventista.com.py/site/" target="_blank" rel="noopener">Sanatorio Adventista</a></li>
@@ -80,6 +80,6 @@
 </footer>
 
 <!-- WhatsApp flotante (todas las páginas) -->
-<a class="rd-wa-float" href="https://api.whatsapp.com/send?phone=5950982304977" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+<a class="rd-wa-float" href="<?php echo samap_whatsapp_url(); ?>" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>

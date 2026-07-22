@@ -95,6 +95,7 @@ $rutaSlider = '../documentos/slider/';
 $rutaServicios = '../documentos/servicios/';
 $rutaMedico = '../documentos/medicos/';
 $rutaBlog = '../documentos/blog/';
+$rutaPortada = '../documentos/portada/';
 $rutaAliados= '../documentos/aliados/';
 
 

@@ -53,6 +53,13 @@
 	</a>
 </li>
 
+<li class="<?php echo ($currentScript === 'portada.php') ? 'active' : ''; ?>">
+	<a href="<?php echo $URL?>admin/portada/" title="Portada" class="has-submenu">
+		<em class="fa fa-home"></em>
+		<span class="item-text">Portada</span>
+	</a>
+</li>
+
 <li class="">
 	<a href="<?php echo $URL?>admin/slider/" title="Sliders" class="has-submenu">
 		<em class="fa fa-caret-square-o-right"></em>

@@ -63,6 +63,91 @@ $correctosMETA   = array(' ', '', '', '', '', '', '', '', '', '', '', '');
  * "documentos/blog/" (que devuelve 403 y muestra la imagen rota).
  */
 /**
+ * Contenido de la portada (hero de index.php) editable desde el panel.
+ *
+ * Devuelve SIEMPRE un array completo: arranca de los valores por defecto
+ * (los mismos que antes estaban escritos a mano en index.php) y encima
+ * aplica lo que haya en tbl_portada. Por eso el sitio sigue funcionando
+ * igual aunque la tabla todavia no exista -- importante para poder subir
+ * los PHP antes de correr la migracion sin romper la home.
+ *
+ * Cachea en estatica: header.php, index.php y footer.php lo llaman, pero
+ * la consulta se hace una sola vez por request.
+ */
+if (!function_exists('samap_portada')) {
+    function samap_portada() {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+
+        $defaults = [
+            'eyebrow'     => 'Medicina Prepaga · Sanatorio Adventista',
+            'titulo'      => 'Cuidándote siempre',
+            'subtitulo'   => 'Cobertura médica para vos y tu familia con el respaldo del Sanatorio Adventista.',
+            'btn1_texto'  => 'Solicitar información',
+            'btn1_url'    => '',
+            'btn2_texto'  => 'Conocer planes',
+            'btn2_url'    => 'planes/',
+            'imagen'      => '',
+            'stat1_num'   => '+40',
+            'stat1_label' => 'años de experiencia',
+            'stat2_num'   => '+8.000',
+            'stat2_label' => 'familias adheridas',
+            'stat3_num'   => 'Respaldo',
+            'stat3_label' => 'del Sanatorio Adventista',
+            'whatsapp'    => '5950982304977',
+        ];
+
+        $cache = $defaults;
+
+        global $connect, $database;
+        if ($connect) {
+            // @ y chequeo del resultado: si la tabla no existe todavia
+            // (deploy de los PHP antes de la migracion) se usan los defaults.
+            @mysqli_select_db($connect, $database);
+            $res = @mysqli_query($connect, 'SELECT * FROM tbl_portada WHERE id = 1 AND deleted_at IS NULL LIMIT 1');
+            if ($res && ($row = mysqli_fetch_assoc($res))) {
+                foreach ($defaults as $k => $_) {
+                    if (isset($row[$k]) && trim((string)$row[$k]) !== '') {
+                        $cache[$k] = $row[$k];
+                    }
+                }
+            }
+        }
+
+        return $cache;
+    }
+}
+
+/**
+ * URL de WhatsApp comercial. El numero sale de la portada (editable desde
+ * el panel) en vez de estar repetido a mano en header/footer/index.
+ */
+if (!function_exists('samap_whatsapp_url')) {
+    function samap_whatsapp_url() {
+        $p = samap_portada();
+        $tel = preg_replace('/\D+/', '', (string)$p['whatsapp']);
+        return 'https://api.whatsapp.com/send?phone=' . $tel;
+    }
+}
+
+/**
+ * URL de la imagen del hero, con fallback a la imagen que se usaba antes.
+ */
+if (!function_exists('samap_img_portada')) {
+    function samap_img_portada() {
+        global $URL;
+        $p = samap_portada();
+        $img = trim((string)$p['imagen']);
+        if ($img === '') {
+            return $URL . 'documentos/slider/03.jpg';
+        }
+        return $URL . 'documentos/portada/' . $img;
+    }
+}
+
+/**
  * Quita las imagenes incrustadas en el cuerpo del articulo. La foto del
  * blog es SIEMPRE la del campo "Imagen" (columna imagen), que se muestra
  * arriba del detalle. Si el editor dejo un <img> pegado en el texto, se

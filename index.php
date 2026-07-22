@@ -2,18 +2,10 @@
 
 <?php 
     
-    mysqli_select_db($connect, $database);
-    $query_slider = 'SELECT * FROM tbl_slider WHERE deleted_at IS NULL ORDER BY id DESC';
-    $slider = mysqli_query($connect, $query_slider) or die(mysqli_error($link));
-    $row_slider = mysqli_fetch_assoc($slider);
-    $totalRows_slider = mysqli_num_rows($slider);
-
-    mysqli_select_db($connect, $database);
-    $query_slider2 = 'SELECT * FROM tbl_slider WHERE deleted_at IS NULL ORDER BY id DESC';
-    $slider2 = mysqli_query($connect, $query_slider2) or die(mysqli_error($link));
-    $row_slider2 = mysqli_fetch_assoc($slider2);
-    $totalRows_slider2 = mysqli_num_rows($slider2);
-
+    // Las dos consultas a tbl_slider que habia aca se eliminaron: el hero del
+    // rediseno ya no usa el carrusel, los resultados nunca se imprimian y solo
+    // gastaban dos queries por visita. El contenido del hero ahora sale de
+    // tbl_portada via samap_portada() (editable en admin/portada).
 
     mysqli_select_db($connect, $database);
     $query_planes = 'SELECT * FROM tbl_planes WHERE especial=0 AND deleted_at IS NULL ORDER BY id ASC';
@@ -100,34 +92,50 @@
         <div class="rd-container">
             <div class="rd-hero__grid">
                 <div class="rd-hero__content">
-                    <span class="rd-hero__eyebrow">Medicina Prepaga · Sanatorio Adventista</span>
-                    <h1 class="rd-hero__title">Cuidándote siempre</h1>
-                    <p class="rd-hero__subtitle">Cobertura médica para vos y tu familia con el respaldo del Sanatorio Adventista.</p>
+                    <?php
+                    // Contenido editable desde el panel (admin/portada). Si la
+                    // tabla no existe todavia, samap_portada() devuelve los
+                    // valores por defecto y la home se ve igual que siempre.
+                    $portada = samap_portada();
+                    $btn1_url = trim((string)$portada['btn1_url']);
+                    if ($btn1_url === '') {
+                        $btn1_url = samap_whatsapp_url();
+                    } elseif (!preg_match('#^(https?:)?//#i', $btn1_url)) {
+                        $btn1_url = $URL . ltrim($btn1_url, '/');
+                    }
+                    $btn2_url = trim((string)$portada['btn2_url']);
+                    if (!preg_match('#^(https?:)?//#i', $btn2_url)) {
+                        $btn2_url = $URL . ltrim($btn2_url, '/');
+                    }
+                    ?>
+                    <span class="rd-hero__eyebrow"><?php echo htmlspecialchars($portada['eyebrow'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <h1 class="rd-hero__title"><?php echo htmlspecialchars($portada['titulo'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                    <p class="rd-hero__subtitle"><?php echo htmlspecialchars($portada['subtitulo'], ENT_QUOTES, 'UTF-8'); ?></p>
                     <div class="rd-hero__cta">
-                        <a href="https://api.whatsapp.com/send?phone=5950982304977" class="rd-btn rd-btn--wa">
-                            <i class="fa-brands fa-whatsapp"></i> Solicitar información
+                        <a href="<?php echo htmlspecialchars($btn1_url, ENT_QUOTES, 'UTF-8'); ?>" class="rd-btn rd-btn--wa">
+                            <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($portada['btn1_texto'], ENT_QUOTES, 'UTF-8'); ?>
                         </a>
-                        <a href="<?php echo $URL?>planes/" class="rd-btn rd-btn--azul">Conocer planes</a>
+                        <a href="<?php echo htmlspecialchars($btn2_url, ENT_QUOTES, 'UTF-8'); ?>" class="rd-btn rd-btn--azul"><?php echo htmlspecialchars($portada['btn2_texto'], ENT_QUOTES, 'UTF-8'); ?></a>
                     </div>
                 </div>
                 <div class="rd-hero__media">
-                    <img src="<?php echo $URL?>documentos/slider/03.jpg" alt="Familia con cobertura médica SAMAP" fetchpriority="high" decoding="async">
+                    <img src="<?php echo samap_img_portada(); ?>" alt="<?php echo htmlspecialchars($portada['titulo'], ENT_QUOTES, 'UTF-8'); ?>" fetchpriority="high" decoding="async">
                 </div>
             </div>
 
             <!-- Mini-stats -->
             <div class="rd-stats">
                 <div class="rd-stats__item">
-                    <span class="rd-stats__num">+40</span>
-                    <span class="rd-stats__label">años de experiencia</span>
+                    <span class="rd-stats__num"><?php echo htmlspecialchars($portada['stat1_num'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="rd-stats__label"><?php echo htmlspecialchars($portada['stat1_label'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <div class="rd-stats__item">
-                    <span class="rd-stats__num">+8.000</span>
-                    <span class="rd-stats__label">familias adheridas</span>
+                    <span class="rd-stats__num"><?php echo htmlspecialchars($portada['stat2_num'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="rd-stats__label"><?php echo htmlspecialchars($portada['stat2_label'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <div class="rd-stats__item">
-                    <span class="rd-stats__num">Respaldo</span>
-                    <span class="rd-stats__label">del Sanatorio Adventista</span>
+                    <span class="rd-stats__num"><?php echo htmlspecialchars($portada['stat3_num'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="rd-stats__label"><?php echo htmlspecialchars($portada['stat3_label'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             </div>
         </div>
