@@ -56,8 +56,15 @@ if (isset($_SESSION['ADM_Username'])) {
 		}
 		$quitar_imagen = !empty($POST_RAW['quitar_imagen']);
 
-		// Aseguramos que exista la fila 1 antes de actualizar.
-		@$conexion->query('INSERT IGNORE INTO tbl_portada (id) VALUES (1)');
+		// Aseguramos que exista la fila 1 antes de actualizar. try/catch:
+		// desde PHP 8.1 mysqli lanza excepciones y "@" no las suprime.
+		try {
+			$conexion->query('INSERT IGNORE INTO tbl_portada (id) VALUES (1)');
+		} catch (Throwable $e) {
+			samap_flash_set('error', 'Falta crear la tabla de la portada. Ejecutá migracion-portada.sql en la base de datos.');
+			header('Location: ' . $URL . 'admin/portada/');
+			exit;
+		}
 
 		$sets = [];
 		foreach ($campos as $c) {
@@ -100,12 +107,22 @@ if (isset($_SESSION['ADM_Username'])) {
 
 	// ---- Cargar la fila actual ----
 	$row = [];
-	$res = @$conexion->query('SELECT * FROM tbl_portada WHERE id = 1 LIMIT 1');
-	if ($res === false) {
-		// La tabla todavia no existe: falta correr migracion-portada.sql
+	try {
+		// SHOW TABLES primero: una consulta fallida deja la conexion en estado
+		// de error y mysqli reaparece esa excepcion en la siguiente llamada.
+		$chk = $conexion->query("SHOW TABLES LIKE 'tbl_portada'");
+		if ($chk && $chk->num_rows > 0) {
+			$res = $conexion->query('SELECT * FROM tbl_portada WHERE id = 1 LIMIT 1');
+			if ($res && $res->num_rows > 0) {
+				$row = $res->fetch_assoc();
+			}
+		} else {
+			// Falta correr migracion-portada.sql: se avisa en pantalla y el
+			// formulario queda cargado con los valores por defecto.
+			$tabla_ok = false;
+		}
+	} catch (Throwable $e) {
 		$tabla_ok = false;
-	} elseif ($res->num_rows > 0) {
-		$row = $res->fetch_assoc();
 	}
 
 	$P = $defaults;

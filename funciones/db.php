@@ -103,16 +103,30 @@ if (!function_exists('samap_portada')) {
 
         global $connect, $database;
         if ($connect) {
-            // @ y chequeo del resultado: si la tabla no existe todavia
-            // (deploy de los PHP antes de la migracion) se usan los defaults.
-            @mysqli_select_db($connect, $database);
-            $res = @mysqli_query($connect, 'SELECT * FROM tbl_portada WHERE id = 1 AND deleted_at IS NULL LIMIT 1');
-            if ($res && ($row = mysqli_fetch_assoc($res))) {
-                foreach ($defaults as $k => $_) {
-                    if (isset($row[$k]) && trim((string)$row[$k]) !== '') {
-                        $cache[$k] = $row[$k];
+            // try/catch y NO "@": desde PHP 8.1 mysqli reporta los errores
+            // lanzando mysqli_sql_exception, y el operador @ no suprime
+            // excepciones. Si la tabla todavia no existe (deploy de los PHP
+            // antes de correr la migracion) hay que atrapar la excepcion,
+            // si no la home se cae con un fatal error.
+            try {
+                mysqli_select_db($connect, $database);
+                // Primero SHOW TABLES (nunca falla) en vez de tirar el SELECT
+                // y atrapar el error: una consulta fallida deja la conexion en
+                // estado de error y mysqli vuelve a lanzar esa excepcion en la
+                // siguiente llamada, aunque sea de otra consulta sin relacion.
+                $chk = mysqli_query($connect, "SHOW TABLES LIKE 'tbl_portada'");
+                if ($chk && mysqli_num_rows($chk) > 0) {
+                    $res = mysqli_query($connect, 'SELECT * FROM tbl_portada WHERE id = 1 AND deleted_at IS NULL LIMIT 1');
+                    if ($res && ($row = mysqli_fetch_assoc($res))) {
+                        foreach ($defaults as $k => $_) {
+                            if (isset($row[$k]) && trim((string)$row[$k]) !== '') {
+                                $cache[$k] = $row[$k];
+                            }
+                        }
                     }
                 }
+            } catch (Throwable $e) {
+                // Sin tabla: se usan los valores por defecto y el sitio sigue.
             }
         }
 
