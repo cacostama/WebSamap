@@ -7,6 +7,6 @@
 		getenv('DB_HOST') ?: 'localhost',
 		getenv('DB_USER') ?: 'webadmin',
 		getenv('DB_PASS') ?: 's2m2p.m2st3r',
-		getenv('DB_NAME') ?: 'web_samap_v2'
+		getenv('DB_NAME') ?: 'web_samap'
 	);
 ?>

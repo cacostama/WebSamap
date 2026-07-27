@@ -20,7 +20,7 @@ if (!headers_sent()) {
 // produccion no expone getenv(DB_*); sin el, el sitio publico se cae con HTTP
 // 500. En local/Docker las env vars ganan y apuntan a la DB del dev.
 $hostname = getenv('DB_HOST') ?: 'localhost';
-$database = getenv('DB_NAME') ?: 'web_samap_v2';
+$database = getenv('DB_NAME') ?: 'web_samap';
 $username = getenv('DB_USER') ?: 'webadmin';
 $password = getenv('DB_PASS') ?: 's2m2p.m2st3r';
 $connect = mysqli_connect($hostname, $username, $password) or mysqli_error($connect);
