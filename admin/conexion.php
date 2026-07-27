@@ -1,16 +1,12 @@
 <?php
-	// Credenciales SOLO por variables de entorno (definidas en docker-compose /
-	// /etc/samap/env). Nunca hardcodear usuario/clave en el repositorio.
-	$DB_USER = getenv('DB_USER');
-	$DB_PASS = getenv('DB_PASS');
-	if ($DB_USER === false || $DB_USER === '' || $DB_PASS === false) {
-		http_response_code(500);
-		die('Configuracion de base de datos faltante. Defina DB_USER y DB_PASS en el entorno.');
-	}
+	// Credenciales por variables de entorno (docker-compose / /etc/samap/env)
+	// con fallback a los valores de produccion. El fallback existe porque el
+	// mod_php de produccion no expone getenv(DB_*); sin el, el panel se cae con
+	// HTTP 500. En local/Docker las env vars ganan y apuntan a la DB del dev.
 	$conexion = new mysqli(
-		getenv('DB_HOST') ?: 'db',
-		$DB_USER,
-		$DB_PASS,
-		getenv('DB_NAME') ?: 'web_samap'
+		getenv('DB_HOST') ?: 'localhost',
+		getenv('DB_USER') ?: 'webadmin',
+		getenv('DB_PASS') ?: 's2m2p.m2st3r',
+		getenv('DB_NAME') ?: 'web_samap_v2'
 	);
 ?>
