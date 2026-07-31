@@ -1,0 +1,187 @@
+/* ============================================================
+   PLANES — grid compacto (planes.php)
+
+   Este archivo solo aplica dentro de .rd-grid--planes, asi que
+   NO afecta las tarjetas de convenios/beneficios que comparten
+   las clases .rd-card / .rd-card__* en rediseno-convenios.css.
+
+   Problema que resuelve: el campo `detalle` de tbl_planes puede
+   traer un listado largo de coberturas (ej. SEVEN) y otros planes
+   pueden venir vacios. Como el grid iguala la altura de la fila,
+   una sola tarjeta larga estiraba todas. Aca la descripcion se
+   recorta a una cantidad fija de lineas y se expande con "Ver mas".
+   ============================================================ */
+
+/* 4 tarjetas por fila en escritorio, bajando de a una por breakpoint. */
+.rd-grid--planes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.9rem, 2vw, 1.4rem);
+  align-items: start;
+}
+
+@media (max-width: 1199px) {
+  .rd-grid--planes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .rd-grid--planes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .rd-grid--planes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Tarjeta mas compacta que la de convenios: menos padding y logo chico.
+   height:auto anula el height:100% que .rd-card trae de rediseno-convenios.css.
+   Con height:100% la tarjeta se estira hasta el alto de la fila, asi que al
+   expandir un plan largo TODAS sus vecinas quedaban gigantes y vacias.
+   Con auto, cada tarjeta mide su propio contenido y expandir una no toca
+   a las demas (align-items:start del grid las mantiene arriba). */
+.rd-grid--planes .rd-card {
+  padding: 1.25rem 1.1rem 1.35rem;
+  height: auto;
+}
+
+.rd-grid--planes .rd-card__logo {
+  width: 84px;
+  height: 84px;
+  margin-bottom: 0.85rem;
+}
+
+.rd-grid--planes .rd-card__title {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.65rem;
+}
+
+/* --- Descripcion recortable ------------------------------------ */
+
+/* Bloque que absorbe el alto sobrante de la tarjeta.
+   IMPORTANTE: el que crece es este contenedor, NO el texto recortado.
+   Si el flex-grow se aplica sobre el elemento recortado, al expandir una
+   tarjeta el grid estira a las hermanas, y un elemento estirado con
+   display:-webkit-box renderiza las lineas encimadas. Por eso el recorte
+   vive en un hijo de alto fijo y este padre es el unico flexible. */
+.rd-grid--planes .rd-plan__desc {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Estado plegado: alto maximo de 5 lineas por max-height en em.
+   Se usa max-height en vez de -webkit-line-clamp a proposito: line-clamp
+   depende de -webkit-box, que es fragil dentro de flex/grid y es
+   justamente lo que producia el solapado. max-height + overflow:hidden
+   da el mismo recorte y es estable en todos los navegadores.
+   5 lineas x 1.5 de interlineado = 7.5em. */
+.rd-plan__detalle {
+  font-size: 0.86rem;
+  color: var(--samap-gris);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+  text-align: center;
+  width: 100%;
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  max-height: 7.5em;
+}
+
+/* Degradado al pie del texto recortado: indica que hay mas contenido.
+   Queda dentro del overflow:hidden, asi que no se ve al expandir. */
+.rd-plan__detalle.is-clamped::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.6em;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 85%);
+  pointer-events: none;
+}
+
+/* Estado expandido: se libera el recorte. */
+.rd-plan__detalle.is-open {
+  max-height: none;
+}
+
+/* El contenido de la DB suele traer parrafos con margenes propios
+   que inflan la tarjeta; los neutralizamos. */
+.rd-plan__detalle p,
+.rd-plan__detalle ul,
+.rd-plan__detalle ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rd-plan__detalle img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Boton "Ver mas" -------------------------------------------- */
+
+/* Nace oculto (atributo hidden) y solo se muestra por JS cuando el
+   texto realmente se desborda, para no ofrecer expandir de mas. */
+.rd-plan__toggle {
+  align-self: center;
+  margin: 0 0 0.35rem;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--samap-azul);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  /* El tema base define `body { line-height: 0 }` y `a, button
+     { display: inline-flex }` (assets/css/style.css). Heredar eso dejaba el
+     boton con 0px de alto: el texto se veia, pero la caja clickeable no
+     existia. Por eso line-height y display van explicitos, y el padding le
+     da un area de toque real. */
+  display: inline-block;
+  line-height: 1.4;
+  padding: 0.4rem 0.7rem;
+}
+
+/* En pantallas tactiles el objetivo debe ser comodo de tocar con el dedo
+   (44px es la referencia habitual de accesibilidad movil). */
+@media (pointer: coarse) {
+  .rd-plan__toggle {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+  }
+
+  .rd-grid--planes .rd-card__link {
+    min-height: 44px;
+    align-items: center;
+  }
+}
+
+.rd-plan__toggle:hover {
+  color: var(--samap-verde);
+}
+
+.rd-plan__toggle:focus-visible {
+  outline: 2px solid var(--samap-verde);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Cuando no hay descripcion cargada en la DB, la tarjeta no debe
+   quedar con un hueco raro: el link de accion sube solo. */
+.rd-plan__detalle:empty {
+  margin: 0;
+}

@@ -52,6 +52,7 @@
     <!-- rediseno css -->
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-base.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-base.css'); ?>">
     <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-convenios.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-convenios.css'); ?>">
+    <link rel="stylesheet" href="<?php echo $URL?>assets/css/rediseno-planes.css?v=<?php echo @filemtime(__DIR__.'/assets/css/rediseno-planes.css'); ?>">
 
 </head>
 
@@ -86,17 +87,30 @@
                 <p class="rd-subtitle">En SAMAP entendemos que cada persona es única. Por eso ofrecemos distintas opciones para que encuentres el plan que mejor se ajuste a vos y a tu familia.</p>
             </div>
 
-            <div class="rd-grid">
+            <div class="rd-grid rd-grid--planes">
                 <?php if ($totalRows_planes > 0) { do { ?>
                     <article class="rd-card">
                         <div class="rd-card__logo">
                             <img src="<?php echo $URL?>documentos/<?php echo $row_planes['imagen']; ?>" alt="<?php echo $row_planes['titulo']; ?>">
                         </div>
                         <h3 class="rd-card__title"><?php echo $row_planes['titulo']; ?></h3>
-                        <p class="rd-card__text"><?php echo $row_planes['detalle']; ?></p>
+                        <?php /* La descripcion viene de la DB y puede ser un listado largo.
+                                 Se recorta por CSS (.rd-plan__detalle) y el boton de abajo la
+                                 expande. El boton arranca oculto: solo lo muestra el JS del pie
+                                 de pagina si el texto realmente se desborda. */ ?>
+                        <div class="rd-plan__desc">
+                            <div class="rd-plan__detalle" id="plan-detalle-<?php echo (int) $row_planes['id']; ?>"><?php echo $row_planes['detalle']; ?></div>
+                            <button type="button" class="rd-plan__toggle" hidden
+                                    aria-expanded="false"
+                                    aria-controls="plan-detalle-<?php echo (int) $row_planes['id']; ?>">Ver más</button>
+                        </div>
                         <?php $waPlan = trim($row_planes['url']); ?>
                         <a target="_blank" rel="noopener" href="<?php echo ($waPlan !== '' && $waPlan !== 'https://') ? htmlspecialchars($waPlan) : 'https://wa.link/gza9hk'; ?>" class="rd-card__link">Consultar</a>
-                        <?php $anexoPlan = trim($row_planes['anexo']); if ($anexoPlan !== '' && is_file(__DIR__ . '/documentos/planes/' . $anexoPlan)) { ?>
+                        <?php /* `anexo` no existe en todas las bases (la columna se agrego a mano en
+                                 produccion y nunca entro al schema del repo). Con ?? '' la tarjeta
+                                 funciona igual con o sin la columna, en vez de emitir
+                                 "Undefined array key" + "trim(null) deprecated" por cada plan. */ ?>
+                        <?php $anexoPlan = trim($row_planes['anexo'] ?? ''); if ($anexoPlan !== '' && is_file(__DIR__ . '/documentos/planes/' . $anexoPlan)) { ?>
                             <a href="<?php echo $URL?>documentos/planes/<?php echo rawurlencode($anexoPlan); ?>" download class="rd-card__anexo">
                                 <i class="fas fa-file-pdf"></i> Descargar anexo
                             </a>
@@ -153,6 +167,33 @@
     <script src="<?php echo $URL?>assets/js/plugins.js?v=<?php echo @filemtime(__DIR__."/assets/js/plugins.js"); ?>"></script>
     <!-- main js -->
     <script src="<?php echo $URL?>assets/js/main.js"></script>
+
+    <!-- Ver mas / Ver menos en las tarjetas de planes -->
+    <script>
+    (function () {
+        var tarjetas = document.querySelectorAll('.rd-grid--planes .rd-plan__toggle');
+
+        Array.prototype.forEach.call(tarjetas, function (boton) {
+            var detalle = document.getElementById(boton.getAttribute('aria-controls'));
+            if (!detalle) { return; }
+
+            // Solo ofrecemos expandir si el texto recortado se desborda de verdad.
+            // scrollHeight (alto real) vs clientHeight (alto visible con el clamp).
+            // El margen de 2px evita falsos positivos por redondeo del navegador.
+            if (detalle.scrollHeight <= detalle.clientHeight + 2) { return; }
+
+            boton.hidden = false;
+            detalle.classList.add('is-clamped');
+
+            boton.addEventListener('click', function () {
+                var abierto = detalle.classList.toggle('is-open');
+                detalle.classList.toggle('is-clamped', !abierto);
+                boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                boton.textContent = abierto ? 'Ver menos' : 'Ver más';
+            });
+        });
+    })();
+    </script>
 
 </body>
 
