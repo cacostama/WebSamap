@@ -99,7 +99,11 @@
                                 <img src="<?php echo $URL?>documentos/aliados/<?php echo$row_aliados['imagen'];?>" alt="Icon" loading="lazy" decoding="async">
                             </div>
                             <h4 class="mb_30"><?php echo$row_aliados['titulo'];?></h4>
-                            <p class="mb_40"><?php echo$row_aliados['intro'];?></p>
+                            <?php /* `intro` no existe en tbl_aliados (la tabla tiene titulo,
+                                     categoria, descuento, orden, detalle, imagen). Sin el ?? ''
+                                     PHP emitia "Undefined array key" por cada aliado y el aviso
+                                     se imprimia dentro de la tarjeta. */ ?>
+                            <p class="mb_40"><?php echo $row_aliados['intro'] ?? '';?></p>
                            <!-- <a href="<?php echo $URL;?>beneficio-detalle/titulo/<?php echo str_replace($especiales, $correctos,$row_aliados['titulo']); ?>/cod/<?php echo $row_aliados['id']; ?>/" class="service__card-read-more">Más info</a>-->
                         </div>
                     </div>
